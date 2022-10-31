@@ -14,5 +14,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <concepts>
+#include <type_traits>
 
 #endif //PCH_H

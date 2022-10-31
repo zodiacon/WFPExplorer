@@ -23,37 +23,6 @@ DWORD WFPEngine::LastError() const {
 	return m_LastError;
 }
 
-std::vector<WFPSessionInfo> WFPEngine::EnumSessions() const {
-	HANDLE hEnum;
-	std::vector<WFPSessionInfo> info;
-	m_LastError = FwpmSessionCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError != ERROR_SUCCESS)
-		return info;
-
-	UINT32 count;
-	FWPM_SESSION** sessions;
-	if ((m_LastError = FwpmSessionEnum(m_hEngine, hEnum, 128, &sessions, &count)) == ERROR_SUCCESS) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto session = sessions[i];
-			WFPSessionInfo si;
-			si.Name = ParseMUIString(session->displayData.name);
-			si.Desc = ParseMUIString(session->displayData.description);
-			si.SessionKey = session->sessionKey;
-			si.ProcessId = session->processId;
-			si.UserName = session->username;
-			si.Flags = session->flags;
-			::CopySid(sizeof(si.Sid), (PSID)si.Sid, session->sid);
-			si.KernelMode = session->kernelMode;
-			info.emplace_back(std::move(si));
-		}
-		FwpmFreeMemory((void**)&sessions);
-	}
-	m_LastError = FwpmSessionDestroyEnumHandle(m_hEngine, hEnum);
-
-	return info;
-}
-
 std::vector<WFPLayerInfo> WFPEngine::EnumLayers() const {
 	HANDLE hEnum;
 	std::vector<WFPLayerInfo> info;
@@ -83,6 +52,34 @@ std::vector<WFPLayerInfo> WFPEngine::EnumLayers() const {
 				fi.FieldKey = *field.fieldKey;
 				li.Fields.emplace_back(fi);
 			}
+			info.emplace_back(std::move(li));
+		}
+	}
+	return info;
+}
+
+std::vector<WFPSubLayerInfo> WFPEngine::EnumSubLayers() const {
+	HANDLE hEnum;
+	std::vector<WFPSubLayerInfo> info;
+	m_LastError = FwpmSubLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+	if (m_LastError)
+		return info;
+	FWPM_SUBLAYER** layers;
+	UINT32 count;
+	m_LastError = FwpmSubLayerEnum(m_hEngine, hEnum, 256, &layers, &count);
+	if (m_LastError == ERROR_SUCCESS) {
+		info.reserve(count);
+		for (UINT32 i = 0; i < count; i++) {
+			auto layer = layers[i];
+			WFPSubLayerInfo li;
+			li.Name = ParseMUIString(layer->displayData.name);
+			li.Desc = ParseMUIString(layer->displayData.description);
+			li.SubLayerKey = layer->subLayerKey;
+			li.Flags = layer->flags;
+			li.Weight = layer->weight;
+			li.ProviderKey = layer->providerKey ? *layer->providerKey : GUID_NULL;
+			li.ProviderData.resize(layer->providerData.size);
+			memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
 			info.emplace_back(std::move(li));
 		}
 	}
@@ -143,41 +140,6 @@ std::vector<WFPCalloutInfo> WFPEngine::EnumCallouts() const {
 	return info;
 }
 
-std::vector<WFPFilterInfo> WFPEngine::EnumFilters(bool includeConditions) const {
-	HANDLE hEnum;
-	std::vector<WFPFilterInfo> info;
-	m_LastError = FwpmFilterCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_FILTER** filters;
-	UINT32 count;
-	m_LastError = FwpmFilterEnum(m_hEngine, hEnum, 4096, &filters, &count);
-	if (m_LastError == ERROR_SUCCESS) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto filter = filters[i];
-			WFPFilterInfo fi;
-			fi.FilterKey = filter->filterKey;
-			fi.FilterId = filter->filterId;
-			fi.ProviderKey = filter->providerKey ? *filter->providerKey : GUID_NULL;
-			fi.Name = ParseMUIString(filter->displayData.name);
-			fi.Desc = ParseMUIString(filter->displayData.description);
-			fi.ConditionCount = filter->numFilterConditions;
-			fi.EffectiveWeight = *(WFPValue*)&filter->effectiveWeight;
-			fi.LayerKey = filter->layerKey;
-			fi.SubLayerKey = filter->subLayerKey;
-			fi.Weight = *(WFPValue*)&filter->weight;
-			if (includeConditions) {
-				// TODO
-			}
-			info.emplace_back(std::move(fi));
-		}
-		FwpmFreeMemory((void**)&filters);
-		m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
-	}
-	return info;
-}
-
 WFPProviderInfo WFPEngine::GetProviderByKey(GUID const& guid) const {
 	FWPM_PROVIDER* provider;
 	m_LastError = FwpmProviderGetByKey(m_hEngine, &guid, &provider);
@@ -201,7 +163,6 @@ WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
 	}
 	return pi;
 }
-
 
 std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 	if (input == nullptr)

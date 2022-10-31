@@ -4,6 +4,11 @@
 #include "pch.h"
 #include "resource.h"
 #include "MainFrm.h"
+#include <ThemeHelper.h>
+
+#pragma comment(lib, "Fwpuclnt.lib")
+#pragma comment(lib, "Shlwapi.lib")
+
 
 CAppModule _Module;
 
@@ -26,7 +31,7 @@ int Run(LPTSTR /*lpstrCmdLine*/ = nullptr, int nCmdShow = SW_SHOWDEFAULT) {
 	return nRet;
 }
 
-int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow) {
 	HRESULT hRes = ::CoInitialize(nullptr);
 	ATLASSERT(SUCCEEDED(hRes));
 
@@ -34,6 +39,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
 	hRes = _Module.Init(nullptr, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));
+
+	ThemeHelper::Init();
 
 	int nRet = Run(lpstrCmdLine, nCmdShow);
 

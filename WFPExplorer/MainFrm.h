@@ -1,15 +1,14 @@
-// MainFrm.h : interface of the CMainFrame class
-//
-/////////////////////////////////////////////////////////////////////////////
-
 #pragma once
+
+#include <WFPEngine.h>
+#include "Interfaces.h"
 
 class CMainFrame : 
 	public CFrameWindowImpl<CMainFrame>, 
 	public CAutoUpdateUI<CMainFrame>,
 	public CMessageFilter, 
-	public CIdleHandler
-{
+	public IMainFrame,
+	public CIdleHandler {
 public:
 	DECLARE_FRAME_WND_CLASS(L"WFPExplorerMainWndClass", IDR_MAINFRAME)
 
@@ -46,4 +45,6 @@ public:
 	LRESULT OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnWindowActivate(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
+	WFPEngine m_Engine;
 };
