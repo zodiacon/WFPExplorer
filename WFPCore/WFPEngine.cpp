@@ -104,6 +104,7 @@ WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
 	pi.Desc = ParseMUIString(p->displayData.description);
 	pi.ProviderKey = p->providerKey;
 	pi.Flags = p->flags;
+	pi.ServiceName = p->serviceName ? p->serviceName : L"";
 	pi.ProviderDataSize = p->providerData.size;
 	if (includeData) {
 		pi.ProviderData = std::make_unique<BYTE[]>(p->providerData.size);

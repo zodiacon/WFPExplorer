@@ -8,6 +8,7 @@
 #include <WFPEngine.h>
 #include "StringHelper.h"
 #include "ProcessHelper.h"
+#include <SortHelper.h>
 
 CSessionsView::CSessionsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -36,6 +37,24 @@ CString CSessionsView::GetColumnText(HWND, int row, int col) {
 			return session.ProcessName;
 	}
 	return CString();
+}
+
+void CSessionsView::DoSort(SortInfo const* si) {
+	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
+	auto asc = si->SortAscending;
+
+	auto compare = [&](auto& s1, auto& s2) {
+		switch (col) {
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(s1.SessionKey), StringHelper::GuidToString(s2.SessionKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(s1.Name, s2.Name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(s1.Desc, s2.Desc, asc);
+			case ColumnType::Flags: return SortHelper::Sort(s1.Flags, s2.Flags, asc);
+			case ColumnType::ProcessId: return SortHelper::Sort(s1.ProcessId, s2.ProcessId, asc);
+			case ColumnType::ProcessName: return SortHelper::Sort(s1.ProcessName, s2.ProcessName, asc);
+		}
+		return false;
+	};
+	std::ranges::sort(m_Sessions, compare);
 }
 
 LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {

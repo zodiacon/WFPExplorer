@@ -16,6 +16,8 @@ public:
 	void Refresh();
 
 	CString GetColumnText(HWND, int row, int col);
+	void DoSort(SortInfo const* si);
+	int GetSaveColumnRange(HWND, int&) const;
 
 	BEGIN_MSG_MAP(CFiltersView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
@@ -33,11 +35,12 @@ public:
 private:
 	enum class ColumnType {
 		Key, Name, Desc, Flags, ProviderGUID, ProviderName, LayerKey, SubLayerKey,
-		Weight, ConditionCount, Action, Id, EffectiveWeight,
+		Weight, ConditionCount, Action, Id, EffectiveWeight, Layer, SubLayer,
 	};
 
 	struct FilterInfo : WFPFilterInfo {
 		CString ProviderName;
+		CString Layer, SubLayer;
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

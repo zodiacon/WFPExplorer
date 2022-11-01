@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ProvidersView.h"
 #include "StringHelper.h"
+#include <SortHelper.h>
 
 CProvidersView::CProvidersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -38,8 +39,25 @@ CString CProvidersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(info.ProviderKey);
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: return std::to_wstring(info.Flags).c_str();
+		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
 		case ColumnType::ServiceName: return info.ServiceName.c_str();
 	}
 	return CString();
+}
+
+void CProvidersView::DoSort(SortInfo const* si) {
+	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
+	auto asc = si->SortAscending;
+
+	auto compare = [&](auto& p1, auto& p2) {
+		switch (col) {
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(p1.ProviderKey), StringHelper::GuidToString(p2.ProviderKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(p1.Name, p2.Name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(p1.Desc, p2.Desc, asc);
+			case ColumnType::Flags: return SortHelper::Sort(p1.Flags, p2.Flags, asc);
+			case ColumnType::ServiceName: return SortHelper::Sort(p1.ServiceName, p2.ServiceName, asc);
+		}
+		return false;
+	};
+	std::ranges::sort(m_Providers, compare);
 }

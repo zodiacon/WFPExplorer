@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "LayersView.h"
 #include "StringHelper.h"
+#include <SortHelper.h>
 
 CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -52,9 +53,34 @@ CString CLayersView::GetColumnText(HWND, int row, int col) {
 
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: return std::to_wstring(info.Flags).c_str();
+		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
 		case ColumnType::Fields: return std::to_wstring(info.NumFields).c_str();
 		case ColumnType::Id: return std::to_wstring(info.LayerId).c_str();
 	}
 	return CString();
+}
+
+void CLayersView::DoSort(SortInfo const* si) {
+	if (si == nullptr)
+		return;
+	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
+	auto asc = si->SortAscending;
+
+	auto compare = [&](auto& l1, auto& l2) {
+		switch (col) {
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(l1.LayerKey), StringHelper::GuidToString(l2.LayerKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(l1.Name, l2.Name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(l1.Desc, l2.Desc, asc);
+			case ColumnType::Flags: return SortHelper::Sort(l1.Flags, l2.Flags, asc);
+			case ColumnType::Fields: return SortHelper::Sort(l1.NumFields, l2.NumFields, asc);
+			case ColumnType::DefaultSubLayer: return SortHelper::Sort(l1.DefaultSublayer, l2.DefaultSublayer, asc);
+			case ColumnType::Id: return SortHelper::Sort(l1.LayerId, l2.LayerId, asc);
+		}
+		return false;
+	};
+	std::ranges::sort(m_Layers, compare);
+}
+
+int CLayersView::GetSaveColumnRange(HWND, int&) const {
+	return 1;
 }

@@ -16,6 +16,8 @@ public:
 	void Refresh();
 
 	CString GetColumnText(HWND, int row, int col);
+	void DoSort(SortInfo const* si);
+	int GetSaveColumnRange(HWND, int&) const;
 
 	BEGIN_MSG_MAP(CSublayersView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)

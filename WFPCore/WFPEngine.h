@@ -381,6 +381,7 @@ public:
         fi.Desc = ParseMUIString(filter->displayData.description);
         fi.ConditionCount = filter->numFilterConditions;
         fi.EffectiveWeight = WFPValueInit(filter->effectiveWeight);
+        fi.Flags = filter->flags;
         fi.LayerKey = filter->layerKey;
         fi.SubLayerKey = filter->subLayerKey;
         fi.Weight = WFPValueInit(filter->weight);

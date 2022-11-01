@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CalloutsView.h"
 #include "StringHelper.h"
+#include <SortHelper.h>
 
 CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -55,4 +56,26 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Id: return std::to_wstring(info.CalloutId).c_str();
 	}
 	return CString();
+}
+
+void CCalloutsView::DoSort(SortInfo const* si) {
+	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
+	auto asc = si->SortAscending;
+
+	auto compare = [&](auto& c1, auto& c2) {
+		switch (col) {
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(c1.CalloutKey), StringHelper::GuidToString(c2.CalloutKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(c1.Name, c2.Name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(c1.Desc, c2.Desc, asc);
+			case ColumnType::Flags: return SortHelper::Sort(c1.Flags, c2.Flags, asc);
+			case ColumnType::Provider: return SortHelper::Sort(c1.Provider, c2.Provider, asc);
+			case ColumnType::Id: return SortHelper::Sort(c1.CalloutId, c2.CalloutId, asc);
+		}
+		return false;
+	};
+	std::ranges::sort(m_Callouts, compare);
+}
+
+int CCalloutsView::GetSaveColumnRange(HWND, int&) const {
+	return 1;
 }

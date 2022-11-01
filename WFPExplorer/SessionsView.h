@@ -17,6 +17,7 @@ public:
 	void Refresh();
 
 	CString GetColumnText(HWND, int row, int col);
+	void DoSort(SortInfo const* si);
 
 	BEGIN_MSG_MAP(CSessionsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)

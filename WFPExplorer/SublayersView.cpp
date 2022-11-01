@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SublayersView.h"
 #include "StringHelper.h"
+#include <SortHelper.h>
 
 CSublayersView::CSublayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -55,4 +56,26 @@ CString CSublayersView::GetColumnText(HWND, int row, int col) {
 
 	}
 	return CString();
+}
+
+void CSublayersView::DoSort(SortInfo const* si) {
+	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
+	auto asc = si->SortAscending;
+
+	auto compare = [&](auto& l1, auto& l2) {
+		switch (col) {
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(l1.SubLayerKey), StringHelper::GuidToString(l2.SubLayerKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(l1.Name, l2.Name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(l1.Desc, l2.Desc, asc);
+			case ColumnType::Flags: return SortHelper::Sort(l1.Flags, l2.Flags, asc);
+			case ColumnType::Provider: return SortHelper::Sort(l1.ProviderName, l2.ProviderName, asc);
+			case ColumnType::Weight: return SortHelper::Sort(l1.Weight, l2.Weight, asc);
+		}
+		return false;
+	};
+	std::ranges::sort(m_Layers, compare);
+}
+
+int CSublayersView::GetSaveColumnRange(HWND, int&) const {
+	return 1;
 }
