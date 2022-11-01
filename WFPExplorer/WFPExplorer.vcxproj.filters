@@ -48,6 +48,9 @@
     <ClCompile Include="FiltersView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ProvidersView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FiltersView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvidersView.h">
       <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
@@ -121,6 +127,9 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\sublayers.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\provider.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

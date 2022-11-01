@@ -7,19 +7,19 @@
 
 class WFPEngine;
 
-class CFiltersView :
-	public CFrameView<CFiltersView, IMainFrame>,
-	public CVirtualListView<CFiltersView> {
+class CProvidersView :
+	public CFrameView<CProvidersView, IMainFrame>,
+	public CVirtualListView<CProvidersView> {
 public:
-	CFiltersView(IMainFrame* frame, WFPEngine& engine);
+	CProvidersView(IMainFrame* frame, WFPEngine& engine);
 
 	void Refresh();
 
 	CString GetColumnText(HWND, int row, int col);
 
-	BEGIN_MSG_MAP(CFiltersView)
+	BEGIN_MSG_MAP(CProvidersView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CFiltersView>)
+		CHAIN_MSG_MAP(CVirtualListView<CProvidersView>)
 		CHAIN_MSG_MAP(BaseFrame)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
@@ -32,12 +32,7 @@ public:
 
 private:
 	enum class ColumnType {
-		Key, Name, Desc, Flags, ProviderGUID, ProviderName, LayerKey, SubLayerKey,
-		Weight, ConditionCount, Action, Id, EffectiveWeight,
-	};
-
-	struct FilterInfo : WFPFilterInfo {
-		CString ProviderName;
+		Key, Name, Desc, Flags, ServiceName,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -46,5 +41,5 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<FilterInfo> m_Filters;
+	std::vector<WFPProviderInfo> m_Providers;
 };

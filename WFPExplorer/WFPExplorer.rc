@@ -67,12 +67,13 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "&Sessions",                   ID_VIEW_SESSIONS
+        MENUITEM "&Providers",                  ID_VIEW_PROVIDERS
         MENUITEM "&Filters",                    ID_VIEW_FILTERS
         MENUITEM "&Layers",                     ID_VIEW_LAYERS
         MENUITEM "&Callouts",                   ID_VIEW_CALLOUTS
         MENUITEM "Subla&yers",                  ID_VIEW_SUBLAYERS
         MENUITEM SEPARATOR
-        MENUITEM "&Refresh",                    ID_VIEW_REFRESH32778
+        MENUITEM "&Refresh",                    ID_VIEW_REFRESH
         MENUITEM SEPARATOR
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
     END
@@ -126,6 +127,8 @@ IDI_PIN                 ICON                    "res\\pin.ico"
 IDI_REFRESH             ICON                    "res\\Refresh.ico"
 
 IDI_SUBLAYER            ICON                    "res\\sublayers.ico"
+
+IDI_PROVIDER            ICON                    "res\\provider.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

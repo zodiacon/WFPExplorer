@@ -7,7 +7,9 @@
 #include "AboutDlg.h"
 #include "SessionsView.h"
 #include "FiltersView.h"
+#include "ProvidersView.h"
 #include "MainFrm.h"
+#include <ToolbarHelper.h>
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg))
@@ -28,12 +30,27 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CreateSimpleStatusBar();
 
+	ToolBarButtonInfo const buttons[] = {
+		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ 0 },
+		{ ID_VIEW_SESSIONS, IDI_SESSION },
+		{ ID_VIEW_PROVIDERS, IDI_PROVIDER },
+		{ ID_VIEW_FILTERS, IDI_FILTER },
+		{ ID_VIEW_LAYERS, IDI_LAYERS },
+		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
+		{ ID_VIEW_CALLOUTS, IDI_CALLOUT },
+	};
+	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
+	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
+	AddSimpleReBarBand(tb);
+	UIAddToolBar(tb);
+
 	m_view.m_bTabCloseButton = false;
 	m_hWndClient = m_view.Create(m_hWnd, rcDefault, nullptr, 
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
-	UINT icons[] = { IDI_SESSION, IDI_FILTER, IDI_LAYERS, IDI_CALLOUT };
+	UINT icons[] = { IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_CALLOUT };
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_view.SetImageList(images);
@@ -71,6 +88,7 @@ void CMainFrame::InitMenu() {
 		{ ID_VIEW_FILTERS, IDI_FILTER },
 		{ ID_VIEW_CALLOUTS, IDI_CALLOUT },
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ ID_VIEW_PROVIDERS, IDI_PROVIDER },
 		{ ID_VIEW_LAYERS, IDI_LAYERS },
 		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
 		{ ID_OPTIONS_ALWAYSONTOP, IDI_PIN },
@@ -112,6 +130,18 @@ LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 	m_view.AddPage(view->m_hWnd, L"Filters", 1, view);
 
 	return 0;
+}
+
+LRESULT CMainFrame::OnViewProviders(WORD, WORD, HWND, BOOL&) {
+	auto view = new CProvidersView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Providers", 2, view);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
+	return LRESULT();
 }
 
 LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {

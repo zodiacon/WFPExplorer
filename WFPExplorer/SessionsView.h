@@ -22,6 +22,8 @@ public:
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CVirtualListView<CSessionsView>)
 		CHAIN_MSG_MAP(BaseFrame)
+	ALT_MSG_MAP(1)
+		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 	END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
@@ -38,6 +40,7 @@ private:
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;
 

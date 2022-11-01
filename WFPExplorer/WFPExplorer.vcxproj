@@ -227,6 +227,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ProcessHelper.cpp" />
+    <ClCompile Include="ProvidersView.cpp" />
     <ClCompile Include="SessionsView.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="WFPExplorer.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ProcessHelper.h" />
+    <ClInclude Include="ProvidersView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SessionsView.h" />
@@ -255,6 +257,7 @@
     <Image Include="res\layers.ico" />
     <Image Include="res\Paste.ico" />
     <Image Include="res\pin.ico" />
+    <Image Include="res\provider.ico" />
     <Image Include="res\Refresh.ico" />
     <Image Include="res\Session.ico" />
     <Image Include="res\sublayers.ico" />

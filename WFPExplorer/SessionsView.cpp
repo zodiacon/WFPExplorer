@@ -55,3 +55,8 @@ LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 
 	return 0;
 }
+
+LRESULT CSessionsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
+	Refresh();
+	return 0;
+}

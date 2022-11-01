@@ -7,6 +7,7 @@ CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(fr
 }
 
 void CFiltersView::Refresh() {
+	CWaitCursor wait;
 	m_Filters = m_Engine.EnumFilters<FilterInfo>();
 	m_List.SetItemCountEx((int)m_Filters.size(), LVSICF_NOSCROLL);
 }
@@ -21,6 +22,7 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::LayerKey: return StringHelper::GuidToString(info.LayerKey);
 		case ColumnType::SubLayerKey: return StringHelper::GuidToString(info.SubLayerKey);
 		case ColumnType::Weight: return StringHelper::WFPValueToString(info.Weight, true);
+		case ColumnType::Flags: return std::to_wstring(info.Flags).c_str();
 		case ColumnType::EffectiveWeight: return StringHelper::WFPValueToString(info.EffectiveWeight, true);
 		case ColumnType::ProviderName:
 			if (info.ProviderName.IsEmpty() && info.ProviderKey != GUID_NULL) {
@@ -52,5 +54,10 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	Refresh();
 
+	return 0;
+}
+
+LRESULT CFiltersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
+	Refresh();
 	return 0;
 }
