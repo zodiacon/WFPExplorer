@@ -218,7 +218,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="CalloutsView.cpp" />
     <ClCompile Include="FiltersView.cpp" />
+    <ClCompile Include="LayersView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -230,12 +232,15 @@
     <ClCompile Include="ProvidersView.cpp" />
     <ClCompile Include="SessionsView.cpp" />
     <ClCompile Include="StringHelper.cpp" />
+    <ClCompile Include="SublayersView.cpp" />
     <ClCompile Include="WFPExplorer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="CalloutsView.h" />
     <ClInclude Include="FiltersView.h" />
     <ClInclude Include="Interfaces.h" />
+    <ClInclude Include="LayersView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ProvidersView.h" />
@@ -243,6 +248,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="SessionsView.h" />
     <ClInclude Include="StringHelper.h" />
+    <ClInclude Include="SublayersView.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WFPExplorer.rc" />

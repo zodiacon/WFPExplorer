@@ -24,54 +24,6 @@ DWORD WFPEngine::LastError() const {
 	return m_LastError;
 }
 
-std::vector<WFPLayerInfo> WFPEngine::EnumLayers(bool includeFields) const {
-	HANDLE hEnum;
-	std::vector<WFPLayerInfo> info;
-	m_LastError = FwpmLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_LAYER** layers;
-	UINT32 count;
-	m_LastError = FwpmLayerEnum(m_hEngine, hEnum, 512, &layers, &count);
-	if (m_LastError == ERROR_SUCCESS) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto layer = layers[i];
-			auto li = InitLayer(layer, includeFields);
-			info.emplace_back(std::move(li));
-		}
-	}
-	return info;
-}
-
-std::vector<WFPSubLayerInfo> WFPEngine::EnumSubLayers() const {
-	HANDLE hEnum;
-	std::vector<WFPSubLayerInfo> info;
-	m_LastError = FwpmSubLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_SUBLAYER** layers;
-	UINT32 count;
-	m_LastError = FwpmSubLayerEnum(m_hEngine, hEnum, 256, &layers, &count);
-	if (m_LastError == ERROR_SUCCESS) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto layer = layers[i];
-			WFPSubLayerInfo li;
-			li.Name = ParseMUIString(layer->displayData.name);
-			li.Desc = ParseMUIString(layer->displayData.description);
-			li.SubLayerKey = layer->subLayerKey;
-			li.Flags = layer->flags;
-			li.Weight = layer->weight;
-			li.ProviderKey = layer->providerKey ? *layer->providerKey : GUID_NULL;
-			li.ProviderData.resize(layer->providerData.size);
-			memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
-			info.emplace_back(std::move(li));
-		}
-	}
-	return info;
-}
-
 std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
 	HANDLE hEnum;
 	std::vector<WFPProviderInfo> info;
@@ -94,43 +46,12 @@ std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
 	return info;
 }
 
-std::vector<WFPCalloutInfo> WFPEngine::EnumCallouts() const {
-	HANDLE hEnum;
-	std::vector<WFPCalloutInfo> info;
-	m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_CALLOUT** callouts;
-	UINT32 count;
-	m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
-	if (m_LastError == ERROR_SUCCESS) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto c = callouts[i];
-			WFPCalloutInfo ci;
-			ci.Name = ParseMUIString(c->displayData.name);
-			ci.Desc = ParseMUIString(c->displayData.description);
-			ci.ProviderKey = c->providerKey ? *c->providerKey : GUID_NULL;
-			ci.Flags = c->flags;
-			ci.CalloutKey = c->calloutKey;
-			ci.ProviderData.resize(c->providerData.size);
-			memcpy(ci.ProviderData.data(), c->providerData.data, c->providerData.size);
-			ci.CalloutId = c->calloutId;
-			ci.ApplicableLayer = c->applicableLayer;
-			info.emplace_back(std::move(ci));
-		}
-		FwpmFreeMemory((void**)&callouts);
-		m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
-	}
-
-	return info;
-}
-
 WFPProviderInfo WFPEngine::GetProviderByKey(GUID const& guid) const {
 	FWPM_PROVIDER* provider;
 	m_LastError = FwpmProviderGetByKey(m_hEngine, &guid, &provider);
 	if (ERROR_SUCCESS != m_LastError)
 		return {};
+
 	auto p = InitProvider(provider);
 	FwpmFreeMemory((void**)&provider);
 	return p;
@@ -142,7 +63,9 @@ WFPFilterInfo WFPEngine::GetFilterByKey(GUID const& key) const {
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
-	return InitFilter(filter);
+	auto info = InitFilter(filter);
+	FwpmFreeMemory((void**)&filter);
+	return info;
 }
 
 WFPFilterInfo WFPEngine::GetFilterById(UINT64 id) const {
@@ -151,7 +74,9 @@ WFPFilterInfo WFPEngine::GetFilterById(UINT64 id) const {
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
-	return InitFilter(filter, true);
+	auto info = InitFilter(filter, true);
+	FwpmFreeMemory((void**)&filter);
+	return info;
 }
 
 WFPLayerInfo WFPEngine::GetLayerByKey(GUID const& key) const {
@@ -160,7 +85,17 @@ WFPLayerInfo WFPEngine::GetLayerByKey(GUID const& key) const {
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
-	return InitLayer(layer, true);
+	auto info = InitLayer(layer, true);
+	FwpmFreeMemory((void**)&layer);
+	return info;
+}
+
+WFPSubLayerInfo WFPEngine::GetSubLayerByKey(GUID const& key) const {
+	FWPM_SUBLAYER* sublayer;
+	FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
+	auto info = InitSubLayer(sublayer);
+	FwpmFreeMemory((void**)&sublayer);
+	return info;
 }
 
 WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
@@ -238,4 +173,12 @@ WFPValue WFPValueInit(FWP_VALUE const& value) {
 
 WFPProviderInfo::operator bool() const {
 	return ProviderKey != GUID_NULL;
+}
+
+WFPSubLayerInfo::operator bool() const {
+	return SubLayerKey != GUID_NULL;
+}
+
+WFPLayerInfo::operator bool() const {
+	return LayerKey != GUID_NULL;
 }

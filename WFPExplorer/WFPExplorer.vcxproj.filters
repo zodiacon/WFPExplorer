@@ -51,6 +51,15 @@
     <ClCompile Include="ProvidersView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="LayersView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="SublayersView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="CalloutsView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -81,6 +90,15 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="ProvidersView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="LayersView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="SublayersView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="CalloutsView.h">
       <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>

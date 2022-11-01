@@ -105,6 +105,8 @@ struct WFPLayerInfo {
     std::vector<WFPFieldInfo> Fields;
     GUID DefaultSubLayerKey;
     UINT16 LayerId;
+
+    operator bool() const;
 };
 
 struct WFPSubLayerInfo {
@@ -115,6 +117,8 @@ struct WFPSubLayerInfo {
     GUID ProviderKey;
     std::vector<BYTE> ProviderData;
     UINT16 Weight;
+
+    operator bool() const;
 };
 
 enum class WFPMatchType {
@@ -268,10 +272,75 @@ public:
         }
         return info;
     }
-    std::vector<WFPLayerInfo> EnumLayers(bool includeFields = false) const;
-    std::vector<WFPSubLayerInfo> EnumSubLayers() const;
+
+    template<typename T = WFPLayerInfo> requires std::is_base_of_v<WFPLayerInfo, T>
+    std::vector<T> EnumLayers(bool includeFields = false) const {
+        HANDLE hEnum;
+        std::vector<T> info;
+        m_LastError = FwpmLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+        if (m_LastError)
+            return info;
+        FWPM_LAYER** layers;
+        UINT32 count;
+        m_LastError = FwpmLayerEnum(m_hEngine, hEnum, 512, &layers, &count);
+        if (m_LastError == ERROR_SUCCESS) {
+            info.reserve(count);
+            for (UINT32 i = 0; i < count; i++) {
+                auto layer = layers[i];
+                auto li = InitLayer(layer, includeFields);
+                info.emplace_back(std::move(li));
+            }
+        }
+        return info;
+    }
+
+    template<typename T = WFPSubLayerInfo> requires std::is_base_of_v<WFPSubLayerInfo, T>
+    std::vector<T> EnumSubLayers() const {
+        HANDLE hEnum;
+        std::vector<T> info;
+        m_LastError = FwpmSubLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+        if (m_LastError)
+            return info;
+        FWPM_SUBLAYER** layers;
+        UINT32 count;
+        m_LastError = FwpmSubLayerEnum(m_hEngine, hEnum, 256, &layers, &count);
+        if (m_LastError == ERROR_SUCCESS) {
+            info.reserve(count);
+            for (UINT32 i = 0; i < count; i++) {
+                auto layer = layers[i];
+                auto li = InitSubLayer(layer);
+                info.emplace_back(std::move(li));
+            }
+        }
+        return info;
+
+    }
+
     std::vector<WFPProviderInfo> EnumProviders(bool includeData = false) const;
-    std::vector<WFPCalloutInfo> EnumCallouts() const;
+
+    template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
+    std::vector<TCallout> EnumCallouts() const {
+        HANDLE hEnum;
+        std::vector<TCallout> info;
+        m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+        if (m_LastError)
+            return info;
+        FWPM_CALLOUT** callouts;
+        UINT32 count;
+        m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
+        if (m_LastError == ERROR_SUCCESS) {
+            info.reserve(count);
+            for (UINT32 i = 0; i < count; i++) {
+                auto c = callouts[i];
+                auto ci = InitCallout(c);
+                info.emplace_back(std::move(ci));
+            }
+            FwpmFreeMemory((void**)&callouts);
+            m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
+        }
+
+        return info;
+    }
 
     //
     // providers API
@@ -288,6 +357,13 @@ public:
     // layer API
     //
     WFPLayerInfo GetLayerByKey(GUID const& key) const;
+
+    //
+    // sublayer API
+    //
+    WFPSubLayerInfo GetSubLayerByKey(GUID const& key) const;
+    WFPSubLayerInfo GetSubLayerById(UINT16 id) const;
+
 
     //
     // helpers
@@ -338,6 +414,34 @@ public:
         return li;
     }
 
+    template<typename TLayer = WFPSubLayerInfo> requires std::is_base_of_v<WFPSubLayerInfo, TLayer>
+    static TLayer InitSubLayer(FWPM_SUBLAYER* layer) {
+        TLayer li;
+        li.Name = ParseMUIString(layer->displayData.name);
+        li.Desc = ParseMUIString(layer->displayData.description);
+        li.SubLayerKey = layer->subLayerKey;
+        li.Flags = layer->flags;
+        li.Weight = layer->weight;
+        li.ProviderKey = layer->providerKey ? *layer->providerKey : GUID_NULL;
+        li.ProviderData.resize(layer->providerData.size);
+        memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
+        return li;
+    }
+
+    template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
+    static TCallout InitCallout(FWPM_CALLOUT* c) {
+        TCallout ci;
+        ci.Name = ParseMUIString(c->displayData.name);
+        ci.Desc = ParseMUIString(c->displayData.description);
+        ci.ProviderKey = c->providerKey ? *c->providerKey : GUID_NULL;
+        ci.Flags = c->flags;
+        ci.CalloutKey = c->calloutKey;
+        ci.ProviderData.resize(c->providerData.size);
+        memcpy(ci.ProviderData.data(), c->providerData.data, c->providerData.size);
+        ci.CalloutId = c->calloutId;
+        ci.ApplicableLayer = c->applicableLayer;
+        return ci;
+    }
 
 private:
     static std::wstring PoorParseMUIString(std::wstring const& path);

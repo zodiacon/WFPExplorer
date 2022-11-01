@@ -8,6 +8,9 @@
 #include "SessionsView.h"
 #include "FiltersView.h"
 #include "ProvidersView.h"
+#include "LayersView.h"
+#include "SublayersView.h"
+#include "CalloutsView.h"
 #include "MainFrm.h"
 #include <ToolbarHelper.h>
 
@@ -50,7 +53,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
-	UINT icons[] = { IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_CALLOUT };
+	UINT icons[] = { IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_SUBLAYER, IDI_CALLOUT };
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_view.SetImageList(images);
@@ -141,7 +144,27 @@ LRESULT CMainFrame::OnViewProviders(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
-	return LRESULT();
+	auto view = new CLayersView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Layers", 3, view);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewSublayers(WORD, WORD, HWND, BOOL&) {
+	auto view = new CSublayersView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Sublayers", 4, view);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewCallouts(WORD, WORD, HWND, BOOL&) {
+	auto view = new CCalloutsView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Callouts", 5, view);
+
+	return 0;
 }
 
 LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
