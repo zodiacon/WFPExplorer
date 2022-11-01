@@ -13,8 +13,6 @@ class CSessionsView :
 public:
 	CSessionsView(IMainFrame* frame, WFPEngine& engine);
 
-	DECLARE_WND_CLASS(nullptr)
-
 	BOOL PreTranslateMessage(MSG* pMsg);
 	void Refresh();
 
@@ -35,7 +33,7 @@ private:
 	enum class ColumnType {
 		Key, Name, Desc, Flags, ProcessId, ProcessName,
 	};
-	struct Session : WFPSessionInfo {
+	struct SessionInfo : WFPSessionInfo {
 		CString ProcessName;
 	};
 
@@ -44,5 +42,5 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<Session> m_Sessions;
+	std::vector<SessionInfo> m_Sessions;
 };

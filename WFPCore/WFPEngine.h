@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <concepts>
 
+
 struct WFPSessionInfo {
     GUID SessionKey;
     std::wstring Name;
@@ -27,6 +28,8 @@ struct WFPProviderInfo {
     UINT32 Flags;
     ULONG ProviderDataSize;
     std::unique_ptr<BYTE[]> ProviderData;
+
+    operator bool() const;
 };
 
 enum class WFPFieldType {
@@ -67,13 +70,13 @@ struct WFPValue {
         UINT8 uint8;
         UINT16 uint16;
         UINT32 uint32;
-        UINT64* uint64;
+        UINT64 uint64;
         INT8 int8;
         INT16 int16;
         INT32 int32;
-        INT64* int64;
+        INT64 int64;
         float float32;
-        double* double64;
+        double double64;
         FWP_BYTE_ARRAY16* byteArray16;
         FWP_BYTE_BLOB* byteBlob;
         SID* sid;
@@ -85,7 +88,7 @@ struct WFPValue {
     };
 };
 
-static_assert(sizeof(WFPValue) == sizeof(FWP_VALUE));
+WFPValue WFPValueInit(FWP_VALUE const& value);
 
 struct WFPFieldInfo {
     GUID FieldKey;
@@ -98,6 +101,7 @@ struct WFPLayerInfo {
     std::wstring Name;
     std::wstring Desc;
     UINT32 Flags;
+    UINT32 NumFields;
     std::vector<WFPFieldInfo> Fields;
     GUID DefaultSubLayerKey;
     UINT16 LayerId;
@@ -256,20 +260,7 @@ public:
             info.reserve(count);
             for (UINT32 i = 0; i < count; i++) {
                 auto filter = filters[i];
-                TFilter fi;
-                fi.FilterKey = filter->filterKey;
-                fi.FilterId = filter->filterId;
-                fi.ProviderKey = filter->providerKey ? *filter->providerKey : GUID_NULL;
-                fi.Name = ParseMUIString(filter->displayData.name);
-                fi.Desc = ParseMUIString(filter->displayData.description);
-                fi.ConditionCount = filter->numFilterConditions;
-                fi.EffectiveWeight = *(WFPValue*)&filter->effectiveWeight;
-                fi.LayerKey = filter->layerKey;
-                fi.SubLayerKey = filter->subLayerKey;
-                fi.Weight = *(WFPValue*)&filter->weight;
-                if (includeConditions) {
-                    // TODO
-                }
+                auto fi = InitFilter<TFilter>(filter, includeConditions);
                 info.emplace_back(std::move(fi));
             }
             FwpmFreeMemory((void**)&filters);
@@ -277,7 +268,7 @@ public:
         }
         return info;
     }
-    std::vector<WFPLayerInfo> EnumLayers() const;
+    std::vector<WFPLayerInfo> EnumLayers(bool includeFields = false) const;
     std::vector<WFPSubLayerInfo> EnumSubLayers() const;
     std::vector<WFPProviderInfo> EnumProviders(bool includeData = false) const;
     std::vector<WFPCalloutInfo> EnumCallouts() const;
@@ -285,15 +276,72 @@ public:
     //
     // providers API
     //
-    WFPProviderInfo GetProviderByKey(GUID const& guid) const;
+    WFPProviderInfo GetProviderByKey(GUID const& key) const;
+
+    //
+    // Filters API
+    //
+    WFPFilterInfo GetFilterByKey(GUID const& key) const;
+    WFPFilterInfo GetFilterById(UINT64 id) const;
+
+    //
+    // layer API
+    //
+    WFPLayerInfo GetLayerByKey(GUID const& key) const;
 
     //
     // helpers
     //
     static std::wstring ParseMUIString(PCWSTR input);
     static WFPProviderInfo InitProvider(FWPM_PROVIDER* p, bool includeData = false);
+    
+    template<typename TFilter = WFPFilterInfo> requires std::is_base_of_v<WFPFilterInfo, TFilter>
+    static TFilter InitFilter(FWPM_FILTER* filter, bool includeConditions = false) {
+        TFilter fi;
+        fi.FilterKey = filter->filterKey;
+        fi.FilterId = filter->filterId;
+        fi.ProviderKey = filter->providerKey ? *filter->providerKey : GUID_NULL;
+        fi.Name = ParseMUIString(filter->displayData.name);
+        fi.Desc = ParseMUIString(filter->displayData.description);
+        fi.ConditionCount = filter->numFilterConditions;
+        fi.EffectiveWeight = WFPValueInit(filter->effectiveWeight);
+        fi.LayerKey = filter->layerKey;
+        fi.SubLayerKey = filter->subLayerKey;
+        fi.Weight = WFPValueInit(filter->weight);
+        if (includeConditions) {
+            // TODO
+        }
+        return fi;
+    }
+
+    template<typename TLayer = WFPLayerInfo> requires std::is_base_of_v<WFPLayerInfo, TLayer>
+    static TLayer InitLayer(FWPM_LAYER* layer, bool includeFields) {
+        TLayer li;
+        li.Name = ParseMUIString(layer->displayData.name);
+        li.Desc = ParseMUIString(layer->displayData.description);
+        li.LayerKey = layer->layerKey;
+        li.Flags = layer->flags;
+        li.DefaultSubLayerKey = layer->defaultSubLayerKey;
+        li.LayerId = layer->layerId;
+        li.NumFields = layer->numFields;
+        if (includeFields) {
+            li.Fields.reserve(layer->numFields);
+            for (UINT32 f = 0; f < layer->numFields; f++) {
+                WFPFieldInfo fi;
+                auto& field = layer->field[f];
+                fi.DataType = (WFPDataType)field.dataType;
+                fi.Type = (WFPFieldType)field.type;
+                fi.FieldKey = *field.fieldKey;
+                li.Fields.emplace_back(fi);
+            }
+        }
+        return li;
+    }
+
 
 private:
+    static std::wstring PoorParseMUIString(std::wstring const& path);
+
 	HANDLE m_hEngine{ nullptr };
 	mutable DWORD m_LastError{ 0 };
 };

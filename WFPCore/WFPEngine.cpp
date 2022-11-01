@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "WFPEngine.h"
+#include <unordered_map>
 
 bool WFPEngine::Open(DWORD auth) {
 	if (m_hEngine)
@@ -23,7 +24,7 @@ DWORD WFPEngine::LastError() const {
 	return m_LastError;
 }
 
-std::vector<WFPLayerInfo> WFPEngine::EnumLayers() const {
+std::vector<WFPLayerInfo> WFPEngine::EnumLayers(bool includeFields) const {
 	HANDLE hEnum;
 	std::vector<WFPLayerInfo> info;
 	m_LastError = FwpmLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
@@ -31,27 +32,12 @@ std::vector<WFPLayerInfo> WFPEngine::EnumLayers() const {
 		return info;
 	FWPM_LAYER** layers;
 	UINT32 count;
-	m_LastError = FwpmLayerEnum(m_hEngine, hEnum, 256, &layers, &count);
+	m_LastError = FwpmLayerEnum(m_hEngine, hEnum, 512, &layers, &count);
 	if (m_LastError == ERROR_SUCCESS) {
 		info.reserve(count);
 		for (UINT32 i = 0; i < count; i++) {
 			auto layer = layers[i];
-			WFPLayerInfo li;
-			li.Name = ParseMUIString(layer->displayData.name);
-			li.Desc = ParseMUIString(layer->displayData.description);
-			li.LayerKey = layer->layerKey;
-			li.Flags = layer->flags;
-			li.DefaultSubLayerKey = layer->defaultSubLayerKey;
-			li.LayerId = layer->layerId;
-			li.Fields.reserve(layer->numFields);
-			for (UINT32 f = 0; f < layer->numFields; f++) {
-				WFPFieldInfo fi;
-				auto& field = layer->field[f];
-				fi.DataType = (WFPDataType)field.dataType;
-				fi.Type = (WFPFieldType)field.type;
-				fi.FieldKey = *field.fieldKey;
-				li.Fields.emplace_back(fi);
-			}
+			auto li = InitLayer(layer, includeFields);
 			info.emplace_back(std::move(li));
 		}
 	}
@@ -150,6 +136,33 @@ WFPProviderInfo WFPEngine::GetProviderByKey(GUID const& guid) const {
 	return p;
 }
 
+WFPFilterInfo WFPEngine::GetFilterByKey(GUID const& key) const {
+	FWPM_FILTER* filter;
+	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);
+	if (m_LastError != ERROR_SUCCESS)
+		return {};
+
+	return InitFilter(filter);
+}
+
+WFPFilterInfo WFPEngine::GetFilterById(UINT64 id) const {
+	FWPM_FILTER* filter;
+	m_LastError = FwpmFilterGetById(m_hEngine, id, &filter);
+	if (m_LastError != ERROR_SUCCESS)
+		return {};
+
+	return InitFilter(filter, true);
+}
+
+WFPLayerInfo WFPEngine::GetLayerByKey(GUID const& key) const {
+	FWPM_LAYER* layer;
+	m_LastError = FwpmLayerGetByKey(m_hEngine, &key, &layer);
+	if (m_LastError != ERROR_SUCCESS)
+		return {};
+
+	return InitLayer(layer, true);
+}
+
 WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
 	WFPProviderInfo pi;
 	pi.Name = ParseMUIString(p->displayData.name);
@@ -164,6 +177,39 @@ WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
 	return pi;
 }
 
+std::wstring WFPEngine::PoorParseMUIString(std::wstring const& path) {
+	static std::unordered_map<std::wstring, std::wstring> cache;
+
+	if (path[0] != L'@')
+		return path;
+
+	if (auto it = cache.find(path); it != cache.end())
+		return it->second;
+
+	auto comma = path.find(L',', 1);
+	if (comma == std::wstring::npos)
+		return path;
+
+	auto dllname = path.substr(1, comma - 1);
+	auto hDll = ::LoadLibraryEx(dllname.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+	if (!hDll)
+		return path;
+
+	CString result;
+	auto id = _wtoi(path.substr(comma + 1).c_str());
+	if (id < 0)
+		id = -id;
+	result.LoadStringW(hDll, id);
+	::FreeLibrary(hDll);
+	if (!result.IsEmpty()) {
+		cache.insert({ path, (PCWSTR)result });
+		return (PCWSTR)result;
+	}
+	if (dllname.substr(dllname.rfind(L'.')) != L".mui")
+		return PoorParseMUIString(L"@c:\\Windows\\System32\\en-US\\" + dllname + L".mui" + path.substr(comma));
+	return path;
+}
+
 std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 	if (input == nullptr)
 		return L"";
@@ -174,4 +220,22 @@ std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 			return result;
 	}
 	return input;
+}
+
+WFPValue WFPValueInit(FWP_VALUE const& value) {
+	WFPValue result;
+	result.Type = (WFPDataType)value.type;
+
+	switch (result.Type) {
+		case WFPDataType::INT64: result.int64 = *value.int64; break;
+		case WFPDataType::UINT64: result.uint64 = *value.uint64; break;
+		case WFPDataType::DOUBLE: result.double64 = *value.double64; break;
+		default:
+			memcpy(&result, &value, sizeof(value));
+	}
+	return result;
+}
+
+WFPProviderInfo::operator bool() const {
+	return ProviderKey != GUID_NULL;
 }

@@ -53,7 +53,6 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
         MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
         MENUITEM "&Save...\tCtrl+S",            ID_FILE_SAVE
         MENUITEM SEPARATOR
@@ -67,6 +66,14 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "&Sessions",                   ID_VIEW_SESSIONS
+        MENUITEM "&Filters",                    ID_VIEW_FILTERS
+        MENUITEM "&Layers",                     ID_VIEW_LAYERS
+        MENUITEM "&Callouts",                   ID_VIEW_CALLOUTS
+        MENUITEM "Subla&yers",                  ID_VIEW_SUBLAYERS
+        MENUITEM SEPARATOR
+        MENUITEM "&Refresh",                    ID_VIEW_REFRESH32778
+        MENUITEM SEPARATOR
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
     END
     POPUP "&Options"
@@ -106,9 +113,19 @@ IDI_DELETE              ICON                    "res\\Delete.ico"
 
 IDI_FILTER              ICON                    "res\\Filter.ico"
 
-IDI_FILTERS             ICON                    "res\\Filters.ico"
-
 IDI_SESSION             ICON                    "res\\Session.ico"
+
+IDI_ENGINE              ICON                    "res\\engine.ico"
+
+IDI_LAYERS              ICON                    "res\\layers.ico"
+
+IDI_PASTE               ICON                    "res\\Paste.ico"
+
+IDI_PIN                 ICON                    "res\\pin.ico"
+
+IDI_REFRESH             ICON                    "res\\Refresh.ico"
+
+IDI_SUBLAYER            ICON                    "res\\sublayers.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

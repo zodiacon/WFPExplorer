@@ -18,7 +18,7 @@ BOOL CSessionsView::PreTranslateMessage(MSG* pMsg) {
 }
 
 void CSessionsView::Refresh() {
-	m_Sessions = m_Engine.EnumSessions<Session>();
+	m_Sessions = m_Engine.EnumSessions<SessionInfo>();
 	m_List.SetItemCountEx((int)m_Sessions.size(), LVSICF_NOSCROLL);
 }
 

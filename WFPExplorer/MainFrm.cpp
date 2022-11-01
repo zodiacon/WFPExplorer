@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "AboutDlg.h"
 #include "SessionsView.h"
+#include "FiltersView.h"
 #include "MainFrm.h"
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
@@ -27,8 +28,16 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CreateSimpleStatusBar();
 
+	m_view.m_bTabCloseButton = false;
 	m_hWndClient = m_view.Create(m_hWnd, rcDefault, nullptr, 
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32, 8, 4);
+	UINT icons[] = { IDI_SESSION, IDI_FILTER, IDI_LAYERS, IDI_CALLOUT };
+	for (auto icon : icons)
+		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
+	m_view.SetImageList(images);
+
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -43,7 +52,36 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	if (!m_Engine.Open()) {
 		AtlMessageBox(nullptr, L"Failed to open WFP Engine", IDR_MAINFRAME, MB_ICONERROR);
 	}
+	InitMenu();
+	UIAddMenu(menuMain);
+	AddMenu(menuMain);
+
 	return 0;
+}
+
+void CMainFrame::InitMenu() {
+	struct {
+		UINT id, icon;
+		HICON hIcon = nullptr;
+	} cmds[] = {
+		{ ID_EDIT_COPY, IDI_COPY },
+		{ ID_EDIT_CUT, IDI_CUT },
+		{ ID_EDIT_PASTE, IDI_PASTE },
+		{ ID_VIEW_SESSIONS, IDI_SESSION },
+		{ ID_VIEW_FILTERS, IDI_FILTER },
+		{ ID_VIEW_CALLOUTS, IDI_CALLOUT },
+		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ ID_VIEW_LAYERS, IDI_LAYERS },
+		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
+		{ ID_OPTIONS_ALWAYSONTOP, IDI_PIN },
+		{ ID_EDIT_DELETE, IDI_DELETE },
+	};
+	for (auto& cmd : cmds) {
+		if (cmd.icon)
+			AddCommand(cmd.id, cmd.icon);
+		else
+			AddCommand(cmd.id, cmd.hIcon);
+	}
 }
 
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
@@ -60,12 +98,18 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 	return 0;
 }
 
-LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	auto pView = new CSessionsView(this, m_Engine);
-	pView->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(pView->m_hWnd, _T("Sessions"));
+LRESULT CMainFrame::OnViewSessions(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
+	auto view = new CSessionsView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Sessions", 0, view);
 
-	// TODO: add code to initialize document
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
+	auto view = new CFiltersView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Filters", 1, view);
 
 	return 0;
 }

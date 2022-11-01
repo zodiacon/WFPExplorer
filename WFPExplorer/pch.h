@@ -18,12 +18,13 @@ extern CAppModule _Module;
 #include <atldlgs.h>
 #include <atlctrlx.h>
 #include <atlsplit.h>
+#include <atltypes.h>
 #include <fwpmu.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <concepts>
+#include <format>
 #include <strsafe.h>
 #include <dontuse.h>
 #include <TlHelp32.h>

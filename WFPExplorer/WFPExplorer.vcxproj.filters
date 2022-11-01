@@ -45,6 +45,9 @@
     <ClCompile Include="ProcessHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FiltersView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -71,6 +74,9 @@
     <ClInclude Include="ProcessHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FiltersView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WFPExplorer.rc">
@@ -93,13 +99,28 @@
     <Image Include="res\Filter.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
-    <Image Include="res\Filters.ico">
-      <Filter>Resource Files\Icons</Filter>
-    </Image>
     <Image Include="res\Session.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\WFPExplorer.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\engine.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\layers.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Paste.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\pin.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Refresh.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\sublayers.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>
