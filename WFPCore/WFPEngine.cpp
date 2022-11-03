@@ -46,7 +46,7 @@ std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
 	return info;
 }
 
-WFPProviderInfo WFPEngine::GetProviderByKey(GUID const& guid) const {
+std::optional<WFPProviderInfo> WFPEngine::GetProviderByKey(GUID const& guid) const {
 	FWPM_PROVIDER* provider;
 	m_LastError = FwpmProviderGetByKey(m_hEngine, &guid, &provider);
 	if (ERROR_SUCCESS != m_LastError)
@@ -57,7 +57,7 @@ WFPProviderInfo WFPEngine::GetProviderByKey(GUID const& guid) const {
 	return p;
 }
 
-WFPFilterInfo WFPEngine::GetFilterByKey(GUID const& key) const {
+std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key) const {
 	FWPM_FILTER* filter;
 	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);
 	if (m_LastError != ERROR_SUCCESS)
@@ -68,7 +68,7 @@ WFPFilterInfo WFPEngine::GetFilterByKey(GUID const& key) const {
 	return info;
 }
 
-WFPFilterInfo WFPEngine::GetFilterById(UINT64 id) const {
+std::optional<WFPFilterInfo> WFPEngine::GetFilterById(UINT64 id) const {
 	FWPM_FILTER* filter;
 	m_LastError = FwpmFilterGetById(m_hEngine, id, &filter);
 	if (m_LastError != ERROR_SUCCESS)
@@ -79,7 +79,7 @@ WFPFilterInfo WFPEngine::GetFilterById(UINT64 id) const {
 	return info;
 }
 
-WFPLayerInfo WFPEngine::GetLayerByKey(GUID const& key) const {
+std::optional<WFPLayerInfo> WFPEngine::GetLayerByKey(GUID const& key) const {
 	FWPM_LAYER* layer;
 	m_LastError = FwpmLayerGetByKey(m_hEngine, &key, &layer);
 	if (m_LastError != ERROR_SUCCESS)
@@ -90,7 +90,7 @@ WFPLayerInfo WFPEngine::GetLayerByKey(GUID const& key) const {
 	return info;
 }
 
-WFPSubLayerInfo WFPEngine::GetSubLayerByKey(GUID const& key) const {
+std::optional<WFPSubLayerInfo> WFPEngine::GetSubLayerByKey(GUID const& key) const {
 	FWPM_SUBLAYER* sublayer;
 	FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
 	auto info = InitSubLayer(sublayer);
@@ -172,14 +172,3 @@ WFPValue WFPValueInit(FWP_VALUE const& value) {
 	return result;
 }
 
-WFPProviderInfo::operator bool() const {
-	return ProviderKey != GUID_NULL;
-}
-
-WFPSubLayerInfo::operator bool() const {
-	return SubLayerKey != GUID_NULL;
-}
-
-WFPLayerInfo::operator bool() const {
-	return LayerKey != GUID_NULL;
-}

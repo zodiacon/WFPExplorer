@@ -4,8 +4,7 @@
 #include <atlsecurity.h>
 #include <memory>
 #include <type_traits>
-#include <concepts>
-
+#include <optional>
 
 struct WFPSessionInfo {
     GUID SessionKey;
@@ -28,8 +27,6 @@ struct WFPProviderInfo {
     UINT32 Flags;
     ULONG ProviderDataSize;
     std::unique_ptr<BYTE[]> ProviderData;
-
-    operator bool() const;
 };
 
 enum class WFPFieldType {
@@ -105,8 +102,6 @@ struct WFPLayerInfo {
     std::vector<WFPFieldInfo> Fields;
     GUID DefaultSubLayerKey;
     UINT16 LayerId;
-
-    operator bool() const;
 };
 
 struct WFPSubLayerInfo {
@@ -117,9 +112,51 @@ struct WFPSubLayerInfo {
     GUID ProviderKey;
     std::vector<BYTE> ProviderData;
     UINT16 Weight;
-
-    operator bool() const;
 };
+
+enum class WFPProviderContextType {
+    IPSEC_KEYING = 0,
+    IPSEC_IKE_QM_TRANSPORT,
+    IPSEC_IKE_QM_TUNNEL,
+    IPSEC_AUTHIP_QM_TRANSPORT,
+    IPSEC_AUTHIP_QM_TUNNEL,
+    IPSEC_IKE_MM,
+    IPSEC_AUTHIP_MM,
+    CLASSIFY_OPTIONS,
+    GENERAL,
+    IPSEC_IKEV2_QM_TUNNEL,
+    IPSEC_IKEV2_MM,
+    IPSEC_DOSP,
+    IPSEC_IKEV2_QM_TRANSPORT,
+    NETWORK_CONNECTION_POLICY,
+};
+
+//struct WFPProviderContextInfo {
+//    GUID ProviderContextKey;
+//    std::wstring Name;
+//    std::wstring Desc;
+//    UINT32 Flags;
+//    GUID ProviderKey;
+//    std::vector<BYTE[]> ProviderData;
+//    WFPProviderContextType Type;
+//    union {
+//        IPSEC_KEYING_POLICY1* keyingPolicy;
+//        IPSEC_TRANSPORT_POLICY2* ikeQmTransportPolicy;
+//        IPSEC_TUNNEL_POLICY3* ikeQmTunnelPolicy;
+//        IPSEC_TRANSPORT_POLICY2* authipQmTransportPolicy;
+//        IPSEC_TUNNEL_POLICY3* authipQmTunnelPolicy;
+//        IKEEXT_POLICY2* ikeMmPolicy;
+//        IKEEXT_POLICY2* authIpMmPolicy;
+//        FWP_BYTE_BLOB* dataBuffer;
+//        FWPM_CLASSIFY_OPTIONS0* classifyOptions;
+//        IPSEC_TUNNEL_POLICY3* ikeV2QmTunnelPolicy;
+//        IPSEC_TRANSPORT_POLICY2* ikeV2QmTransportPolicy;
+//        IKEEXT_POLICY2* ikeV2MmPolicy;
+//        IPSEC_DOSP_OPTIONS0* idpOptions;
+//        FWPM_NETWORK_CONNECTION_POLICY_SETTINGS0* networkConnectionPolicy;
+//    };
+//    UINT64 ProviderContextId;
+//};
 
 enum class WFPMatchType {
     EQUAL,
@@ -244,8 +281,8 @@ public:
                 info.emplace_back(std::move(si));
             }
             FwpmFreeMemory((void**)&sessions);
+            m_LastError = FwpmSessionDestroyEnumHandle(m_hEngine, hEnum);
         }
-        m_LastError = FwpmSessionDestroyEnumHandle(m_hEngine, hEnum);
 
         return info;
     }
@@ -290,6 +327,8 @@ public:
                 auto li = InitLayer(layer, includeFields);
                 info.emplace_back(std::move(li));
             }
+            FwpmFreeMemory((void**)&layers);
+            m_LastError = FwpmLayerDestroyEnumHandle(m_hEngine, hEnum);
         }
         return info;
     }
@@ -311,13 +350,16 @@ public:
                 auto li = InitSubLayer(layer);
                 info.emplace_back(std::move(li));
             }
+            FwpmFreeMemory((void**)&layers);
+            m_LastError = FwpmSubLayerDestroyEnumHandle(m_hEngine, hEnum);
         }
         return info;
 
     }
 
     std::vector<WFPProviderInfo> EnumProviders(bool includeData = false) const;
-
+    //std::vector<WFPProviderContextInfo> EnumProviderContexts() const;
+    
     template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
     std::vector<TCallout> EnumCallouts() const {
         HANDLE hEnum;
@@ -345,24 +387,24 @@ public:
     //
     // providers API
     //
-    WFPProviderInfo GetProviderByKey(GUID const& key) const;
+    std::optional<WFPProviderInfo> GetProviderByKey(GUID const& key) const;
 
     //
     // Filters API
     //
-    WFPFilterInfo GetFilterByKey(GUID const& key) const;
-    WFPFilterInfo GetFilterById(UINT64 id) const;
+    std::optional<WFPFilterInfo> GetFilterByKey(GUID const& key) const;
+    std::optional<WFPFilterInfo> GetFilterById(UINT64 id) const;
 
     //
     // layer API
     //
-    WFPLayerInfo GetLayerByKey(GUID const& key) const;
+    std::optional<WFPLayerInfo> GetLayerByKey(GUID const& key) const;
 
     //
     // sublayer API
     //
-    WFPSubLayerInfo GetSubLayerByKey(GUID const& key) const;
-    WFPSubLayerInfo GetSubLayerById(UINT16 id) const;
+    std::optional<WFPSubLayerInfo> GetSubLayerByKey(GUID const& key) const;
+    std::optional<WFPSubLayerInfo> GetSubLayerById(UINT16 id) const;
 
 
     //

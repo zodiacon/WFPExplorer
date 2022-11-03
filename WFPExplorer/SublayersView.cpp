@@ -46,8 +46,8 @@ CString CSublayersView::GetColumnText(HWND, int row, int col) {
 			if (info.ProviderName.IsEmpty()) {
 				if (info.ProviderKey != GUID_NULL) {
 					auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
-					if (provider && !provider.Name.empty() && provider.Name[0] != L'@')
-						info.ProviderName = provider.Name.c_str();
+					if (provider && !provider.value().Name.empty() && provider.value().Name[0] != L'@')
+						info.ProviderName = provider.value().Name.c_str();
 					else
 						info.ProviderName = StringHelper::GuidToString(info.ProviderKey);
 				}

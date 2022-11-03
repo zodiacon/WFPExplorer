@@ -16,8 +16,10 @@
 #define IDI_PIN                         212
 #define IDI_REFRESH                     213
 #define IDI_SUBLAYER                    214
-#define IDI_ICON1                       215
 #define IDI_PROVIDER                    215
+#define IDC_VERSION                     1000
+#define IDC_VERSION2                    1001
+#define IDC_COPYRIGHT                   1001
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -37,7 +39,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        216
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -25,36 +25,42 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Weight: return StringHelper::WFPValueToString(info.Weight, true);
 		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
 		case ColumnType::EffectiveWeight: return StringHelper::WFPValueToString(info.EffectiveWeight, true);
-		case ColumnType::ProviderName:
-			if (info.ProviderName.IsEmpty() && info.ProviderKey != GUID_NULL) {
-				auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
-				if (provider && !provider.Name.empty() && provider.Name[0] != L'@')
-					info.ProviderName = provider.Name.c_str();
-			}
-			return info.ProviderName;
-
-		case ColumnType::Layer:
-			if (info.Layer.IsEmpty() && info.LayerKey != GUID_NULL) {
-				auto layer = m_Engine.GetLayerByKey(info.LayerKey);
-				if (layer && !layer.Name.empty() && layer.Name[0] != L'@')
-					info.Layer = layer.Name.c_str();
-				else
-					info.Layer = StringHelper::GuidToString(info.LayerKey);
-			}
-			return info.Layer;
-
-		case ColumnType::SubLayer:
-			if (info.SubLayer.IsEmpty() && info.SubLayerKey != GUID_NULL) {
-				auto layer = m_Engine.GetSubLayerByKey(info.SubLayerKey);
-				if (layer && !layer.Name.empty() && layer.Name[0] != L'@')
-					info.SubLayer = layer.Name.c_str();
-				else
-					info.SubLayer = StringHelper::GuidToString(info.LayerKey);
-			}
-			return info.SubLayer;
-
+		case ColumnType::ProviderName: return GetProviderName(info);
+		case ColumnType::Layer: return GetLayerName(info);
+		case ColumnType::SubLayer: return GetSubLayerName(info);
 	}
 	return CString();
+}
+
+CString const& CFiltersView::GetProviderName(FilterInfo& info) const {
+	if (info.ProviderName.IsEmpty() && info.ProviderKey != GUID_NULL) {
+		auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
+		if (provider && !provider.value().Name.empty() && provider.value().Name[0] != L'@')
+			info.ProviderName = provider.value().Name.c_str();
+	}
+	return info.ProviderName;
+}
+
+CString const& CFiltersView::GetLayerName(FilterInfo& info) const {
+	if (info.Layer.IsEmpty() && info.LayerKey != GUID_NULL) {
+		auto layer = m_Engine.GetLayerByKey(info.LayerKey);
+		if (layer && !layer.value().Name.empty() && layer.value().Name[0] != L'@')
+			info.Layer = layer.value().Name.c_str();
+		else
+			info.Layer = StringHelper::GuidToString(info.LayerKey);
+	}
+	return info.Layer;
+}
+
+CString const& CFiltersView::GetSubLayerName(FilterInfo& info) const {
+	if (info.SubLayer.IsEmpty() && info.SubLayerKey != GUID_NULL) {
+		auto layer = m_Engine.GetSubLayerByKey(info.SubLayerKey);
+		if (layer && !layer.value().Name.empty() && layer.value().Name[0] != L'@')
+			info.SubLayer = layer.value().Name.c_str();
+		else
+			info.SubLayer = StringHelper::GuidToString(info.LayerKey);
+	}
+	return info.SubLayer;
 }
 
 LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -93,8 +99,11 @@ void CFiltersView::DoSort(SortInfo const* si) {
 			case ColumnType::Name: return SortHelper::Sort(f1.Name, f2.Name, asc);
 			case ColumnType::Desc: return SortHelper::Sort(f1.Desc, f2.Desc, asc);
 			case ColumnType::Flags: return SortHelper::Sort(f1.Flags, f2.Flags, asc);
-			case ColumnType::ProviderName: return SortHelper::Sort(f1.ProviderName, f2.ProviderName, asc);
-			case ColumnType::Weight: return SortHelper::Sort(f1.Weight.int64, f2.Weight.int64, asc);
+			case ColumnType::ProviderName: return SortHelper::Sort(GetProviderName(f1), GetProviderName(f2), asc);
+			case ColumnType::Weight: return SortHelper::Sort(f1.Weight.uint8, f2.Weight.uint8, asc);
+			case ColumnType::EffectiveWeight: return SortHelper::Sort(f1.EffectiveWeight.uint64, f2.EffectiveWeight.uint64, asc);
+			case ColumnType::Layer: return SortHelper::Sort(GetLayerName(f1), GetLayerName(f2), asc);
+			case ColumnType::SubLayer: return SortHelper::Sort(GetSubLayerName(f1), GetSubLayerName(f2), asc);
 		}
 		return false;
 	};

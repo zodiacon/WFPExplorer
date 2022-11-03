@@ -43,6 +43,10 @@ private:
 		CString Layer, SubLayer;
 	};
 
+	CString const& GetProviderName(FilterInfo& info) const;
+	CString const& GetLayerName(FilterInfo& info) const;
+	CString const& GetSubLayerName(FilterInfo& info) const;
+
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 

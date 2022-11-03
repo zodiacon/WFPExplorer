@@ -43,8 +43,8 @@ CString CLayersView::GetColumnText(HWND, int row, int col) {
 			if (info.DefaultSublayer.IsEmpty()) {
 				if (info.DefaultSubLayerKey != GUID_NULL) {
 					auto sl = m_Engine.GetSubLayerByKey(info.DefaultSubLayerKey);
-					if (sl && !sl.Name.empty())
-						info.DefaultSublayer = sl.Name.c_str();
+					if (sl && !sl.value().Name.empty())
+						info.DefaultSublayer = sl.value().Name.c_str();
 					else
 						info.DefaultSublayer = StringHelper::GuidToString(info.DefaultSubLayerKey);
 				}

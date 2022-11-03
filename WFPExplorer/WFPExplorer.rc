@@ -70,8 +70,8 @@ BEGIN
         MENUITEM "&Providers",                  ID_VIEW_PROVIDERS
         MENUITEM "&Filters",                    ID_VIEW_FILTERS
         MENUITEM "&Layers",                     ID_VIEW_LAYERS
-        MENUITEM "&Callouts",                   ID_VIEW_CALLOUTS
         MENUITEM "Subla&yers",                  ID_VIEW_SUBLAYERS
+        MENUITEM "&Callouts",                   ID_VIEW_CALLOUTS
         MENUITEM SEPARATOR
         MENUITEM "&Refresh",                    ID_VIEW_REFRESH
         MENUITEM SEPARATOR
@@ -138,12 +138,13 @@ IDI_PROVIDER            ICON                    "res\\provider.ico"
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 189, 81
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
+CAPTION "About WFP Explorer"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,69,60,50,14
-    CTEXT           "WFP Explorer v1.0\n\n(C)2022 Pavel Yosifovich",IDC_STATIC,56,7,78,32
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
+    LTEXT           "Static",IDC_VERSION,57,7,97,8
+    LTEXT           "Static",IDC_COPYRIGHT,56,23,97,8
 END
 
 
@@ -196,8 +197,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,0,0
+ PRODUCTVERSION 0,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -212,13 +213,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "WFPExplorer Module"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "CompanyName", "Scorpio Software"
+            VALUE "FileDescription", "Windows Filtering Platform Explorer"
+            VALUE "FileVersion", "0.1.0.0"
             VALUE "InternalName", "WFPExplorer"
-            VALUE "LegalCopyright", "Copyright 2022"
+            VALUE "LegalCopyright", "©2022 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
-            VALUE "ProductName", "WFPExplorer Module"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductName", "WFP Explorer"
+            VALUE "ProductVersion", "0.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -302,6 +304,7 @@ END
 STRINGTABLE
 BEGIN
     ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+    ID_VIEW_REFRESH         "\nRefresh"
 END
 
 STRINGTABLE
@@ -330,6 +333,21 @@ END
 STRINGTABLE
 BEGIN
     ATL_IDS_MRU_FILE        "Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OPTIONS_ALWAYSONTOP  "\nAlways On Top"
+    ID_VIEW_SESSIONS        "\nSessions"
+    ID_VIEW_FILTERS         "\nFilters"
+    ID_VIEW_LAYERS          "\nLayers"
+    ID_VIEW_CALLOUTS        "\nCallouts"
+    ID_VIEW_SUBLAYERS       "\nSublayers"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_PROVIDERS       "\nProviders"
 END
 
 #endif    // English (United States) resources

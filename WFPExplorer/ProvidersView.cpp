@@ -61,3 +61,7 @@ void CProvidersView::DoSort(SortInfo const* si) {
 	};
 	std::ranges::sort(m_Providers, compare);
 }
+
+int CProvidersView::GetSaveColumnRange(HWND, int&) const {
+	return 1;
+}

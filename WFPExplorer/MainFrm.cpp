@@ -22,6 +22,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 }
 
 BOOL CMainFrame::OnIdle() {
+	UIUpdateToolBar();
 	return FALSE;
 }
 
@@ -75,6 +76,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	InitMenu();
 	UIAddMenu(menuMain);
 	AddMenu(menuMain);
+	UpdateUI();
 
 	return 0;
 }
@@ -103,6 +105,16 @@ void CMainFrame::InitMenu() {
 		else
 			AddCommand(cmd.id, cmd.hIcon);
 	}
+}
+
+void CMainFrame::UpdateUI() {
+	bool anyPage = m_view.GetPageCount() > 0;
+	UIEnable(ID_FILE_SAVE, anyPage);
+	UIEnable(ID_EDIT_COPY, anyPage);
+	UIEnable(ID_EDIT_CUT, anyPage);
+	UIEnable(ID_EDIT_PASTE, anyPage);
+	UIEnable(ID_EDIT_DELETE, anyPage);
+	UIEnable(ID_VIEW_REFRESH, anyPage);
 }
 
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
@@ -168,7 +180,7 @@ LRESULT CMainFrame::OnViewCallouts(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	BOOL bVisible = !::IsWindowVisible(m_hWndStatusBar);
+	bool bVisible = !::IsWindowVisible(m_hWndStatusBar);
 	::ShowWindow(m_hWndStatusBar, bVisible ? SW_SHOWNOACTIVATE : SW_HIDE);
 	UISetCheck(ID_VIEW_STATUS_BAR, bVisible);
 	UpdateLayout();
@@ -201,5 +213,17 @@ LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 	int nPage = wID - ID_WINDOW_TABFIRST;
 	m_view.SetActivePage(nPage);
 
+	return 0;
+}
+
+LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
+	int page = m_view.GetActivePage();
+	bool handled = false;
+	if (page >= 0) {
+		handled = ::SendMessage(m_view.GetPageHWND(page), WM_ACTIVATE, 1, 0);
+	}
+	if(!handled) {
+		UpdateUI();
+	}
 	return 0;
 }

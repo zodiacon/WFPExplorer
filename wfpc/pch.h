@@ -13,5 +13,6 @@
 #include <string>
 #include <shlwapi.h>
 #include <memory>
+#include <optional>
 
 #endif //PCH_H

@@ -25,6 +25,7 @@ extern CAppModule _Module;
 #include <unordered_map>
 #include <vector>
 #include <format>
+#include <optional>
 #include <strsafe.h>
 #include <dontuse.h>
 #include <TlHelp32.h>

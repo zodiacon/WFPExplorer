@@ -10,10 +10,10 @@ CString StringHelper::GuidToString(GUID const& guid) {
 CString StringHelper::WFPValueToString(WFPValue const& value, bool hex) {
 	CString str;
 	switch (value.Type) {
-		case WFPDataType::INT8: str.Format(L"%d", (int)value.int8); break;
-		case WFPDataType::UINT8: str.Format(L"%u", (int)value.uint8); break;
-		case WFPDataType::INT16: str.Format(L"%d", (int)value.int16); break;
-		case WFPDataType::INT32: str.Format(L"%d", value.int32); break;
+		case WFPDataType::INT8: str.Format(hex ? L"0x%X" : L"%d", (int)value.int8); break;
+		case WFPDataType::UINT8: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint8); break;
+		case WFPDataType::INT16: str.Format(hex ? L"0x%X" : L"%d", (int)value.int16); break;
+		case WFPDataType::INT32: str.Format(hex ? L"0x%X" : L"%d", value.int32); break;
 		case WFPDataType::UINT16: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint16); break;
 		case WFPDataType::UINT32: str.Format(hex ? L"0x%X" : L"%u", value.uint32); break;
 		case WFPDataType::INT64: str.Format(hex ? L"0x%llX" : L"%lld", value.int64); break;
