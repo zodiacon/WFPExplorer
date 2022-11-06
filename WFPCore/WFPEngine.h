@@ -87,6 +87,34 @@ struct WFPValue {
 
 WFPValue WFPValueInit(FWP_VALUE const& value);
 
+enum class WFPLayerFlags {
+    None,
+    Kernel = FWPM_LAYER_FLAG_KERNEL,
+    BuiltIn = FWPM_LAYER_FLAG_BUILTIN,
+    ClassifyMostly = FWPM_LAYER_FLAG_CLASSIFY_MOSTLY,
+    Buffered = FWPM_LAYER_FLAG_BUFFERED,
+};
+DEFINE_ENUM_FLAG_OPERATORS(WFPLayerFlags);
+
+enum class WFPFilterFlags {
+    None = FWPM_FILTER_FLAG_NONE,
+    Persistent = FWPM_FILTER_FLAG_PERSISTENT,
+    BootTime = FWPM_FILTER_FLAG_BOOTTIME,
+    HasProviderContext = FWPM_FILTER_FLAG_HAS_PROVIDER_CONTEXT,
+    ClearActionRight = FWPM_FILTER_FLAG_CLEAR_ACTION_RIGHT,
+    PermitIfCalloutUnregistered = FWPM_FILTER_FLAG_PERMIT_IF_CALLOUT_UNREGISTERED,
+    Disabled = FWPM_FILTER_FLAG_DISABLED,
+    Indexed = FWPM_FILTER_FLAG_INDEXED,
+    HasSecurityRealmProviderContext = FWPM_FILTER_FLAG_HAS_SECURITY_REALM_PROVIDER_CONTEXT,
+    SystemOsOnly = FWPM_FILTER_FLAG_SYSTEMOS_ONLY,
+    GameOsOnly = FWPM_FILTER_FLAG_GAMEOS_ONLY,
+    SilentMode = FWPM_FILTER_FLAG_SILENT_MODE,
+    IPSecNoAcquireInitiate = FWPM_FILTER_FLAG_IPSEC_NO_ACQUIRE_INITIATE,
+    Reserved0 = FWPM_FILTER_FLAG_RESERVED0,
+    Reserved1 = FWPM_FILTER_FLAG_RESERVED1,
+};
+DEFINE_ENUM_FLAG_OPERATORS(WFPFilterFlags);
+
 struct WFPFieldInfo {
     GUID FieldKey;
     WFPFieldType Type;
@@ -97,7 +125,7 @@ struct WFPLayerInfo {
     GUID LayerKey;
     std::wstring Name;
     std::wstring Desc;
-    UINT32 Flags;
+    WFPLayerFlags Flags;
     UINT32 NumFields;
     std::vector<WFPFieldInfo> Fields;
     GUID DefaultSubLayerKey;
@@ -216,7 +244,7 @@ struct WFPFilterInfo {
     GUID FilterKey;
     std::wstring Name;
     std::wstring Desc;
-    UINT32 Flags;
+    WFPFilterFlags Flags;
     GUID ProviderKey;
     std::vector<BYTE> ProviderData;
     GUID LayerKey;
@@ -244,6 +272,27 @@ struct WFPCalloutInfo {
     UINT32 CalloutId;
 };
 
+enum class WFPNetEventType {
+    IKEEXT_MM_FAILURE = 0,
+    IKEEXT_QM_FAILURE,
+    IKEEXT_EM_FAILURE,
+    CLASSIFY_DROP,
+    IPSEC_KERNEL_DROP,
+    IPSEC_DOSP_DROP,
+    CLASSIFY_ALLOW,
+    CAPABILITY_DROP,
+    CAPABILITY_ALLOW,
+    CLASSIFY_DROP_MAC,
+    LPM_PACKET_ARRIVAL,
+    MAX,
+};
+
+struct WFPNetEventInfo {
+    //WFPNetEventHeader Header;
+    WFPNetEventType Type;
+
+};
+
 class WFPEngine {
 public:
 	bool Open(DWORD auth = RPC_C_AUTHN_WINNT);
@@ -254,6 +303,8 @@ public:
     //
     // enumerations
     //
+
+    std::vector<WFPNetEventInfo> EnumNetEvents();
 
     template<typename TSession = WFPSessionInfo> requires std::is_base_of_v<WFPSessionInfo, TSession>
     std::vector<TSession> EnumSessions() const {
@@ -423,7 +474,7 @@ public:
         fi.Desc = ParseMUIString(filter->displayData.description);
         fi.ConditionCount = filter->numFilterConditions;
         fi.EffectiveWeight = WFPValueInit(filter->effectiveWeight);
-        fi.Flags = filter->flags;
+        fi.Flags = static_cast<WFPFilterFlags>(filter->flags);
         fi.LayerKey = filter->layerKey;
         fi.SubLayerKey = filter->subLayerKey;
         fi.Weight = WFPValueInit(filter->weight);
@@ -439,7 +490,7 @@ public:
         li.Name = ParseMUIString(layer->displayData.name);
         li.Desc = ParseMUIString(layer->displayData.description);
         li.LayerKey = layer->layerKey;
-        li.Flags = layer->flags;
+        li.Flags = static_cast<WFPLayerFlags>(layer->flags);
         li.DefaultSubLayerKey = layer->defaultSubLayerKey;
         li.LayerId = layer->layerId;
         li.NumFields = layer->numFields;

@@ -24,3 +24,38 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex) {
 	return str;
 }
 
+CString StringHelper::WFPFilterFlagsToString(WFPFilterFlags flags) {
+	static const struct {
+		WFPFilterFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPFilterFlags::Persistent, L"Persistent" },
+		{ WFPFilterFlags::BootTime, L"Boot Time" },
+		{ WFPFilterFlags::HasProviderContext, L"Provider Context" },
+		{ WFPFilterFlags::ClearActionRight, L"Clear Acyion Right" },
+		{ WFPFilterFlags::PermitIfCalloutUnregistered, L"Permit if Callout Unregistered" },
+		{ WFPFilterFlags::Disabled, L"Disabled" },
+		{ WFPFilterFlags::Indexed, L"Indexed" },
+		{ WFPFilterFlags::HasSecurityRealmProviderContext, L"Security Realm Provider Context" },
+		{ WFPFilterFlags::SystemOsOnly, L"System OS Only" },
+		{ WFPFilterFlags::GameOsOnly, L"Game OS Only" },
+		{ WFPFilterFlags::SilentMode, L"Silent Mode" },
+		{ WFPFilterFlags::IPSecNoAcquireInitiate, L"IPSec No Acquire Initiate" },
+	};
+
+	return FlagsToString(flags, data);
+}
+
+CString StringHelper::WFPLayerFlagsToString(WFPLayerFlags flags) {
+	static const struct {
+		WFPLayerFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPLayerFlags::Kernel, L"Kernel" },
+		{ WFPLayerFlags::BuiltIn, L"Builtin" },
+		{ WFPLayerFlags::ClassifyMostly, L"Class Modify" },
+		{ WFPLayerFlags::Buffered, L"Buffered" },
+	};
+	return FlagsToString(flags, data);
+}
+

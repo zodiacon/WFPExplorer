@@ -2,6 +2,7 @@
 #include "LayersView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
+#include "resource.h"
 
 CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -15,10 +16,15 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	cm->AddColumn(L"Layer Key", 0, 250, ColumnType::Key);
 	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 90, ColumnType::Id);
 	cm->AddColumn(L"Name", 0, 180, ColumnType::Name);
-	cm->AddColumn(L"Flags", LVCFMT_RIGHT, 80, ColumnType::Flags);
+	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
 	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 80, ColumnType::Fields);
 	cm->AddColumn(L"Default Sublayer", 0, 250, ColumnType::DefaultSubLayer);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
+	images.AddIcon(AtlLoadIconImage(IDI_LAYERS, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
 
@@ -53,7 +59,12 @@ CString CLayersView::GetColumnText(HWND, int row, int col) {
 
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
+		case ColumnType::Flags: 
+			if (info.Flags == WFPLayerFlags::None)
+				return L"0";
+			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, 
+				(PCWSTR)StringHelper::WFPLayerFlagsToString(info.Flags)).c_str();
+
 		case ColumnType::Fields: return std::to_wstring(info.NumFields).c_str();
 		case ColumnType::Id: return std::to_wstring(info.LayerId).c_str();
 	}
@@ -83,4 +94,8 @@ void CLayersView::DoSort(SortInfo const* si) {
 
 int CLayersView::GetSaveColumnRange(HWND, int&) const {
 	return 1;
+}
+
+int CLayersView::GetRowImage(HWND, int row, int col) const {
+	return 0;
 }

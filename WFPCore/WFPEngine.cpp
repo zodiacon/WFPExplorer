@@ -172,3 +172,17 @@ WFPValue WFPValueInit(FWP_VALUE const& value) {
 	return result;
 }
 
+std::vector<WFPNetEventInfo> WFPEngine::EnumNetEvents() {
+	std::vector<WFPNetEventInfo> events;
+	HANDLE hEnum;
+	m_LastError = FwpmNetEventCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+	if (m_LastError != ERROR_SUCCESS)
+		return {};
+
+	FWPM_NET_EVENT** pEvents;
+	UINT32 count;
+	m_LastError = FwpmNetEventEnum(m_hEngine, hEnum, 128, &pEvents, &count);
+	if (ERROR_SUCCESS == m_LastError) {
+	}
+	return events;
+}

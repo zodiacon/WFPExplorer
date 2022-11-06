@@ -3,6 +3,7 @@
 #include <WFPEngine.h>
 #include "StringHelper.h"
 #include <SortHelper.h>
+#include "resource.h"
 
 CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -23,7 +24,11 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::LayerKey: return StringHelper::GuidToString(info.LayerKey);
 		case ColumnType::SubLayerKey: return StringHelper::GuidToString(info.SubLayerKey);
 		case ColumnType::Weight: return StringHelper::WFPValueToString(info.Weight, true);
-		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
+		case ColumnType::Flags: 
+			if (info.Flags == WFPFilterFlags::None)
+				return L"0";
+			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, 
+				(PCWSTR)StringHelper::WFPFilterFlagsToString(info.Flags)).c_str();
 		case ColumnType::EffectiveWeight: return StringHelper::WFPValueToString(info.EffectiveWeight, true);
 		case ColumnType::ProviderName: return GetProviderName(info);
 		case ColumnType::Layer: return GetLayerName(info);
@@ -37,6 +42,8 @@ CString const& CFiltersView::GetProviderName(FilterInfo& info) const {
 		auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
 		if (provider && !provider.value().Name.empty() && provider.value().Name[0] != L'@')
 			info.ProviderName = provider.value().Name.c_str();
+		else
+			info.ProviderName = StringHelper::GuidToString(info.ProviderKey);
 	}
 	return info.ProviderName;
 }
@@ -72,12 +79,17 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	cm->AddColumn(L"Filter Key", 0, 250, ColumnType::Key);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 90, ColumnType::Weight);
 	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 90, ColumnType::EffectiveWeight);
-	cm->AddColumn(L"Flags", LVCFMT_RIGHT, 80, ColumnType::Flags);
+	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
 	cm->AddColumn(L"Filter Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 	cm->AddColumn(L"Provider", 0, 240, ColumnType::ProviderName);
 	cm->AddColumn(L"Layer", LVCFMT_LEFT, 250, ColumnType::Layer);
 	cm->AddColumn(L"Sublayer", LVCFMT_LEFT, 250, ColumnType::SubLayer);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
+	images.AddIcon(AtlLoadIconImage(IDI_FILTER, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
 
@@ -112,4 +124,8 @@ void CFiltersView::DoSort(SortInfo const* si) {
 
 int CFiltersView::GetSaveColumnRange(HWND, int&) const {
 	return 1;
+}
+
+int CFiltersView::GetRowImage(HWND, int row, int col) const {
+	return 0;
 }
