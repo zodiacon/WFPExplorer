@@ -130,6 +130,12 @@ IDI_SUBLAYER            ICON                    "res\\sublayers.ico"
 
 IDI_PROVIDER            ICON                    "res\\provider.ico"
 
+IDI_FILTER_DISABLED     ICON                    "res\\filter-disabled.ico"
+
+IDI_PROVIDER_PERSISTENT ICON                    "res\\provider-persistent.ico"
+
+IDI_SESSION_DYNAMIC     ICON                    "res\\Session-synamic.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

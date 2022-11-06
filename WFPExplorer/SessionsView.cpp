@@ -30,7 +30,10 @@ CString CSessionsView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Name: return session.Name.c_str();
 		case ColumnType::Desc: return session.Desc.c_str();
 		case ColumnType::ProcessId: return std::to_wstring(session.ProcessId).c_str();
-		case ColumnType::Flags: return std::to_wstring(session.Flags).c_str();
+		case ColumnType::Flags: 
+			if (session.Flags == WFPSessionFlags::None)
+				return L"0";
+			return std::format(L"0x{:X} ({})", (UINT32)session.Flags, StringHelper::WFPSessionFlagsToString(session.Flags)).c_str();
 		case ColumnType::ProcessName:
 			if (session.ProcessName.IsEmpty())
 				session.ProcessName = ProcessHelper::GetProcessName(session.ProcessId);
@@ -57,6 +60,10 @@ void CSessionsView::DoSort(SortInfo const* si) {
 	std::ranges::sort(m_Sessions, compare);
 }
 
+int CSessionsView::GetRowImage(HWND, int row, int col) const {
+	return (m_Sessions[row].Flags & WFPSessionFlags::Dynamic) == WFPSessionFlags::Dynamic ? 1 : 0;
+}
+
 LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
@@ -66,9 +73,15 @@ LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Session Key", 0, 250, ColumnType::Key);
 	cm->AddColumn(L"PID", LVCFMT_RIGHT, 90, ColumnType::ProcessId);
 	cm->AddColumn(L"Process Name", LVCFMT_LEFT, 180, ColumnType::ProcessName);
-	cm->AddColumn(L"Flags", LVCFMT_RIGHT, 80, ColumnType::Flags);
+	cm->AddColumn(L"Flags", LVCFMT_LEFT, 120, ColumnType::Flags);
 	cm->AddColumn(L"Session Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
+	images.AddIcon(AtlLoadIconImage(IDI_SESSION, 0, 16, 16));
+	images.AddIcon(AtlLoadIconImage(IDI_SESSION_DYNAMIC, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
 

@@ -269,12 +269,15 @@
     <Image Include="res\Cut.ico" />
     <Image Include="res\Delete.ico" />
     <Image Include="res\engine.ico" />
+    <Image Include="res\filter-disabled.ico" />
     <Image Include="res\Filter.ico" />
     <Image Include="res\layers.ico" />
     <Image Include="res\Paste.ico" />
     <Image Include="res\pin.ico" />
+    <Image Include="res\provider-persistent.ico" />
     <Image Include="res\provider.ico" />
     <Image Include="res\Refresh.ico" />
+    <Image Include="res\Session-synamic.ico" />
     <Image Include="res\Session.ico" />
     <Image Include="res\sublayers.ico" />
     <Image Include="res\WFPExplorer.ico" />

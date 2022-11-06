@@ -2,6 +2,7 @@
 #include "ProvidersView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
+#include "resource.h"
 
 CProvidersView::CProvidersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -14,9 +15,15 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Provider Key", 0, 250, ColumnType::Key);
 	cm->AddColumn(L"Service Name", 0, 180, ColumnType::ServiceName);
+	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
-	cm->AddColumn(L"Flags", LVCFMT_RIGHT, 80, ColumnType::Flags);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
+	images.AddIcon(AtlLoadIconImage(IDI_PROVIDER, 0, 16, 16));
+	images.AddIcon(AtlLoadIconImage(IDI_PROVIDER_PERSISTENT, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
 
@@ -39,7 +46,10 @@ CString CProvidersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(info.ProviderKey);
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
+		case ColumnType::Flags: 
+			if (info.Flags == WFPProviderFlags::None)
+				return L"0";
+			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, StringHelper::WFPProviderFlagsToString(info.Flags)).c_str();
 		case ColumnType::ServiceName: return info.ServiceName.c_str();
 	}
 	return CString();
@@ -64,4 +74,8 @@ void CProvidersView::DoSort(SortInfo const* si) {
 
 int CProvidersView::GetSaveColumnRange(HWND, int&) const {
 	return 1;
+}
+
+int CProvidersView::GetRowImage(HWND, int row, int col) const {
+	return (m_Providers[row].Flags & WFPProviderFlags::Persistent) == WFPProviderFlags::Persistent ? 1 : 0;
 }

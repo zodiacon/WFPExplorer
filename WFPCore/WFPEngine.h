@@ -6,25 +6,38 @@
 #include <type_traits>
 #include <optional>
 
+enum class WFPSessionFlags {
+    None,
+    Dynamic = FWPM_SESSION_FLAG_DYNAMIC,
+    Reserved = FWPM_SESSION_FLAG_RESERVED,
+};
+DEFINE_ENUM_FLAG_OPERATORS(WFPSessionFlags);
+
 struct WFPSessionInfo {
     GUID SessionKey;
     std::wstring Name;
     std::wstring Desc;
-    UINT32 flags;
+    WFPSessionFlags Flags;
     UINT32 TxWaitTimeoutInMSec;
     DWORD ProcessId;
     BYTE Sid[SECURITY_MAX_SID_SIZE];
     std::wstring UserName;
-    DWORD Flags;
     bool KernelMode;
 };
+
+enum class WFPProviderFlags {
+    None,
+    Persistent = FWPM_PROVIDER_FLAG_PERSISTENT,
+    Disabled = FWPM_PROVIDER_FLAG_DISABLED,
+};
+DEFINE_ENUM_FLAG_OPERATORS(WFPProviderFlags);
 
 struct WFPProviderInfo {
     GUID ProviderKey;
     std::wstring Name;
     std::wstring Desc;
     std::wstring ServiceName;
-    UINT32 Flags;
+    WFPProviderFlags Flags;
     ULONG ProviderDataSize;
     std::unique_ptr<BYTE[]> ProviderData;
 };
@@ -132,11 +145,17 @@ struct WFPLayerInfo {
     UINT16 LayerId;
 };
 
+enum class WFPSubLayerFlags {
+    None = 0,
+    Persistent = FWPM_SUBLAYER_FLAG_PERSISTENT,
+};
+DEFINE_ENUM_FLAG_OPERATORS(WFPSubLayerFlags);
+
 struct WFPSubLayerInfo {
     GUID SubLayerKey;
     std::wstring Name;
     std::wstring Desc;
-    UINT32 Flags;
+    WFPSubLayerFlags Flags;
     GUID ProviderKey;
     std::vector<BYTE> ProviderData;
     UINT16 Weight;
@@ -261,11 +280,19 @@ struct WFPFilterInfo {
     WFPValue EffectiveWeight;
 };
 
+enum class WFPCalloutFlags {
+    None = 0,
+    Persistent          = FWPM_CALLOUT_FLAG_PERSISTENT,
+    UsesProviderContext = FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
+    Registered          = FWPM_CALLOUT_FLAG_REGISTERED,
+};
+DEFINE_ENUM_FLAG_OPERATORS(WFPCalloutFlags);
+
 struct WFPCalloutInfo {
     GUID CalloutKey;
     std::wstring Name;
     std::wstring Desc;
-    UINT32 Flags;
+    WFPCalloutFlags Flags;
     GUID ProviderKey;
     std::vector<BYTE> ProviderData;
     GUID ApplicableLayer;
@@ -326,7 +353,7 @@ public:
                 si.SessionKey = session->sessionKey;
                 si.ProcessId = session->processId;
                 si.UserName = session->username;
-                si.Flags = session->flags;
+                si.Flags = static_cast<WFPSessionFlags>(session->flags);
                 ::CopySid(sizeof(si.Sid), (PSID)si.Sid, session->sid);
                 si.KernelMode = session->kernelMode;
                 info.emplace_back(std::move(si));
@@ -514,7 +541,7 @@ public:
         li.Name = ParseMUIString(layer->displayData.name);
         li.Desc = ParseMUIString(layer->displayData.description);
         li.SubLayerKey = layer->subLayerKey;
-        li.Flags = layer->flags;
+        li.Flags = static_cast<WFPSubLayerFlags>(layer->flags);
         li.Weight = layer->weight;
         li.ProviderKey = layer->providerKey ? *layer->providerKey : GUID_NULL;
         li.ProviderData.resize(layer->providerData.size);
@@ -528,7 +555,7 @@ public:
         ci.Name = ParseMUIString(c->displayData.name);
         ci.Desc = ParseMUIString(c->displayData.description);
         ci.ProviderKey = c->providerKey ? *c->providerKey : GUID_NULL;
-        ci.Flags = c->flags;
+        ci.Flags = static_cast<WFPCalloutFlags>(c->flags);
         ci.CalloutKey = c->calloutKey;
         ci.ProviderData.resize(c->providerData.size);
         memcpy(ci.ProviderData.data(), c->providerData.data, c->providerData.size);

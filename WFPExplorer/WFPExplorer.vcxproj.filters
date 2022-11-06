@@ -68,9 +68,6 @@
     <ClInclude Include="MainFrm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AboutDlg.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
@@ -100,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="CalloutsView.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +148,15 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\provider.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\filter-disabled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\provider-persistent.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Session-synamic.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

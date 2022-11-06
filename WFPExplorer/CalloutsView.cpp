@@ -2,6 +2,7 @@
 #include "CalloutsView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
+#include "resource.h"
 
 CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -15,9 +16,14 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Callout Key", 0, 250, ColumnType::Key);
 	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 90, ColumnType::Id);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
-	cm->AddColumn(L"Flags", LVCFMT_RIGHT, 80, ColumnType::Flags);
+	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider", 0, 250, ColumnType::Provider);
 	cm->AddColumn(L"Description", 0, 300, ColumnType::Desc);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
+	images.AddIcon(AtlLoadIconImage(IDI_CALLOUT, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
 
@@ -52,7 +58,12 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: return std::format(L"0x{:X}", info.Flags).c_str();
+		case ColumnType::Flags:
+			if (info.Flags == WFPCalloutFlags::None)
+				return L"0";
+			return std::format(L"0x{:X} ({})", (UINT32)info.Flags,
+				(PCWSTR)StringHelper::WFPCalloutFlagsToString(info.Flags)).c_str();
+
 		case ColumnType::Id: return std::to_wstring(info.CalloutId).c_str();
 	}
 	return CString();
@@ -78,4 +89,8 @@ void CCalloutsView::DoSort(SortInfo const* si) {
 
 int CCalloutsView::GetSaveColumnRange(HWND, int&) const {
 	return 1;
+}
+
+int CCalloutsView::GetRowImage(HWND, int row, int col) const {
+	return 0;
 }

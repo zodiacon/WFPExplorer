@@ -59,3 +59,49 @@ CString StringHelper::WFPLayerFlagsToString(WFPLayerFlags flags) {
 	return FlagsToString(flags, data);
 }
 
+CString StringHelper::WFPSessionFlagsToString(WFPSessionFlags flags) {
+	static const struct {
+		WFPSessionFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPSessionFlags::Dynamic, L"Dynamic" },
+	};
+
+	return FlagsToString(flags, data);
+}
+
+CString StringHelper::WFPProviderFlagsToString(WFPProviderFlags flags) {
+	static const struct {
+		WFPProviderFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPProviderFlags::Persistent, L"Persistent" },
+		{ WFPProviderFlags::Disabled, L"Disabled" },
+	};
+
+	return FlagsToString(flags, data);
+}
+
+CString StringHelper::WFPSubLayerFlagsToString(WFPSubLayerFlags flags) {
+	static const struct {
+		WFPSubLayerFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPSubLayerFlags::Persistent, L"Persistent" },
+	};
+
+	return FlagsToString(flags, data);
+}
+
+CString StringHelper::WFPCalloutFlagsToString(WFPCalloutFlags flags) {
+	static const struct {
+		WFPCalloutFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPCalloutFlags::Persistent, L"Persistent" },
+		{ WFPCalloutFlags::UsesProviderContext, L"Provider Context" },
+		{ WFPCalloutFlags::Registered, L"Registered" },
+	};
+
+	return FlagsToString(flags, data);
+}

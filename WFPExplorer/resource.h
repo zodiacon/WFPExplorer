@@ -17,8 +17,11 @@
 #define IDI_REFRESH                     213
 #define IDI_SUBLAYER                    214
 #define IDI_PROVIDER                    215
+#define IDI_FILTER_DISABLED             216
+#define IDI_PROVIDER_PERSISTENT         217
+#define IDI_ICON3                       218
+#define IDI_SESSION_DYNAMIC             218
 #define IDC_VERSION                     1000
-#define IDC_VERSION2                    1001
 #define IDC_COPYRIGHT                   1001
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
@@ -37,7 +40,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        216
+#define _APS_NEXT_RESOURCE_VALUE        219
 #define _APS_NEXT_COMMAND_VALUE         32785
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
