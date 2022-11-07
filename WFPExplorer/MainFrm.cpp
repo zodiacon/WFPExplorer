@@ -14,6 +14,8 @@
 #include "MainFrm.h"
 #include <ToolbarHelper.h>
 
+const int WINDOW_MENU_POSITION = 4;
+
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg))
 		return TRUE;
@@ -64,8 +66,6 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
 	pLoop->AddMessageFilter(this);
 	pLoop->AddIdleHandler(this);
-
-	const int WINDOW_MENU_POSITION = 4;
 
 	CMenuHandle menuMain = GetMenu();
 	m_view.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
@@ -126,6 +126,12 @@ LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	return 1;
 }
 
+LRESULT CMainFrame::OnRebuildWindowMenu(UINT, WPARAM, LPARAM, BOOL& bHandled) {
+	AddSubMenu(GetSubMenu(GetMenu(), WINDOW_MENU_POSITION));
+
+	return 0;
+}
+
 LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	PostMessage(WM_CLOSE);
 	return 0;
@@ -135,6 +141,7 @@ LRESULT CMainFrame::OnViewSessions(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 	auto view = new CSessionsView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Sessions", 0, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_SESSION);
 
 	return 0;
 }
@@ -143,6 +150,7 @@ LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 	auto view = new CFiltersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Filters", 1, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_FILTER);
 
 	return 0;
 }
@@ -151,6 +159,7 @@ LRESULT CMainFrame::OnViewProviders(WORD, WORD, HWND, BOOL&) {
 	auto view = new CProvidersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Providers", 2, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_PROVIDER);
 
 	return 0;
 }
@@ -159,6 +168,7 @@ LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CLayersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Layers", 3, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_LAYERS);
 
 	return 0;
 }
@@ -167,6 +177,7 @@ LRESULT CMainFrame::OnViewSublayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CSublayersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Sublayers", 4, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_SUBLAYER);
 
 	return 0;
 }
@@ -175,12 +186,13 @@ LRESULT CMainFrame::OnViewCallouts(WORD, WORD, HWND, BOOL&) {
 	auto view = new CCalloutsView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Callouts", 5, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_CALLOUT);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	bool bVisible = !::IsWindowVisible(m_hWndStatusBar);
+	auto bVisible = !::IsWindowVisible(m_hWndStatusBar);
 	::ShowWindow(m_hWndStatusBar, bVisible ? SW_SHOWNOACTIVATE : SW_HIDE);
 	UISetCheck(ID_VIEW_STATUS_BAR, bVisible);
 	UpdateLayout();

@@ -107,6 +107,9 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
+	IPSEC_STATISTICS1 stats;
+	::IPsecGetStatistics(engine.Handle(), &stats);
+
 	switch (argv[1][0]) {
 		case 's': case 'S':
 			DisplaySessions(engine.EnumSessions());

@@ -162,20 +162,20 @@ struct WFPSubLayerInfo {
 };
 
 enum class WFPProviderContextType {
-    IPSEC_KEYING = 0,
-    IPSEC_IKE_QM_TRANSPORT,
-    IPSEC_IKE_QM_TUNNEL,
-    IPSEC_AUTHIP_QM_TRANSPORT,
-    IPSEC_AUTHIP_QM_TUNNEL,
-    IPSEC_IKE_MM,
-    IPSEC_AUTHIP_MM,
-    CLASSIFY_OPTIONS,
-    GENERAL,
-    IPSEC_IKEV2_QM_TUNNEL,
-    IPSEC_IKEV2_MM,
-    IPSEC_DOSP,
-    IPSEC_IKEV2_QM_TRANSPORT,
-    NETWORK_CONNECTION_POLICY,
+    IPSecKeying                     = FWPM_IPSEC_KEYING_CONTEXT,
+    IPSecIkeQuickModeTransport      = FWPM_IPSEC_IKE_QM_TRANSPORT_CONTEXT,
+    IPSecIkeQuickModeTunnel         = FWPM_IPSEC_IKE_QM_TUNNEL_CONTEXT,
+    IPSecAuthIPQuickModeTransport   = FWPM_IPSEC_AUTHIP_QM_TRANSPORT_CONTEXT,
+    IPSecAuthIPQuickModeTunnel      = FWPM_IPSEC_AUTHIP_QM_TUNNEL_CONTEXT,
+    IPSecIkeMainMode                = FWPM_IPSEC_IKE_MM_CONTEXT,
+    IPSecAuthIPMainMode             = FWPM_IPSEC_AUTHIP_MM_CONTEXT,
+    ClassifyOptions                 = FWPM_CLASSIFY_OPTIONS_CONTEXT,
+    General                         = FWPM_GENERAL_CONTEXT,
+    IPSecIkeV2QuickModeTunnel       = FWPM_IPSEC_IKEV2_QM_TUNNEL_CONTEXT,
+    IPSecIKeV2MainMode              = FWPM_IPSEC_IKEV2_MM_CONTEXT,
+    IPSecDosProtection              = FWPM_IPSEC_DOSP_CONTEXT,
+    IPSecIkeV2QuickModeTransport    = FWPM_IPSEC_IKEV2_QM_TRANSPORT_CONTEXT,
+    _Max                            = FWPM_PROVIDER_CONTEXT_TYPE_MAX
 };
 
 //struct WFPProviderContextInfo {
@@ -326,6 +326,7 @@ public:
 	~WFPEngine();
 	void Close();
 	DWORD LastError() const;
+    HANDLE Handle() const;
 
     //
     // enumerations

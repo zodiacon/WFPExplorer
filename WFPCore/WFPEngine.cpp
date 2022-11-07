@@ -24,6 +24,10 @@ DWORD WFPEngine::LastError() const {
 	return m_LastError;
 }
 
+HANDLE WFPEngine::Handle() const {
+	return m_hEngine;
+}
+
 std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
 	HANDLE hEnum;
 	std::vector<WFPProviderInfo> info;
