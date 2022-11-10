@@ -69,7 +69,7 @@ void DisplayLayers(std::vector<WFPLayerInfo> const& layers) {
 			GuidToString(layer.LayerKey).c_str(),
 			layer.LayerId,
 			GuidToString(layer.DefaultSubLayerKey).c_str(),
-			(int)layer.Fields.size(),
+			(int)layer.NumFields,
 			layer.Name.c_str(),
 			layer.Desc.c_str());
 	}
@@ -107,8 +107,7 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	IPSEC_STATISTICS1 stats;
-	::IPsecGetStatistics(engine.Handle(), &stats);
+	auto conns = engine.EnumProviderContexts();
 
 	switch (argv[1][0]) {
 		case 's': case 'S':

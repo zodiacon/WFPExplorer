@@ -11,6 +11,7 @@
 #include "LayersView.h"
 #include "SublayersView.h"
 #include "CalloutsView.h"
+#include "ProviderContextView.h"
 #include "MainFrm.h"
 #include <ToolbarHelper.h>
 
@@ -45,6 +46,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		{ ID_VIEW_LAYERS, IDI_LAYERS },
 		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
 		{ ID_VIEW_CALLOUTS, IDI_CALLOUT },
+		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
 	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
@@ -56,7 +58,10 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
-	UINT icons[] = { IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_SUBLAYER, IDI_CALLOUT };
+	UINT icons[] = { 
+		IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_SUBLAYER, IDI_CALLOUT,
+		IDI_CONTEXT,
+	};
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_view.SetImageList(images);
@@ -98,6 +103,7 @@ void CMainFrame::InitMenu() {
 		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
 		{ ID_OPTIONS_ALWAYSONTOP, IDI_PIN },
 		{ ID_EDIT_DELETE, IDI_DELETE },
+		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)
@@ -160,6 +166,15 @@ LRESULT CMainFrame::OnViewProviders(WORD, WORD, HWND, BOOL&) {
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Providers", 2, view);
 	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_PROVIDER);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewProviderContexts(WORD, WORD, HWND, BOOL&) {
+	auto view = new CProviderContextView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Provider Contexts", 6, view);
+	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_CONTEXT);
 
 	return 0;
 }

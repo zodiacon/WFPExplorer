@@ -28,6 +28,27 @@ HANDLE WFPEngine::Handle() const {
 	return m_hEngine;
 }
 
+std::vector<WFPConnectionInfo> WFPEngine::EnumConnections(bool includeData) {
+	HANDLE hEnum;
+	std::vector<WFPConnectionInfo> info;
+	m_LastError = FwpmConnectionCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+	if (m_LastError)
+		return info;
+	FWPM_CONNECTION** connections;
+	UINT32 count;
+	m_LastError = FwpmConnectionEnum(m_hEngine, hEnum, 128, &connections, &count);
+	if (m_LastError == ERROR_SUCCESS && count > 0) {
+		info.reserve(count);
+		for (UINT32 i = 0; i < count; i++) {
+			auto p = connections[i];
+			info.emplace_back(std::move(InitConnection(p, includeData)));
+		}
+		FwpmFreeMemory((void**)&connections);
+		m_LastError = FwpmConnectionDestroyEnumHandle(m_hEngine, hEnum);
+	}
+	return info;
+}
+
 std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
 	HANDLE hEnum;
 	std::vector<WFPProviderInfo> info;
@@ -117,6 +138,44 @@ WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
 	return pi;
 }
 
+WFPProviderContextInfo WFPEngine::InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool includeData) {
+	WFPProviderContextInfo pi;
+	pi.Name = ParseMUIString(p->displayData.name);
+	pi.Desc = ParseMUIString(p->displayData.description);
+	pi.ProviderContextKey = p->providerContextKey;
+	pi.ProviderContextId = p->providerContextId;
+	pi.Flags = static_cast<WFPProviderContextFlags>(p->flags);
+	pi.ProviderDataSize = p->providerData.size;
+	pi.ProviderKey = p->providerKey ? *p->providerKey : GUID_NULL;
+	pi.Type = static_cast<WFPProviderContextType>(p->type);
+	if (includeData) {
+		pi.ProviderData.resize(p->providerData.size);
+		memcpy(pi.ProviderData.data(), p->providerData.data, p->providerData.size);
+	}
+	return pi;
+}
+
+WFPConnectionInfo WFPEngine::InitConnection(FWPM_CONNECTION* p, bool includeData) {
+	WFPConnectionInfo ci;
+	ci.ConnectionId = p->connectionId;
+	ci.ProviderKey = p->providerKey ? *p->providerKey : GUID_NULL;
+	ci.IpVersion = static_cast<WFPIPVersion>(p->ipVersion);
+	if (ci.IpVersion == WFPIPVersion::V4) {
+		ci.LocalV4Address = p->localV4Address;
+		ci.RemoteV4Address = p->remoteV4Address;
+	}
+	else {
+		memcpy(ci.LocalV6Address, p->localV6Address, sizeof(ci.LocalV6Address));
+		memcpy(ci.RemoteV6Address, p->remoteV6Address, sizeof(ci.RemoteV6Address));
+	}
+	ci.IpSecTrafficModeType = static_cast<WFPIPSecTrafficType>(p->ipsecTrafficModeType);
+	ci.KeyModuleType = static_cast<WFPIkeExtKeyModuleType>(p->keyModuleType);
+
+	if (includeData) {
+	}
+	return ci;
+}
+
 std::wstring WFPEngine::PoorParseMUIString(std::wstring const& path) {
 	static std::unordered_map<std::wstring, std::wstring> cache;
 
@@ -190,3 +249,26 @@ std::vector<WFPNetEventInfo> WFPEngine::EnumNetEvents() {
 	}
 	return events;
 }
+
+std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool includeData) const {
+	HANDLE hEnum;
+	std::vector<WFPProviderContextInfo> info;
+	m_LastError = FwpmProviderContextCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+	if (m_LastError)
+		return info;
+	FWPM_PROVIDER_CONTEXT** contexts;
+	UINT32 count;
+	m_LastError = FwpmProviderContextEnum(m_hEngine, hEnum, 128, &contexts, &count);
+	if (m_LastError == ERROR_SUCCESS && count > 0) {
+		info.reserve(count);
+		for (UINT32 i = 0; i < count; i++) {
+			auto p = contexts[i];
+			info.emplace_back(std::move(InitProviderContext(p, includeData)));
+		}
+		FwpmFreeMemory((void**)&contexts);
+		m_LastError = FwpmProviderContextDestroyEnumHandle(m_hEngine, hEnum);
+	}
+
+	return info;
+}
+

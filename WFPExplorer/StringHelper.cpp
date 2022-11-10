@@ -105,3 +105,35 @@ CString StringHelper::WFPCalloutFlagsToString(WFPCalloutFlags flags) {
 
 	return FlagsToString(flags, data);
 }
+
+CString StringHelper::WFPProviderContextFlagsToString(WFPProviderContextFlags flags) {
+	static const struct {
+		WFPProviderContextFlags flag;
+		PCWSTR text;
+	} data[] = {
+		{ WFPProviderContextFlags::Persistent, L"Persistent" },
+		{ WFPProviderContextFlags::DownLevel, L"Downlevel" },
+	};
+
+	return FlagsToString(flags, data);
+}
+
+PCWSTR StringHelper::WFPProviderContextTypeToString(WFPProviderContextType type) {
+	static PCWSTR types[] = {
+		L"IPSec Keying",
+		L"IPSec Ike Quick Mode Transport",
+		L"IPSec Ike Quick ModeTunnel",
+		L"IPSec AuthIP Quick Mode Transport",
+		L"IPSec AuthIP Quick ModeTunnel",
+		L"IPSec Ike Main Mode",
+		L"IPSec AuthIP Main Mode",
+		L"Classify Options",
+		L"General",
+		L"IPSec IkeV2 Quick Mode Tunnel",
+		L"IPSec IKeV2 Main Mode",
+		L"IPSec Dos Protection",
+		L"IPSec IkeV2 Quick Mode Transport",
+	};
+	ATLASSERT((int)type < _countof(types));
+	return types[(int)type];
+}

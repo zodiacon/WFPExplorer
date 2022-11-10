@@ -72,6 +72,7 @@ BEGIN
         MENUITEM "&Layers",                     ID_VIEW_LAYERS
         MENUITEM "Subla&yers",                  ID_VIEW_SUBLAYERS
         MENUITEM "&Callouts",                   ID_VIEW_CALLOUTS
+        MENUITEM "Provider Conte&xts",          ID_VIEW_PROVIDERCONTEXTS
         MENUITEM SEPARATOR
         MENUITEM "&Refresh",                    ID_VIEW_REFRESH
         MENUITEM SEPARATOR
@@ -135,6 +136,8 @@ IDI_FILTER_DISABLED     ICON                    "res\\filter-disabled.ico"
 IDI_PROVIDER_PERSISTENT ICON                    "res\\provider-persistent.ico"
 
 IDI_SESSION_DYNAMIC     ICON                    "res\\Session-synamic.ico"
+
+IDI_CONTEXT             ICON                    "res\\context.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -203,8 +206,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,0,0
- PRODUCTVERSION 0,1,0,0
+ FILEVERSION 0,2,0,0
+ PRODUCTVERSION 0,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -221,12 +224,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.1.0.0"
+            VALUE "FileVersion", "0.2.0.0"
             VALUE "InternalName", "WFPExplorer"
             VALUE "LegalCopyright", "©2022 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.1.0.0"
+            VALUE "ProductVersion", "0.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -354,6 +357,7 @@ END
 STRINGTABLE
 BEGIN
     ID_VIEW_PROVIDERS       "\nProviders"
+    ID_VIEW_PROVIDERCONTEXTS "\nProvider Contexts"
 END
 
 #endif    // English (United States) resources

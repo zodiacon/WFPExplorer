@@ -239,6 +239,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ProcessHelper.cpp" />
+    <ClCompile Include="ProviderContextView.cpp" />
     <ClCompile Include="ProvidersView.cpp" />
     <ClCompile Include="SessionsView.cpp" />
     <ClCompile Include="StringHelper.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="LayersView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ProcessHelper.h" />
+    <ClInclude Include="ProviderContextView.h" />
     <ClInclude Include="ProvidersView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
@@ -265,6 +267,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\callback.ico" />
+    <Image Include="res\context.ico" />
     <Image Include="res\Copy.ico" />
     <Image Include="res\Cut.ico" />
     <Image Include="res\Delete.ico" />

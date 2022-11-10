@@ -60,6 +60,9 @@
     <ClCompile Include="CalloutsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ProviderContextView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProviderContextView.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +163,9 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\Session-synamic.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\context.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

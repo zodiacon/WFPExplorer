@@ -19,8 +19,8 @@
 #define IDI_PROVIDER                    215
 #define IDI_FILTER_DISABLED             216
 #define IDI_PROVIDER_PERSISTENT         217
-#define IDI_ICON3                       218
 #define IDI_SESSION_DYNAMIC             218
+#define IDI_CONTEXT                     219
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define ID_WINDOW_CLOSE                 32772
@@ -35,13 +35,14 @@
 #define ID_VIEW_CALLOUTS                32782
 #define ID_VIEW_SUBLAYERS               32783
 #define ID_VIEW_PROVIDERS               32784
+#define ID_VIEW_PROVIDERCONTEXTS        32785
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        219
-#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_RESOURCE_VALUE        220
+#define _APS_NEXT_COMMAND_VALUE         32786
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
