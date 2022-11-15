@@ -35,11 +35,12 @@ public:
 
 private:
 	enum class ColumnType {
-		Key, Name, Desc, Flags, Fields, Provider, Id,
+		Key, Name, Desc, Flags, Fields, Provider, Id, Layer,
 	};
 
 	struct CalloutInfo : WFPCalloutInfo {
 		CString Provider;
+		CString Layer;
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

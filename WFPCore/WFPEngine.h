@@ -101,7 +101,7 @@ struct WFPValue {
 		FWP_TOKEN_INFORMATION* tokenInformation;
 		FWP_BYTE_BLOB* tokenAccessInformation;
 		LPWSTR unicodeString;
-		FWP_BYTE_ARRAY6* byteArray6;
+		BYTE byteArray6[6];
 	};
 };
 
@@ -686,6 +686,7 @@ public:
 		ci.ProviderKey = c->providerKey ? *c->providerKey : GUID_NULL;
 		ci.Flags = static_cast<WFPCalloutFlags>(c->flags);
 		ci.CalloutKey = c->calloutKey;
+		ci.ApplicableLayer = c->applicableLayer;
 		ci.ProviderData.resize(c->providerData.size);
 		memcpy(ci.ProviderData.data(), c->providerData.data, c->providerData.size);
 		ci.CalloutId = c->calloutId;

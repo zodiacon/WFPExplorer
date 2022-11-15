@@ -18,6 +18,7 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider", 0, 250, ColumnType::Provider);
+	cm->AddColumn(L"Applicable Layer", 0, 250, ColumnType::Layer);
 	cm->AddColumn(L"Description", 0, 300, ColumnType::Desc);
 
 	CImageList images;
@@ -44,6 +45,18 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 	auto& info = m_Callouts[row];
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
 		case ColumnType::Key: return StringHelper::GuidToString(info.CalloutKey);
+		case ColumnType::Layer: 
+			if (info.Layer.IsEmpty()) {
+				auto layer = m_Engine.GetLayerByKey(info.ApplicableLayer);
+				if (layer && !layer->Name.empty()) {
+					info.Layer = layer->Name.c_str();
+				}
+				else {
+					info.Layer = StringHelper::GuidToString(info.ApplicableLayer);
+				}
+			}
+			return info.Layer;
+
 		case ColumnType::Provider:
 			if (info.Provider.IsEmpty()) {
 				if (info.ProviderKey != GUID_NULL) {
@@ -76,6 +89,7 @@ void CCalloutsView::DoSort(SortInfo const* si) {
 	auto compare = [&](auto& c1, auto& c2) {
 		switch (col) {
 			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(c1.CalloutKey), StringHelper::GuidToString(c2.CalloutKey), asc);
+			case ColumnType::Layer: return SortHelper::Sort(c1.Layer, c2.Layer, asc);
 			case ColumnType::Name: return SortHelper::Sort(c1.Name, c2.Name, asc);
 			case ColumnType::Desc: return SortHelper::Sort(c1.Desc, c2.Desc, asc);
 			case ColumnType::Flags: return SortHelper::Sort(c1.Flags, c2.Flags, asc);
