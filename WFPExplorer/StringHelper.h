@@ -9,6 +9,7 @@ enum class WFPSubLayerFlags;
 enum class WFPCalloutFlags;
 enum class WFPProviderContextFlags;
 enum class WFPProviderContextType;
+enum class WFPActionType;
 
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
@@ -21,6 +22,7 @@ struct StringHelper abstract final {
 	static CString WFPCalloutFlagsToString(WFPCalloutFlags flags);
 	static CString WFPProviderContextFlagsToString(WFPProviderContextFlags flags);
 	static PCWSTR WFPProviderContextTypeToString(WFPProviderContextType type);
+	static PCWSTR WFPFilterActionTypeToString(WFPActionType const& type);
 
 	template<typename TFlags, typename TValue>
 	static CString FlagsToString(TValue value, TFlags const& data) {

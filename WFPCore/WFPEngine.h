@@ -267,6 +267,27 @@ struct WFPFilterCondition {
 	WFPConditionValue Value;
 };
 
+enum class WFPActionType {
+	Block				= 0x00000001 | FWP_ACTION_FLAG_TERMINATING,
+	Permit				= 0x00000002 | FWP_ACTION_FLAG_TERMINATING,
+	CalloutTerminating	= 0x00000003 | FWP_ACTION_FLAG_CALLOUT | FWP_ACTION_FLAG_TERMINATING,
+	CalloutInspection	= 0x00000004 | FWP_ACTION_FLAG_CALLOUT | FWP_ACTION_FLAG_NON_TERMINATING,
+	CalloutUnknown		= 0x00000005 | FWP_ACTION_FLAG_CALLOUT,
+	Continue			= 0x00000006 | FWP_ACTION_FLAG_NON_TERMINATING,
+	None				= 0x00000007,
+	NoneNoMatch			= 0x00000008,
+};
+
+struct WFPFilterAction {
+	WFPActionType Type;
+	union {
+		GUID FilterType;
+		GUID CalloutKey;
+	};
+};
+
+static_assert(sizeof(WFPFilterAction) == sizeof(FWPM_ACTION));
+
 struct WFPFilterInfo {
 	GUID FilterKey;
 	std::wstring Name;
@@ -279,7 +300,7 @@ struct WFPFilterInfo {
 	WFPValue Weight;
 	UINT32 ConditionCount;
 	std::vector<WFPFilterCondition> Conditions;
-	FWPM_ACTION0 action;
+	WFPFilterAction Action;
 	union {
 		UINT64 RawContext;
 		GUID ProviderContextKey;
@@ -612,6 +633,8 @@ public:
 	std::optional<WFPSubLayerInfo> GetSubLayerById(UINT16 id) const;
 
 
+	std::optional<WFPCalloutInfo> GetCalloutByKey(GUID const& key) const;
+
 	//
 	// helpers
 	//
@@ -634,6 +657,8 @@ public:
 		fi.LayerKey = filter->layerKey;
 		fi.SubLayerKey = filter->subLayerKey;
 		fi.Weight = WFPValueInit(filter->weight);
+		fi.Action.Type = static_cast<WFPActionType>(filter->action.type);
+		fi.Action.FilterType = filter->action.filterType;
 		if (includeConditions) {
 			// TODO
 		}

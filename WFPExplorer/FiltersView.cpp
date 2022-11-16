@@ -24,10 +24,28 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::LayerKey: return StringHelper::GuidToString(info.LayerKey);
 		case ColumnType::SubLayerKey: return StringHelper::GuidToString(info.SubLayerKey);
 		case ColumnType::Weight: return StringHelper::WFPValueToString(info.Weight, true);
-		case ColumnType::Flags: 
+		case ColumnType::Action: return StringHelper::WFPFilterActionTypeToString(info.Action.Type);
+		case ColumnType::ActionKey:
+			if (info.FilterAction.IsEmpty()) {
+				if (info.Action.CalloutKey == GUID_NULL)
+					info.FilterAction = L"(None)";
+				else {
+					auto filter = m_Engine.GetFilterByKey(info.Action.FilterType);
+					if (filter)
+						info.FilterAction = filter->Name.c_str();
+					else {
+						auto callout = m_Engine.GetCalloutByKey(info.Action.CalloutKey);
+						if (callout)
+							info.FilterAction = callout->Name.c_str();
+					}
+				}
+			}
+			return info.FilterAction;
+
+		case ColumnType::Flags:
 			if (info.Flags == WFPFilterFlags::None)
 				return L"0";
-			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, 
+			return std::format(L"0x{:02X} ({})", (UINT32)info.Flags, 
 				(PCWSTR)StringHelper::WFPFilterFlagsToString(info.Flags)).c_str();
 		case ColumnType::EffectiveWeight: return StringHelper::WFPValueToString(info.EffectiveWeight, true);
 		case ColumnType::ProviderName: return GetProviderName(info);
@@ -76,9 +94,11 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Filter Key", 0, 250, ColumnType::Key);
+	cm->AddColumn(L"Filter Key", 0, 270, ColumnType::Key);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 90, ColumnType::Weight);
 	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 90, ColumnType::EffectiveWeight);
+	cm->AddColumn(L"Action", LVCFMT_LEFT, 110, ColumnType::Action);
+	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
 	cm->AddColumn(L"Filter Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
@@ -88,7 +108,9 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
-	images.AddIcon(AtlLoadIconImage(IDI_FILTER, 0, 16, 16));
+	UINT icons[] = { IDI_FILTER, IDI_FILTER_PERMIT, IDI_FILTER_BLOCK, IDI_FILTER_REFRESH };
+	for(auto icon : icons)
+		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
@@ -110,6 +132,8 @@ void CFiltersView::DoSort(SortInfo const* si) {
 			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(f1.FilterKey), StringHelper::GuidToString(f2.FilterKey), asc);
 			case ColumnType::Name: return SortHelper::Sort(f1.Name, f2.Name, asc);
 			case ColumnType::Desc: return SortHelper::Sort(f1.Desc, f2.Desc, asc);
+			case ColumnType::Action: return SortHelper::Sort(f1.Action.Type, f2.Action.Type, asc);
+			case ColumnType::ActionKey: return SortHelper::Sort(f1.FilterAction, f2.FilterAction, asc);
 			case ColumnType::Flags: return SortHelper::Sort(f1.Flags, f2.Flags, asc);
 			case ColumnType::ProviderName: return SortHelper::Sort(GetProviderName(f1), GetProviderName(f2), asc);
 			case ColumnType::Weight: return SortHelper::Sort(f1.Weight.uint8, f2.Weight.uint8, asc);
@@ -127,5 +151,11 @@ int CFiltersView::GetSaveColumnRange(HWND, int&) const {
 }
 
 int CFiltersView::GetRowImage(HWND, int row, int col) const {
+	auto& filter = m_Filters[row];
+	switch (filter.Action.Type) {
+		case WFPActionType::Block: return 2;
+		case WFPActionType::Permit: return 1;
+		case WFPActionType::Continue: return 3;
+	}
 	return 0;
 }

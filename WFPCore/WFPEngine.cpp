@@ -272,3 +272,10 @@ std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool include
 	return info;
 }
 
+std::optional<WFPCalloutInfo> WFPEngine::GetCalloutByKey(GUID const& key) const {
+	FWPM_CALLOUT* co;
+	FwpmCalloutGetByKey(m_hEngine, &key, &co);
+	auto info = InitCallout(co);
+	FwpmFreeMemory((void**)&co);
+	return info;
+}

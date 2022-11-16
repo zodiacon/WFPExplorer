@@ -107,7 +107,7 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	auto conns = engine.EnumProviderContexts();
+	auto conns = engine.EnumConnections();
 
 	switch (argv[1][0]) {
 		case 's': case 'S':

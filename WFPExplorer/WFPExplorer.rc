@@ -139,6 +139,12 @@ IDI_SESSION_DYNAMIC     ICON                    "res\\Session-synamic.ico"
 
 IDI_CONTEXT             ICON                    "res\\context.ico"
 
+IDI_FILTER_REFRESH      ICON                    "res\\FilteringRefresh.ico"
+
+IDI_FILTER_BLOCK        ICON                    "res\\Filteringrestricted.ico"
+
+IDI_FILTER_PERMIT       ICON                    "res\\FilteringRightArrow.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -274,6 +274,9 @@
     <Image Include="res\engine.ico" />
     <Image Include="res\filter-disabled.ico" />
     <Image Include="res\Filter.ico" />
+    <Image Include="res\FilteringRefresh.ico" />
+    <Image Include="res\Filteringrestricted.ico" />
+    <Image Include="res\FilteringRightArrow.ico" />
     <Image Include="res\layers.ico" />
     <Image Include="res\Paste.ico" />
     <Image Include="res\pin.ico" />

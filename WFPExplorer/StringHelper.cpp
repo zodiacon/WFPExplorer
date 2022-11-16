@@ -137,3 +137,17 @@ PCWSTR StringHelper::WFPProviderContextTypeToString(WFPProviderContextType type)
 	ATLASSERT((int)type < _countof(types));
 	return types[(int)type];
 }
+
+PCWSTR StringHelper::WFPFilterActionTypeToString(WFPActionType const& type) {
+	switch (type) {
+		case WFPActionType::Block: return L"Block";
+		case WFPActionType::Permit: return L"Permit";
+		case WFPActionType::CalloutTerminating: return L"Callout Terminating";
+		case WFPActionType::CalloutInspection: return L"Callout Inspection";
+		case WFPActionType::CalloutUnknown: return L"Callout Unknown";
+		case WFPActionType::Continue: return L"Continue";
+		case WFPActionType::None: return L"None";
+		case WFPActionType::NoneNoMatch: return L"None (No Match)";
+	}
+	return PCWSTR();
+}

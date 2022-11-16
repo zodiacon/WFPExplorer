@@ -168,6 +168,15 @@
     <Image Include="res\context.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\FilteringRefresh.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Filteringrestricted.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\FilteringRightArrow.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
