@@ -38,6 +38,7 @@ LRESULT CProvidersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 void CProvidersView::Refresh() {
 	m_Providers = m_Engine.EnumProviders();
 	m_List.SetItemCountEx((int)m_Providers.size(), LVSICF_NOSCROLL);
+	Frame()->SetStatusText(2, std::format(L"{} Providers", m_Providers.size()).c_str());
 }
 
 CString CProvidersView::GetColumnText(HWND, int row, int col) {

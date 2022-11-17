@@ -36,6 +36,10 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	}
 
 	CreateSimpleStatusBar();
+	m_StatusBar.SubclassWindow(m_hWndStatusBar);
+	int parts[] = { 120, 240, 360, 480, 600, 720, 840 };
+	m_StatusBar.SetParts(_countof(parts), parts);
+	m_StatusBar.RedrawWindow();
 
 	ToolBarButtonInfo const buttons[] = {
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
@@ -84,6 +88,10 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UpdateUI();
 
 	return 0;
+}
+
+void CMainFrame::SetStatusText(int index, PCWSTR text) {
+	m_StatusBar.SetText(index, text, 0);
 }
 
 void CMainFrame::InitMenu() {

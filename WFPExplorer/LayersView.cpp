@@ -39,6 +39,7 @@ LRESULT CLayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 void CLayersView::Refresh() {
 	m_Layers = m_Engine.EnumLayers<LayerInfo>();
 	m_List.SetItemCountEx((int)m_Layers.size(), LVSICF_NOSCROLL);
+	Frame()->SetStatusText(4, std::format(L"{} Layers", m_Layers.size()).c_str());
 }
 
 CString CLayersView::GetColumnText(HWND, int row, int col) {

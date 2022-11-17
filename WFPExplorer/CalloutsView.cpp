@@ -39,6 +39,7 @@ LRESULT CCalloutsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 void CCalloutsView::Refresh() {
 	m_Callouts = m_Engine.EnumCallouts<CalloutInfo>();
 	m_List.SetItemCountEx((int)m_Callouts.size(), LVSICF_NOSCROLL);
+	Frame()->SetStatusText(5, std::format(L"{} Callouts", m_Callouts.size()).c_str());
 }
 
 CString CCalloutsView::GetColumnText(HWND, int row, int col) {

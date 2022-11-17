@@ -38,6 +38,7 @@ LRESULT CSublayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 void CSublayersView::Refresh() {
 	m_Layers = m_Engine.EnumSubLayers<SubLayerInfo>();
 	m_List.SetItemCountEx((int)m_Layers.size(), LVSICF_NOSCROLL);
+	Frame()->SetStatusText(6, std::format(L"{} Sublayers", m_Layers.size()).c_str());
 }
 
 CString CSublayersView::GetColumnText(HWND, int row, int col) {
