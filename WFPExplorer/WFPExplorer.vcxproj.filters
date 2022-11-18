@@ -22,6 +22,9 @@
     <Filter Include="Dialogs">
       <UniqueIdentifier>{f00a7e40-bce0-4e4b-98eb-144534e3639f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PropertyPages">
+      <UniqueIdentifier>{194f6333-698f-4887-bc77-19bf2a1a09ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -62,6 +65,15 @@
     </ClCompile>
     <ClCompile Include="ProviderContextView.cpp">
       <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterGeneralPage.cpp">
+      <Filter>PropertyPages</Filter>
+    </ClCompile>
+    <ClCompile Include="WFPHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterConditionsPage.cpp">
+      <Filter>PropertyPages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +118,15 @@
     </ClInclude>
     <ClInclude Include="ProviderContextView.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterGeneralPage.h">
+      <Filter>PropertyPages</Filter>
+    </ClInclude>
+    <ClInclude Include="WFPHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterConditionsPage.h">
+      <Filter>PropertyPages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +196,15 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\FilteringRightArrow.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\properties.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Object.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Condition.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

@@ -20,6 +20,7 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex) {
 		case WFPDataType::UINT64: str.Format(hex ? L"0x%llX" : L"%llu", value.uint64); break;
 		case WFPDataType::FLOAT: str.Format(L"%f", value.float32); break;
 		case WFPDataType::DOUBLE: str.Format(L"%lf", value.double64); break;
+		case WFPDataType::UNICODE_STRING_TYPE: return value.unicodeString;
 	}
 	return str;
 }
@@ -138,7 +139,189 @@ PCWSTR StringHelper::WFPProviderContextTypeToString(WFPProviderContextType type)
 	return types[(int)type];
 }
 
-PCWSTR StringHelper::WFPFilterActionTypeToString(WFPActionType const& type) {
+PCWSTR StringHelper::WFPConditionMatchToString(WFPMatchType type) {
+	switch(type) {
+		case WFPMatchType::Equal: return L"Equal";
+		case WFPMatchType::Greater: return L"Greater";
+		case WFPMatchType::Less: return L"Less";
+		case WFPMatchType::GreaterOrEqual: return L"Greater or Equal";
+		case WFPMatchType::LessOrEqual: return L"Less or Equal";
+		case WFPMatchType::Range: return L"Range";
+		case WFPMatchType::FlagsAllSet: return L"Flags All Set";
+		case WFPMatchType::FlagsAnySet: return L"Flags Any Set";
+		case WFPMatchType::FlagsNoneSet: return L"Flags Non Set";
+		case WFPMatchType::EqualCaseInsensitive: return L"Equal Case Insensitive";
+		case WFPMatchType::NotEqual: return L"Not Equal";
+		case WFPMatchType::Prefix: return L"Prefix";
+		case WFPMatchType::NotPrefix: return L"Not Prefix";
+	}
+	ATLASSERT(false);
+	return L"";
+}
+
+CString StringHelper::WFPConditionValueToString(WFPConditionValue const& value, bool hex) {
+	return WFPValueToString((WFPValue&)value, hex);
+}
+
+PCWSTR StringHelper::WFPDataTypeToString(WFPDataType type) {
+	switch (type) {
+		case WFPDataType::UINT8: return L"UINT8";
+		case WFPDataType::UINT16: return L"UINT16";
+		case WFPDataType::UINT32: return L"UINT32";
+		case WFPDataType::UINT64: return L"UINT64";
+		case WFPDataType::INT8: return L"INT8";
+		case WFPDataType::INT16: return L"INT16";
+		case WFPDataType::INT32: return L"INT32";
+		case WFPDataType::INT64: return L"INT64";
+		case WFPDataType::FLOAT: return L"FLOAT";
+		case WFPDataType::DOUBLE: return L"DOUBLE";
+		case WFPDataType::BYTE_BLOB_TYPE: return L"BLOB";
+		case WFPDataType::BYTE_ARRAY6_TYPE: return L"BYTE[6]";
+		case WFPDataType::RANGE_TYPE: return L"RANGE";
+		case WFPDataType::BYTE_ARRAY16_TYPE: return L"BYTE[16]";
+		case WFPDataType::SID: return L"SID";
+		case WFPDataType::TOKEN_INFORMATION_TYPE: return L"Token Info";
+		case WFPDataType::TOKEN_ACCESS_INFORMATION_TYPE: return L"Token Access";
+		case WFPDataType::SECURITY_DESCRIPTOR_TYPE: return L"SD";
+		case WFPDataType::UNICODE_STRING_TYPE: return L"Unicode String";
+		case WFPDataType::V4_ADDR_MASK: return L"V4 Address";
+		case WFPDataType::V6_ADDR_MASK: return L"V6 Address";
+	}
+	return L"";
+}
+
+namespace std {
+	template<>
+	struct hash<GUID> {
+		size_t operator()(GUID const& guid) const {
+			return guid.Data1 ^ (guid.Data2 << 16) | ((size_t)guid.Data3 << 32);
+		}
+
+	};
+}
+
+CString StringHelper::WFPConditionFieldKeyToString(GUID const& key) {
+	static const std::unordered_map<GUID, CString> fields {
+		{ FWPM_CONDITION_SOURCE_INTERFACE_INDEX, L"Source Interface Index" },
+		{ FWPM_CONDITION_SUB_INTERFACE_INDEX, L"Subinterface Index" },
+		{ FWPM_CONDITION_TUNNEL_TYPE, L"Tunnel Type" },
+		{ FWPM_CONDITION_INTERFACE_TYPE, L"Interface Type" },
+		{ FWPM_CONDITION_INTERFACE_QUARANTINE_EPOCH, L"Interface Qurantine Epoch" },
+		{ FWPM_CONDITION_IP_PHYSICAL_NEXTHOP_INTERFACE, L"IP Physical Next Hop Interface" },
+		{ FWPM_CONDITION_IP_PHYSICAL_ARRIVAL_INTERFACE, L"IP Physical Arrival Interface" },
+		{ FWPM_CONDITION_ORIGINAL_ICMP_TYPE, L"Original ICMP Type" },
+		{ FWPM_CONDITION_REAUTHORIZE_REASON, L"Reauthorize Reason" },
+		{ FWPM_CONDITION_NEXTHOP_INTERFACE_PROFILE_ID, L"Next Hop Interface Profile ID" },
+		{ FWPM_CONDITION_ARRIVAL_INTERFACE_PROFILE_ID, L"Arrival Interface Profile ID" },
+		{ FWPM_CONDITION_LOCAL_INTERFACE_PROFILE_ID, L"Local Interface Profile ID" },
+		{ FWPM_CONDITION_CURRENT_PROFILE_ID, L"Current Profile ID" },
+		{ FWPM_CONDITION_ORIGINAL_PROFILE_ID, L"Original Profile ID" },
+		{ FWPM_CONDITION_NEXTHOP_INTERFACE_INDEX, L"Next Hop Interface Index" },
+		{ FWPM_CONDITION_NEXTHOP_TUNNEL_TYPE, L"Next Hop Tunnel Type" },
+		{ FWPM_CONDITION_NEXTHOP_INTERFACE_TYPE, L"Next Hop Interface Type" },
+		{ FWPM_CONDITION_IP_NEXTHOP_INTERFACE, L"IP Next Hop Interface" },
+		{ FWPM_CONDITION_NEXTHOP_SUB_INTERFACE_INDEX, L"Next Hop Subinterface Index" },
+		{ FWPM_CONDITION_ARRIVAL_INTERFACE_INDEX, L"Arrival Interface Index" },
+		{ FWPM_CONDITION_ARRIVAL_TUNNEL_TYPE, L"Arrival Tunnel Type" },
+		{ FWPM_CONDITION_ARRIVAL_INTERFACE_TYPE, L"Arrival Interface Type" },
+		{ FWPM_CONDITION_IP_ARRIVAL_INTERFACE, L"IP Arrival Interface" },
+		{ FWPM_CONDITION_IP_LOCAL_INTERFACE, L"IP Local Interface" },
+		{ FWPM_CONDITION_IP_NEXTHOP_ADDRESS, L"IP Next Hop Address" },
+		{ FWPM_CONDITION_IP_DESTINATION_ADDRESS_TYPE, L"IP Destination Address Type" },
+		{ FWPM_CONDITION_IP_LOCAL_ADDRESS_TYPE, L"IP Local Address Type" },
+		{ FWPM_CONDITION_IP_DESTINATION_ADDRESS, L"IP Destination Address" },
+		{ FWPM_CONDITION_IP_SOURCE_ADDRESS, L"IP Source Address" },
+		{ FWPM_CONDITION_IP_REMOTE_ADDRESS, L"IP Remote Address" },
+		{ FWPM_CONDITION_IP_LOCAL_ADDRESS, L"IP Local Address" },
+		{ FWPM_CONDITION_ALE_EFFECTIVE_NAME, L"ALE Effective Name" },
+		{ FWPM_CONDITION_IPSEC_SECURITY_REALM_ID, L"IPSec Security Realm ID" },
+		{ FWPM_CONDITION_INTERFACE_MAC_ADDRESS, L"Interface MAC Address" },
+		{ FWPM_CONDITION_MAC_LOCAL_ADDRESS, L"MAC Local Address" },
+		{ FWPM_CONDITION_MAC_REMOTE_ADDRESS, L"MAC Remote Address" },
+		{ FWPM_CONDITION_ETHER_TYPE, L"Ether Type" },
+		{ FWPM_CONDITION_VLAN_ID, L"VLAN ID" },
+		{ FWPM_CONDITION_VSWITCH_TENANT_NETWORK_ID, L"V-Switch Tenant Network ID" },
+		{ FWPM_CONDITION_NDIS_PORT, L"NDIS Port" },
+		{ FWPM_CONDITION_NDIS_MEDIA_TYPE, L"NDIS Media Type" },
+		{ FWPM_CONDITION_NDIS_PHYSICAL_MEDIA_TYPE, L"NDIS Physical Media Type" },
+		{ FWPM_CONDITION_L2_FLAGS, L"L2 Flags" },
+		{ FWPM_CONDITION_MAC_LOCAL_ADDRESS_TYPE, L"MAC Local Address Type" },
+		{ FWPM_CONDITION_MAC_REMOTE_ADDRESS_TYPE, L"MAC Remote Address Type" },
+		{ FWPM_CONDITION_ALE_PACKAGE_ID, L"ALE Package ID" },
+		{ FWPM_CONDITION_MAC_SOURCE_ADDRESS, L"MAC Source Address" },
+		{ FWPM_CONDITION_MAC_DESTINATION_ADDRESS, L"MAC Destination Address" },
+		{ FWPM_CONDITION_MAC_SOURCE_ADDRESS_TYPE, L"MAC Source Address Type" },
+		{ FWPM_CONDITION_MAC_DESTINATION_ADDRESS_TYPE, L"MAC Destination Address Type" },
+		{ FWPM_CONDITION_IP_SOURCE_PORT, L"IP Source Port" },
+		{ FWPM_CONDITION_IP_DESTINATION_PORT, L"IP Destination Port" },
+		{ FWPM_CONDITION_VSWITCH_ID, L"V-Switch ID" },
+		{ FWPM_CONDITION_VSWITCH_NETWORK_TYPE, L" V-Switch Network Type" },
+		{ FWPM_CONDITION_FLAGS, L"Flags" },
+		{ FWPM_CONDITION_ALE_APP_ID, L"ALE App ID" },
+		{ FWPM_CONDITION_DESTINATION_INTERFACE_INDEX, L"Destination Interface Index" },
+		{ FWPM_CONDITION_DESTINATION_SUB_INTERFACE_INDEX, L"Destination Subinterface Index" },
+		{ FWPM_CONDITION_ALE_ORIGINAL_APP_ID, L"ALE Original App ID" },
+		{ FWPM_CONDITION_ALE_USER_ID, L"ALE User ID" },
+		{ FWPM_CONDITION_ALE_REMOTE_USER_ID, L"ALE Remote User ID" },
+		{ FWPM_CONDITION_ALE_REMOTE_MACHINE_ID, L"ALE Remote Machine ID" },
+		{ FWPM_CONDITION_ALE_PROMISCUOUS_MODE, L"ALE Promiscuous Mode" },
+		{ FWPM_CONDITION_ALE_SIO_FIREWALL_SYSTEM_PORT, L"ALE SI/O Firewall System Port" },
+		{ FWPM_CONDITION_ALE_REAUTH_REASON, L"ALE Reauth Reason" },
+		{ FWPM_CONDITION_ALE_NAP_CONTEXT, L"ALE NAP Context" },
+		{ FWPM_CONDITION_KM_AUTH_NAP_CONTEXT, L"KM ALE NAP Context" },
+		{ FWPM_CONDITION_REMOTE_USER_TOKEN, L"Remote User Token" },
+		{ FWPM_CONDITION_RPC_IF_UUID, L"RPC Interface UUID" },
+		{ FWPM_CONDITION_RPC_IF_VERSION, L"RPC Interface Version" },
+		{ FWPM_CONDITION_RPC_IF_FLAG, L"RPC Interface Flag" },
+		{ FWPM_CONDITION_DCOM_APP_ID, L"DCOM App ID" },
+		{ FWPM_CONDITION_IMAGE_NAME, L"Image Name" },
+		{ FWPM_CONDITION_RPC_PROTOCOL, L"RPC Protocol" },
+		{ FWPM_CONDITION_RPC_AUTH_TYPE, L"RPC Auth Type" },
+		{ FWPM_CONDITION_RPC_AUTH_LEVEL, L"RPC Auth Level" },
+		{ FWPM_CONDITION_SEC_ENCRYPT_ALGORITHM, L"Security Encryption Algorithm" },
+		{ FWPM_CONDITION_SEC_KEY_SIZE, L"Security Key Size" },
+		{ FWPM_CONDITION_IP_LOCAL_ADDRESS_V4, L"IP Local Address V4" },
+		{ FWPM_CONDITION_IP_LOCAL_ADDRESS_V6, L"IP Local Address V6" },
+		{ FWPM_CONDITION_PIPE, L"Pipe" },
+		{ FWPM_CONDITION_IP_REMOTE_ADDRESS_V4, L"IP Remote Address V4" },
+		{ FWPM_CONDITION_IP_REMOTE_ADDRESS_V6, L"IP Remote Address V6" },
+		{ FWPM_CONDITION_PROCESS_WITH_RPC_IF_UUID, L"Process with RPC Interface UUID" },
+		{ FWPM_CONDITION_RPC_EP_VALUE, L"RPC EP Value" },
+		{ FWPM_CONDITION_RPC_EP_FLAGS, L"RPC EP Flags" },
+		{ FWPM_CONDITION_CLIENT_TOKEN, L"Client Token" },
+		{ FWPM_CONDITION_RPC_SERVER_NAME, L"RPC Server Name" },
+		{ FWPM_CONDITION_RPC_SERVER_PORT, L"RPC Server Port" },
+		{ FWPM_CONDITION_RPC_PROXY_AUTH_TYPE, L"RPC Proxy Auth Type" },
+		{ FWPM_CONDITION_CLIENT_CERT_KEY_LENGTH, L"Client Certificate Key Length" },
+		{ FWPM_CONDITION_CLIENT_CERT_OID, L"Client Certificate OID" },
+		{ FWPM_CONDITION_NET_EVENT_TYPE, L"NET Event Type" },
+		{ FWPM_CONDITION_PEER_NAME, L"Peer Name" },
+		{ FWPM_CONDITION_REMOTE_ID, L"Remote ID" },
+		{ FWPM_CONDITION_AUTHENTICATION_TYPE, L"Authentication Type" },
+		{ FWPM_CONDITION_KM_TYPE, L"KM Type" },
+		{ FWPM_CONDITION_KM_MODE, L"KM Mode" },
+		{ FWPM_CONDITION_IPSEC_POLICY_KEY, L"IPSec Policy Key" },
+		{ FWPM_CONDITION_QM_MODE, L"QM Mode" },
+		{ FWPM_CONDITION_COMPARTMENT_ID, L"Compartment ID" },
+		{ FWPM_CONDITION_IP_PROTOCOL, L"IP Protocol" },
+		{ FWPM_CONDITION_IP_FORWARD_INTERFACE, L"IP Forward Interface" },
+		{ FWPM_CONDITION_IP_REMOTE_PORT, L"IP Remote Port" },
+		{ FWPM_CONDITION_IP_LOCAL_PORT, L"IP Local Port" },
+		{ FWPM_CONDITION_EMBEDDED_LOCAL_ADDRESS_TYPE, L"Embedded Local Address Type" },
+		{ FWPM_CONDITION_EMBEDDED_REMOTE_ADDRESS, L"Embedded Remote Address" },
+		{ FWPM_CONDITION_EMBEDDED_PROTOCOL, L"Embedded Protocol" },
+		{ FWPM_CONDITION_EMBEDDED_LOCAL_PORT, L"Embedded Local Port" },
+		{ FWPM_CONDITION_EMBEDDED_REMOTE_PORT, L"Embedded Remote Port" },
+		{ FWPM_CONDITION_DIRECTION, L"Direction" },
+		{ FWPM_CONDITION_INTERFACE_INDEX, L"Interface Index" },
+	};
+	if (auto it = fields.find(key); it != fields.end())
+		return it->second;
+
+	return GuidToString(key);
+}
+
+PCWSTR StringHelper::WFPFilterActionTypeToString(WFPActionType type) {
 	switch (type) {
 		case WFPActionType::Block: return L"Block";
 		case WFPActionType::Permit: return L"Permit";

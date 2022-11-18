@@ -71,6 +71,28 @@ std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
 	return info;
 }
 
+std::vector<WFPSystemPortByType> WFPEngine::EnumSystemPorts() {
+	FWPM_SYSTEM_PORTS* ports;
+	m_LastError = ::FwpmSystemPortsGet(m_hEngine, &ports);
+	if (m_LastError)
+		return {};
+
+	std::vector<WFPSystemPortByType> sports;
+	sports.reserve(ports->numTypes);
+	for (UINT32 i = 0; i < ports->numTypes; i++) {
+		WFPSystemPortByType p;
+		auto& port = ports->types[i];
+		p.Type = static_cast<WFPSystemPortType>(port.type);
+		if (port.numPorts) {
+			p.Ports.resize(port.numPorts);
+			memcpy(p.Ports.data(), port.ports, sizeof(uint16_t) * port.numPorts);
+		}
+		sports.emplace_back(std::move(p));
+	}
+	::FwpmFreeMemory((void**)&ports);
+	return sports;
+}
+
 std::optional<WFPProviderInfo> WFPEngine::GetProviderByKey(GUID const& guid) const {
 	FWPM_PROVIDER* provider;
 	m_LastError = FwpmProviderGetByKey(m_hEngine, &guid, &provider);
@@ -82,24 +104,24 @@ std::optional<WFPProviderInfo> WFPEngine::GetProviderByKey(GUID const& guid) con
 	return p;
 }
 
-std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key) const {
+std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key, bool includeConditions) const {
 	FWPM_FILTER* filter;
 	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
-	auto info = InitFilter(filter);
+	auto info = InitFilter(filter, includeConditions);
 	FwpmFreeMemory((void**)&filter);
 	return info;
 }
 
-std::optional<WFPFilterInfo> WFPEngine::GetFilterById(UINT64 id) const {
+std::optional<WFPFilterInfo> WFPEngine::GetFilterById(UINT64 id, bool includeConditions) const {
 	FWPM_FILTER* filter;
 	m_LastError = FwpmFilterGetById(m_hEngine, id, &filter);
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
-	auto info = InitFilter(filter, true);
+	auto info = InitFilter(filter, includeConditions);
 	FwpmFreeMemory((void**)&filter);
 	return info;
 }
@@ -115,7 +137,7 @@ std::optional<WFPLayerInfo> WFPEngine::GetLayerByKey(GUID const& key) const {
 	return info;
 }
 
-std::optional<WFPSubLayerInfo> WFPEngine::GetSubLayerByKey(GUID const& key) const {
+std::optional<WFPSubLayerInfo> WFPEngine::GetSublayerByKey(GUID const& key) const {
 	FWPM_SUBLAYER* sublayer;
 	FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
 	auto info = InitSubLayer(sublayer);
@@ -221,18 +243,17 @@ std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 	return input;
 }
 
-WFPValue WFPValueInit(FWP_VALUE const& value) {
-	WFPValue result;
-	result.Type = (WFPDataType)value.type;
+WFPValue& WFPValue::Init(FWP_VALUE const& value) {
+	Type = static_cast<WFPDataType>(value.type);
 
-	switch (result.Type) {
-		case WFPDataType::INT64: result.int64 = *value.int64; break;
-		case WFPDataType::UINT64: result.uint64 = *value.uint64; break;
-		case WFPDataType::DOUBLE: result.double64 = *value.double64; break;
+	switch (Type) {
+		case WFPDataType::INT64: int64 = *value.int64; break;
+		case WFPDataType::UINT64: uint64 = *value.uint64; break;
+		case WFPDataType::DOUBLE: double64 = *value.double64; break;
 		default:
-			memcpy(&result, &value, sizeof(value));
+			memcpy(this, &value, sizeof(value));
 	}
-	return result;
+	return *this;
 }
 
 std::vector<WFPNetEventInfo> WFPEngine::EnumNetEvents() {
@@ -278,4 +299,17 @@ std::optional<WFPCalloutInfo> WFPEngine::GetCalloutByKey(GUID const& key) const 
 	auto info = InitCallout(co);
 	FwpmFreeMemory((void**)&co);
 	return info;
+}
+
+WFPConditionValue& WFPConditionValue::Init(FWP_CONDITION_VALUE const& value) {
+	Type = static_cast<WFPDataType>(value.type);
+	switch (Type) {
+		case WFPDataType::INT64: int64 = *value.int64; break;
+		case WFPDataType::UINT64: uint64 = *value.uint64; break;
+		case WFPDataType::DOUBLE: double64 = *value.double64; break;
+		default:
+			memcpy(this, &value, sizeof(value));
+	}
+
+	return *this;
 }

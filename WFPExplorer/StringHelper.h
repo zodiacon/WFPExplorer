@@ -1,6 +1,7 @@
 #pragma once
 
 struct WFPValue;
+struct WFPConditionValue;
 enum class WFPFilterFlags;
 enum class WFPLayerFlags;
 enum class WFPSessionFlags;
@@ -10,6 +11,8 @@ enum class WFPCalloutFlags;
 enum class WFPProviderContextFlags;
 enum class WFPProviderContextType;
 enum class WFPActionType;
+enum class WFPMatchType;
+enum class WFPDataType;
 
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
@@ -22,7 +25,11 @@ struct StringHelper abstract final {
 	static CString WFPCalloutFlagsToString(WFPCalloutFlags flags);
 	static CString WFPProviderContextFlagsToString(WFPProviderContextFlags flags);
 	static PCWSTR WFPProviderContextTypeToString(WFPProviderContextType type);
-	static PCWSTR WFPFilterActionTypeToString(WFPActionType const& type);
+	static PCWSTR WFPFilterActionTypeToString(WFPActionType type);
+	static PCWSTR WFPConditionMatchToString(WFPMatchType type);
+	static CString WFPConditionValueToString(WFPConditionValue const& value, bool hex = false);
+	static PCWSTR WFPDataTypeToString(WFPDataType type);
+	static CString WFPConditionFieldKeyToString(GUID const& key);
 
 	template<typename TFlags, typename TValue>
 	static CString FlagsToString(TValue value, TFlags const& data) {

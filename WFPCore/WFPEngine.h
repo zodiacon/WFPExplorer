@@ -82,6 +82,8 @@ enum class WFPDataType {
 };
 
 struct WFPValue {
+	WFPValue& Init(FWP_VALUE const& value);
+
 	WFPDataType Type;
 	union {
 		UINT8 uint8;
@@ -103,9 +105,8 @@ struct WFPValue {
 		LPWSTR unicodeString;
 		BYTE byteArray6[6];
 	};
+	~WFPValue();
 };
-
-WFPValue WFPValueInit(FWP_VALUE const& value);
 
 enum class WFPLayerFlags {
 	None,
@@ -214,19 +215,19 @@ struct WFPProviderContextInfo {
 };
 
 enum class WFPMatchType {
-	EQUAL,
-	GREATER,
-	LESS,
-	GREATER_OR_EQUAL,
-	LESS_OR_EQUAL,
-	RANGE,
-	FLAGS_ALL_SET,
-	FLAGS_ANY_SET,
-	FLAGS_NONE_SET,
-	EQUAL_CASE_INSENSITIVE,
-	NOT_EQUAL,
-	PREFIX,
-	NOT_PREFIX,
+	Equal,
+	Greater,
+	Less,
+	GreaterOrEqual,
+	LessOrEqual,
+	Range,
+	FlagsAllSet,
+	FlagsAnySet,
+	FlagsNoneSet,
+	EqualCaseInsensitive,
+	NotEqual,
+	Prefix,
+	NotPrefix,
 };
 
 struct WFPRange {
@@ -235,18 +236,20 @@ struct WFPRange {
 };
 
 struct WFPConditionValue {
+	WFPConditionValue& Init(FWP_CONDITION_VALUE const& value);
+
 	WFPDataType Type;
 	union {
 		UINT8 uint8;
 		UINT16 uint16;
 		UINT32 uint32;
-		UINT64* uint64;
+		UINT64 uint64;
 		INT8 int8;
 		INT16 int16;
 		INT32 int32;
-		INT64* int64;
+		INT64 int64;
 		float float32;
-		double* double64;
+		double double64;
 		FWP_BYTE_ARRAY16* byteArray16;
 		FWP_BYTE_BLOB* byteBlob;
 		SID* sid;
@@ -254,7 +257,7 @@ struct WFPConditionValue {
 		FWP_TOKEN_INFORMATION* tokenInformation;
 		FWP_BYTE_BLOB* tokenAccessInformation;
 		LPWSTR unicodeString;
-		FWP_BYTE_ARRAY6* byteArray6;
+		BYTE byteArray6[6];
 		FWP_V4_ADDR_AND_MASK* v4AddrMask;
 		FWP_V6_ADDR_AND_MASK* v6AddrMask;
 		WFPRange* rangeValue;
@@ -466,6 +469,18 @@ struct WFPConnectionInfo {
 	int64_t StartSysTime;
 };
 
+enum class WFPSystemPortType {
+	RPC_EPMAP = 0,
+	Teredo,
+	IPHTTPS_In,
+	IPHTTPS_Out,
+};
+
+struct WFPSystemPortByType {
+	WFPSystemPortType Type;
+	std::vector<uint16_t> Ports;
+};
+
 class WFPEngine {
 public:
 	bool Open(DWORD auth = RPC_C_AUTHN_WINNT);
@@ -480,6 +495,7 @@ public:
 
 	std::vector<WFPNetEventInfo> EnumNetEvents();
 	std::vector<WFPConnectionInfo> EnumConnections(bool includeData = false);
+	std::vector<WFPSystemPortByType> EnumSystemPorts();
 
 	template<typename TSession = WFPSessionInfo> requires std::is_base_of_v<WFPSessionInfo, TSession>
 	std::vector<TSession> EnumSessions() const {
@@ -618,8 +634,8 @@ public:
 	//
 	// Filters API
 	//
-	std::optional<WFPFilterInfo> GetFilterByKey(GUID const& key) const;
-	std::optional<WFPFilterInfo> GetFilterById(UINT64 id) const;
+	std::optional<WFPFilterInfo> GetFilterByKey(GUID const& key, bool includeConditions = false) const;
+	std::optional<WFPFilterInfo> GetFilterById(UINT64 id, bool includeConditions = false) const;
 
 	//
 	// layer API
@@ -629,8 +645,8 @@ public:
 	//
 	// sublayer API
 	//
-	std::optional<WFPSubLayerInfo> GetSubLayerByKey(GUID const& key) const;
-	std::optional<WFPSubLayerInfo> GetSubLayerById(UINT16 id) const;
+	std::optional<WFPSubLayerInfo> GetSublayerByKey(GUID const& key) const;
+	std::optional<WFPSubLayerInfo> GetSublayerById(UINT16 id) const;
 
 
 	std::optional<WFPCalloutInfo> GetCalloutByKey(GUID const& key) const;
@@ -652,15 +668,23 @@ public:
 		fi.Name = ParseMUIString(filter->displayData.name);
 		fi.Desc = ParseMUIString(filter->displayData.description);
 		fi.ConditionCount = filter->numFilterConditions;
-		fi.EffectiveWeight = WFPValueInit(filter->effectiveWeight);
+		fi.EffectiveWeight.Init(filter->effectiveWeight);
 		fi.Flags = static_cast<WFPFilterFlags>(filter->flags);
 		fi.LayerKey = filter->layerKey;
 		fi.SubLayerKey = filter->subLayerKey;
-		fi.Weight = WFPValueInit(filter->weight);
+		fi.Weight.Init(filter->weight);
 		fi.Action.Type = static_cast<WFPActionType>(filter->action.type);
 		fi.Action.FilterType = filter->action.filterType;
 		if (includeConditions) {
-			// TODO
+			fi.Conditions.reserve(fi.ConditionCount);
+			for (uint32_t i = 0; i < fi.ConditionCount; i++) {
+				auto& cond = filter->filterCondition[i];
+				WFPFilterCondition c;
+				c.FieldKey = cond.fieldKey;
+				c.MatchType = static_cast<WFPMatchType>(cond.matchType);
+				c.Value.Init(cond.conditionValue);
+				fi.Conditions.emplace_back(std::move(c));
+			}
 		}
 		return fi;
 	}

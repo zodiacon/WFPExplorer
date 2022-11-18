@@ -44,6 +44,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	ToolBarButtonInfo const buttons[] = {
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
 		{ 0 },
+		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
+		{ 0 },
 		{ ID_VIEW_SESSIONS, IDI_SESSION },
 		{ ID_VIEW_PROVIDERS, IDI_PROVIDER },
 		{ ID_VIEW_FILTERS, IDI_FILTER },
@@ -94,6 +96,10 @@ void CMainFrame::SetStatusText(int index, PCWSTR text) {
 	m_StatusBar.SetText(index, text, 0);
 }
 
+CUpdateUIBase& CMainFrame::UI() {
+	return *this;
+}
+
 void CMainFrame::InitMenu() {
 	struct {
 		UINT id, icon;
@@ -112,6 +118,7 @@ void CMainFrame::InitMenu() {
 		{ ID_OPTIONS_ALWAYSONTOP, IDI_PIN },
 		{ ID_EDIT_DELETE, IDI_DELETE },
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
+		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)
@@ -124,11 +131,12 @@ void CMainFrame::InitMenu() {
 void CMainFrame::UpdateUI() {
 	bool anyPage = m_view.GetPageCount() > 0;
 	UIEnable(ID_FILE_SAVE, anyPage);
-	UIEnable(ID_EDIT_COPY, anyPage);
-	UIEnable(ID_EDIT_CUT, anyPage);
-	UIEnable(ID_EDIT_PASTE, anyPage);
-	UIEnable(ID_EDIT_DELETE, anyPage);
+	UIEnable(ID_EDIT_COPY, false);
+	UIEnable(ID_EDIT_CUT, false);
+	UIEnable(ID_EDIT_PASTE, false);
+	UIEnable(ID_EDIT_DELETE, false);
 	UIEnable(ID_VIEW_REFRESH, anyPage);
+	UIEnable(ID_EDIT_PROPERTIES, false);
 }
 
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {

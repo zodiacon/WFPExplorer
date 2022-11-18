@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
@@ -229,6 +229,8 @@
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="CalloutsView.cpp" />
+    <ClCompile Include="FilterConditionsPage.cpp" />
+    <ClCompile Include="FilterGeneralPage.cpp" />
     <ClCompile Include="FiltersView.cpp" />
     <ClCompile Include="LayersView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
@@ -245,10 +247,13 @@
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="SublayersView.cpp" />
     <ClCompile Include="WFPExplorer.cpp" />
+    <ClCompile Include="WFPHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="CalloutsView.h" />
+    <ClInclude Include="FilterConditionsPage.h" />
+    <ClInclude Include="FilterGeneralPage.h" />
     <ClInclude Include="FiltersView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="LayersView.h" />
@@ -261,12 +266,14 @@
     <ClInclude Include="SessionsView.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="SublayersView.h" />
+    <ClInclude Include="WFPHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WFPExplorer.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\callback.ico" />
+    <Image Include="res\Condition.ico" />
     <Image Include="res\context.ico" />
     <Image Include="res\Copy.ico" />
     <Image Include="res\Cut.ico" />
@@ -278,8 +285,10 @@
     <Image Include="res\Filteringrestricted.ico" />
     <Image Include="res\FilteringRightArrow.ico" />
     <Image Include="res\layers.ico" />
+    <Image Include="res\Object.ico" />
     <Image Include="res\Paste.ico" />
     <Image Include="res\pin.ico" />
+    <Image Include="res\properties.ico" />
     <Image Include="res\provider-persistent.ico" />
     <Image Include="res\provider.ico" />
     <Image Include="res\Refresh.ico" />

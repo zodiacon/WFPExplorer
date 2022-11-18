@@ -8,6 +8,8 @@
 #define PCH_H
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#include <sdkddkver.h>
+#define NTDDI_VERSION WDK_NTDDI_VERSION
 #include <Windows.h>
 #include <shlwapi.h>
 #include <fwpmu.h>

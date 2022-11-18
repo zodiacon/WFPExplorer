@@ -3,6 +3,7 @@
 // Used by WFPExplorer.rc
 //
 #define IDD_ABOUTBOX                    100
+#define IDD_FILTERCONDITIONS            107
 #define IDR_MAINFRAME                   128
 #define IDI_CALLOUT                     202
 #define IDI_COPY                        203
@@ -23,10 +24,29 @@
 #define IDI_CONTEXT                     219
 #define IDI_FILTER_REFRESH              220
 #define IDI_FILTER_BLOCK                221
-#define IDI_ICON3                       222
 #define IDI_FILTER_PERMIT               222
+#define IDD_FILTERINFO                  223
+#define IDI_PROPERTIES                  226
+#define IDI_CONDITION                   227
+#define IDI_CUBE                        228
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
+#define IDC_KEY                         1001
+#define IDC_NAME                        1002
+#define IDC_DESC                        1003
+#define IDC_PROVIDER                    1004
+#define IDC_PROVIDER_PROP               1005
+#define IDC_LAYER                       1006
+#define IDC_LAYER_PROP                  1007
+#define IDC_ACTIONTYPE                  1008
+#define IDC_CALLOUT_OR_FILTER           1009
+#define IDC_LIST                        1009
+#define IDC_ID                          1010
+#define IDC_WEIGHT                      1011
+#define IDC_EFFECTIVEWEIGHT             1012
+#define IDC_SUBLAYER                    1013
+#define IDC_LAYER_PROP2                 1014
+#define IDC_EDIT1                       1015
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -40,14 +60,15 @@
 #define ID_VIEW_SUBLAYERS               32783
 #define ID_VIEW_PROVIDERS               32784
 #define ID_VIEW_PROVIDERCONTEXTS        32785
+#define ID_EDIT_PROPERTIES              32786
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        223
-#define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_RESOURCE_VALUE        229
+#define _APS_NEXT_COMMAND_VALUE         32789
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

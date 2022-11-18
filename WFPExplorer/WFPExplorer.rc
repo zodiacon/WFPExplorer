@@ -63,6 +63,8 @@ BEGIN
         MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
         MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
         MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
     END
     POPUP "&View"
     BEGIN
@@ -145,6 +147,12 @@ IDI_FILTER_BLOCK        ICON                    "res\\Filteringrestricted.ico"
 
 IDI_FILTER_PERMIT       ICON                    "res\\FilteringRightArrow.ico"
 
+IDI_PROPERTIES          ICON                    "res\\properties.ico"
+
+IDI_CONDITION           ICON                    "res\\Condition.ico"
+
+IDI_CUBE                ICON                    "res\\Object.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -160,6 +168,46 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
     LTEXT           "Static",IDC_VERSION,56,12,97,8
     LTEXT           "Static",IDC_COPYRIGHT,56,28,97,8
+END
+
+IDD_FILTERINFO DIALOGEX 0, 0, 395, 230
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Key:",IDC_STATIC,7,15,16,8
+    EDITTEXT        IDC_KEY,51,13,248,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Name:",IDC_STATIC,7,38,22,8
+    EDITTEXT        IDC_NAME,51,34,223,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Description:",IDC_STATIC,7,58,39,8
+    EDITTEXT        IDC_DESC,51,55,337,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Provider:",IDC_STATIC,7,81,30,8
+    EDITTEXT        IDC_PROVIDER,51,78,275,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Provider...",IDC_PROVIDER_PROP,338,78,50,14
+    LTEXT           "Layer:",IDC_STATIC,7,102,30,8
+    EDITTEXT        IDC_LAYER,51,99,275,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Layer...",IDC_LAYER_PROP,338,99,50,14
+    LTEXT           "Action:",IDC_STATIC,7,167,30,8
+    LTEXT           "Callout/Filter:",IDC_STATIC,152,167,44,8
+    EDITTEXT        IDC_CALLOUT_OR_FILTER,206,163,182,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "ID:",IDC_STATIC,293,36,20,8
+    EDITTEXT        IDC_ID,318,33,70,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Weight:",IDC_STATIC,7,144,26,8
+    EDITTEXT        IDC_WEIGHT,51,142,117,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Effective Weight:",IDC_STATIC,182,145,57,8
+    EDITTEXT        IDC_EFFECTIVEWEIGHT,244,142,117,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Sublayer:",IDC_STATIC,7,123,32,8
+    EDITTEXT        IDC_SUBLAYER,51,120,275,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Sublayer...",IDC_LAYER_PROP2,338,120,50,14
+    EDITTEXT        IDC_ACTIONTYPE,51,165,82,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
+END
+
+IDD_FILTERCONDITIONS DIALOGEX 0, 0, 363, 239
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Conditions"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_OWNERDATA | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,349,210
 END
 
 
@@ -178,6 +226,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 74
     END
+
+    IDD_FILTERINFO, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 388
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 223
+    END
+
+    IDD_FILTERCONDITIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 356
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 232
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -189,20 +253,21 @@ END
 
 IDR_MAINFRAME ACCELERATORS
 BEGIN
-    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
-    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
-    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
-    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
-    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
-    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
-    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
-    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
-    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
-    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
-    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
-    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
-    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
-    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_RETURN,      ID_EDIT_PROPERTIES,     VIRTKEY, ALT, NOINVERT
 END
 
 
@@ -253,6 +318,17 @@ END
 IDD_ABOUTBOX AFX_DIALOG_LAYOUT
 BEGIN
     0
+END
+
+IDD_FILTERINFO AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FILTERCONDITIONS AFX_DIALOG_LAYOUT
+BEGIN
+    0,
+    0, 0, 100, 100
 END
 
 

@@ -49,7 +49,7 @@ CString CLayersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::DefaultSubLayer:
 			if (info.DefaultSublayer.IsEmpty()) {
 				if (info.DefaultSubLayerKey != GUID_NULL) {
-					auto sl = m_Engine.GetSubLayerByKey(info.DefaultSubLayerKey);
+					auto sl = m_Engine.GetSublayerByKey(info.DefaultSubLayerKey);
 					if (sl && !sl.value().Name.empty())
 						info.DefaultSublayer = sl.value().Name.c_str();
 					else

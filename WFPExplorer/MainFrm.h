@@ -50,6 +50,7 @@ public:
 
 private:
 	void SetStatusText(int index, PCWSTR text) override;
+	CUpdateUIBase& UI() override;
 
 	void InitMenu();
 	void UpdateUI();

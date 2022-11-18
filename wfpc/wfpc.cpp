@@ -107,6 +107,7 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
+	auto ports = engine.EnumSystemPorts();
 	auto conns = engine.EnumConnections();
 
 	switch (argv[1][0]) {
