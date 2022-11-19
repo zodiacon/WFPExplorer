@@ -45,8 +45,9 @@
 #define IDC_WEIGHT                      1011
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
-#define IDC_LAYER_PROP2                 1014
-#define IDC_EDIT1                       1015
+#define IDC_SUBLAYER_PROP               1014
+#define IDC_EDIT1                       1016
+#define IDC_VALUE                       1016
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -68,7 +69,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        229
 #define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1016
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

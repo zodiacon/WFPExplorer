@@ -243,19 +243,6 @@ std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 	return input;
 }
 
-WFPValue& WFPValue::Init(FWP_VALUE const& value) {
-	Type = static_cast<WFPDataType>(value.type);
-
-	switch (Type) {
-		case WFPDataType::INT64: int64 = *value.int64; break;
-		case WFPDataType::UINT64: uint64 = *value.uint64; break;
-		case WFPDataType::DOUBLE: double64 = *value.double64; break;
-		default:
-			memcpy(this, &value, sizeof(value));
-	}
-	return *this;
-}
-
 std::vector<WFPNetEventInfo> WFPEngine::EnumNetEvents() {
 	std::vector<WFPNetEventInfo> events;
 	HANDLE hEnum;
@@ -301,15 +288,3 @@ std::optional<WFPCalloutInfo> WFPEngine::GetCalloutByKey(GUID const& key) const 
 	return info;
 }
 
-WFPConditionValue& WFPConditionValue::Init(FWP_CONDITION_VALUE const& value) {
-	Type = static_cast<WFPDataType>(value.type);
-	switch (Type) {
-		case WFPDataType::INT64: int64 = *value.int64; break;
-		case WFPDataType::UINT64: uint64 = *value.uint64; break;
-		case WFPDataType::DOUBLE: double64 = *value.double64; break;
-		default:
-			memcpy(this, &value, sizeof(value));
-	}
-
-	return *this;
-}

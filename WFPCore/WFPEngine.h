@@ -81,8 +81,14 @@ enum class WFPDataType {
 	RANGE_TYPE,
 };
 
+struct WFPRange;
+
 struct WFPValue {
-	WFPValue& Init(FWP_VALUE const& value);
+	WFPValue();
+	WFPValue(WFPValue const& other);
+	WFPValue& operator=(WFPValue const& other);
+	WFPValue(WFPValue&& other) noexcept;
+	WFPValue& operator=(WFPValue&& other) noexcept;
 
 	WFPDataType Type;
 	union {
@@ -96,7 +102,7 @@ struct WFPValue {
 		INT64 int64;
 		float float32;
 		double double64;
-		FWP_BYTE_ARRAY16* byteArray16;
+		BYTE* byteArray16;
 		FWP_BYTE_BLOB* byteBlob;
 		SID* sid;
 		FWP_BYTE_BLOB* sd;
@@ -104,8 +110,67 @@ struct WFPValue {
 		FWP_BYTE_BLOB* tokenAccessInformation;
 		LPWSTR unicodeString;
 		BYTE byteArray6[6];
+		FWP_V4_ADDR_AND_MASK* v4AddrMask;
+		FWP_V6_ADDR_AND_MASK* v6AddrMask;
+		WFPRange* rangeValue;
 	};
+	void Free();
 	~WFPValue();
+
+	WFPValue& Init(WFPValue const& value);
+
+	template<typename T>
+	WFPValue& Init(T const& value) {
+		Type = static_cast<WFPDataType>(value.type);
+
+		switch (Type) {
+			case WFPDataType::BYTE_ARRAY16_TYPE:
+				byteArray16 = new BYTE[16];
+				memcpy(byteArray16, value.byteArray16, 16);
+				break;
+
+			case WFPDataType::SECURITY_DESCRIPTOR_TYPE:
+			case WFPDataType::BYTE_BLOB_TYPE:
+			case WFPDataType::TOKEN_ACCESS_INFORMATION_TYPE:
+			{
+				sd = new FWP_BYTE_BLOB;
+				auto len = value.sd->size;
+				sd->data = new BYTE[len];
+				sd->size = len;
+				memcpy(sd->data, value.sd->data, len);
+				break;
+			}
+
+			case WFPDataType::SID:
+			{
+				ATLASSERT(value.sid);
+				auto len = ::GetLengthSid(value.sid);
+				sid = (SID*)::malloc(len);
+				ATLASSERT(sid);
+				::CopySid(len, sid, value.sid);
+				break;
+			}
+
+			case WFPDataType::UNICODE_STRING_TYPE:
+				ULONG len;
+				unicodeString = new WCHAR[len = ULONG(wcslen(value.unicodeString) + 1)];
+				wcscpy_s(unicodeString, len, value.unicodeString);
+				break;
+
+			case WFPDataType::INT64: int64 = *value.int64; break;
+			case WFPDataType::UINT64: uint64 = *value.uint64; break;
+			case WFPDataType::DOUBLE: double64 = *value.double64; break;
+			default:
+				memcpy(this, &value, sizeof(value));
+		}
+		return *this;
+	}
+
+};
+
+struct WFPRange {
+	WFPValue Low;
+	WFPValue High;
 };
 
 enum class WFPLayerFlags {
@@ -230,44 +295,10 @@ enum class WFPMatchType {
 	NotPrefix,
 };
 
-struct WFPRange {
-	WFPValue Low;
-	WFPValue High;
-};
-
-struct WFPConditionValue {
-	WFPConditionValue& Init(FWP_CONDITION_VALUE const& value);
-
-	WFPDataType Type;
-	union {
-		UINT8 uint8;
-		UINT16 uint16;
-		UINT32 uint32;
-		UINT64 uint64;
-		INT8 int8;
-		INT16 int16;
-		INT32 int32;
-		INT64 int64;
-		float float32;
-		double double64;
-		FWP_BYTE_ARRAY16* byteArray16;
-		FWP_BYTE_BLOB* byteBlob;
-		SID* sid;
-		FWP_BYTE_BLOB* sd;
-		FWP_TOKEN_INFORMATION* tokenInformation;
-		FWP_BYTE_BLOB* tokenAccessInformation;
-		LPWSTR unicodeString;
-		BYTE byteArray6[6];
-		FWP_V4_ADDR_AND_MASK* v4AddrMask;
-		FWP_V6_ADDR_AND_MASK* v6AddrMask;
-		WFPRange* rangeValue;
-	};
-};
-
 struct WFPFilterCondition {
 	GUID FieldKey;
 	WFPMatchType MatchType;
-	WFPConditionValue Value;
+	WFPValue Value;
 };
 
 enum class WFPActionType {

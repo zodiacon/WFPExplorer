@@ -7,6 +7,7 @@
 #include "FilterGeneralPage.h"
 #include "FilterConditionsPage.h"
 #include "WFPHelper.h"
+#include <ResizablePropertySheet.h>
 
 CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -133,7 +134,7 @@ LRESULT CFiltersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 	ATLASSERT(m_List.GetSelectedIndex() >= 0);
 	auto& filter = m_Filters[m_List.GetSelectedIndex()];
 	CPropertySheet sheet((PCWSTR)(L"Filter Properties (" + WFPHelper::GetFilterName(m_Engine, filter.FilterKey) + L")"));
-	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID;
+	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
 	CFilterGeneralPage general(m_Engine, filter);
 	general.m_psp.dwFlags |= PSP_USEICONID;

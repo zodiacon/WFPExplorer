@@ -7,7 +7,7 @@ CString StringHelper::GuidToString(GUID const& guid) {
 	return ::StringFromGUID2(guid, sguid, _countof(sguid)) ? sguid : L"";
 }
 
-CString StringHelper::WFPValueToString(WFPValue const& value, bool hex) {
+CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool full) {
 	CString str;
 	switch (value.Type) {
 		case WFPDataType::INT8: str.Format(hex ? L"0x%X" : L"%d", (int)value.int8); break;
@@ -21,6 +21,19 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex) {
 		case WFPDataType::FLOAT: str.Format(L"%f", value.float32); break;
 		case WFPDataType::DOUBLE: str.Format(L"%lf", value.double64); break;
 		case WFPDataType::UNICODE_STRING_TYPE: return value.unicodeString;
+		case WFPDataType::BYTE_ARRAY6_TYPE: return FormatBinary(value.byteArray6, 6);
+		case WFPDataType::BYTE_ARRAY16_TYPE: return FormatBinary(value.byteArray16, 16);
+		case WFPDataType::BYTE_BLOB_TYPE: return std::format(L"({} bytes) \r\n", value.byteBlob->size).c_str() +
+			FormatBinary(value.byteBlob->data, full ? value.byteBlob->size : min(16, value.byteBlob->size));
+		case WFPDataType::SID: return FormatSID(value.sid);
+		case WFPDataType::SECURITY_DESCRIPTOR_TYPE:
+			PWSTR sddl;
+			if (::ConvertSecurityDescriptorToStringSecurityDescriptor(value.byteBlob->data, SDDL_REVISION_1,
+				DACL_SECURITY_INFORMATION | OWNER_SECURITY_INFORMATION, &sddl, nullptr)) {
+				str = sddl;
+				::LocalFree(sddl);
+			}
+			break;
 	}
 	return str;
 }
@@ -157,10 +170,6 @@ PCWSTR StringHelper::WFPConditionMatchToString(WFPMatchType type) {
 	}
 	ATLASSERT(false);
 	return L"";
-}
-
-CString StringHelper::WFPConditionValueToString(WFPConditionValue const& value, bool hex) {
-	return WFPValueToString((WFPValue&)value, hex);
 }
 
 PCWSTR StringHelper::WFPDataTypeToString(WFPDataType type) {
@@ -319,6 +328,31 @@ CString StringHelper::WFPConditionFieldKeyToString(GUID const& key) {
 		return it->second;
 
 	return GuidToString(key);
+}
+
+CString StringHelper::FormatBinary(BYTE const* buffer, ULONG size, int lineSize) {
+	CString text;
+	for (ULONG i = 0; i < size; i++) {
+		text += std::format(L"{:02X} ", buffer[i]).c_str();
+		if (i % lineSize == lineSize - 1)
+			text += L"\r\n";
+	}
+	return text;
+}
+
+CString StringHelper::FormatSID(PSID const sid) {
+	WCHAR name[32], domain[32];
+	DWORD lname = _countof(name), ldomain = _countof(domain);
+	SID_NAME_USE use;
+	if (::LookupAccountSid(nullptr, sid, name, &lname, domain, &ldomain, &use))
+		return ldomain ? (domain + CString(L"\\") + name) : name;
+	PWSTR ssid;
+	if (::ConvertSidToStringSid(sid, &ssid)) {
+		CString name(ssid);
+		::LocalFree(ssid);
+		return name;
+	}
+	return L"";
 }
 
 PCWSTR StringHelper::WFPFilterActionTypeToString(WFPActionType type) {

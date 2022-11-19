@@ -12,9 +12,14 @@ CString CFilterConditionsPage::GetColumnText(HWND, int row, int col) const {
         case 0: return StringHelper::WFPConditionFieldKeyToString(cond.FieldKey);
         case 1: return StringHelper::WFPConditionMatchToString(cond.MatchType);
         case 2: return StringHelper::WFPDataTypeToString(cond.Value.Type);
-        case 3: return StringHelper::WFPConditionValueToString(cond.Value, true);
+        case 3: return StringHelper::WFPValueToString(cond.Value, true);
     }
     return CString();
+}
+
+void CFilterConditionsPage::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
+    if (newState & LVIS_SELECTED)
+        SetDlgItemText(IDC_VALUE, StringHelper::WFPValueToString(m_Conditions[from].Value, true, true));
 }
 
 LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
@@ -33,6 +38,15 @@ LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     ATLASSERT(filter);
     m_Conditions = filter->Conditions;
     m_List.SetItemCount(m_Filter.ConditionCount);
+
+    CWindow edit(GetDlgItem(IDC_VALUE));
+    CFontHandle hfont(edit.GetFont());
+    LOGFONT lf;
+    hfont.GetLogFont(lf);
+    wcscpy_s(lf.lfFaceName, L"Consolas");
+    CFont font;
+    font.CreateFontIndirect(&lf);
+    edit.SetFont(font.Detach());
 
     return 0;
 }

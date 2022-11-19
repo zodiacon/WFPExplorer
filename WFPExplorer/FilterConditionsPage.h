@@ -19,6 +19,7 @@ public:
 	CFilterConditionsPage(WFPEngine& engine, WFPFilterInfo& filter);
 
 	CString GetColumnText(HWND, int row, int col) const;
+	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
 
 	BEGIN_MSG_MAP(CFilterConditionsPage)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)

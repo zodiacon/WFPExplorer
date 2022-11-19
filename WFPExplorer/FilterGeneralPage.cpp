@@ -19,6 +19,12 @@ LRESULT CFilterGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     if (m_Filter.Action.FilterType != GUID_NULL) {
         SetDlgItemText(IDC_CALLOUT_OR_FILTER, StringHelper::GuidToString(m_Filter.Action.FilterType));
     }
-   
+    SetDlgItemText(IDC_WEIGHT, StringHelper::WFPValueToString(m_Filter.Weight, true));
+    SetDlgItemText(IDC_EFFECTIVEWEIGHT, StringHelper::WFPValueToString(m_Filter.EffectiveWeight, true));
+
+    AddIconToButton(IDC_PROVIDER_PROP, IDI_PROVIDER);
+    AddIconToButton(IDC_LAYER_PROP, IDI_LAYERS);
+    AddIconToButton(IDC_SUBLAYER_PROP, IDI_SUBLAYER);
+
     return 0;
 }
