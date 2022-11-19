@@ -232,6 +232,7 @@
     <ClCompile Include="FilterConditionsPage.cpp" />
     <ClCompile Include="FilterGeneralPage.cpp" />
     <ClCompile Include="FiltersView.cpp" />
+    <ClCompile Include="LayerFieldsPage.cpp" />
     <ClCompile Include="LayerGeneralPage.cpp" />
     <ClCompile Include="LayersView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="FilterGeneralPage.h" />
     <ClInclude Include="FiltersView.h" />
     <ClInclude Include="Interfaces.h" />
+    <ClInclude Include="LayerFieldsPage.h" />
     <ClInclude Include="LayerGeneralPage.h" />
     <ClInclude Include="LayersView.h" />
     <ClInclude Include="MainFrm.h" />
@@ -281,6 +283,7 @@
     <Image Include="res\Cut.ico" />
     <Image Include="res\Delete.ico" />
     <Image Include="res\engine.ico" />
+    <Image Include="res\field.ico" />
     <Image Include="res\filter-disabled.ico" />
     <Image Include="res\Filter.ico" />
     <Image Include="res\FilteringRefresh.ico" />

@@ -75,6 +75,8 @@ enum class WFPDataType {
 	TOKEN_ACCESS_INFORMATION_TYPE,
 	UNICODE_STRING_TYPE,
 	BYTE_ARRAY6_TYPE,
+	BITMAP_INDEX_TYPE,
+	BITMAP_ARRAY64_TYPE,
 	SINGLE_DATA_TYPE_MAX = 0xff,
 	V4_ADDR_MASK,
 	V6_ADDR_MASK,
@@ -155,6 +157,20 @@ struct WFPValue {
 				ULONG len;
 				unicodeString = new WCHAR[len = ULONG(wcslen(value.unicodeString) + 1)];
 				wcscpy_s(unicodeString, len, value.unicodeString);
+				break;
+
+			case WFPDataType::V4_ADDR_MASK:
+				if constexpr (std::is_base_of_v<T, FWP_CONDITION_VALUE>) {
+					v4AddrMask = new FWP_V4_ADDR_AND_MASK;
+					*v4AddrMask = *value.v4AddrMask;
+				}
+				break;
+
+			case WFPDataType::V6_ADDR_MASK:
+				if constexpr (std::is_base_of_v<T, FWP_CONDITION_VALUE>) {
+					v6AddrMask = new FWP_V6_ADDR_AND_MASK;
+					*v6AddrMask = *value.v6AddrMask;
+				}
 				break;
 
 			case WFPDataType::RANGE_TYPE:

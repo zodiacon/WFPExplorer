@@ -55,6 +55,14 @@ void WFPValue::Free() {
 			delete byteBlob;
 			break;
 
+		case WFPDataType::V4_ADDR_MASK:
+			delete v4AddrMask;
+			break;
+
+		case WFPDataType::V6_ADDR_MASK:
+			delete v6AddrMask;
+			break;
+
 		case WFPDataType::RANGE_TYPE:
 			delete rangeValue;
 			break;
@@ -102,6 +110,16 @@ WFPValue& WFPValue::Init(WFPValue const& value) {
 
 		case WFPDataType::RANGE_TYPE:
 			rangeValue = new WFPRange(value.rangeValue->Low, value.rangeValue->High);
+			break;
+
+		case WFPDataType::V4_ADDR_MASK:
+			v4AddrMask = new FWP_V4_ADDR_AND_MASK;
+			*v4AddrMask = *value.v4AddrMask;
+			break;
+
+		case WFPDataType::V6_ADDR_MASK:
+			v6AddrMask = new FWP_V6_ADDR_AND_MASK;
+			*v6AddrMask = *value.v6AddrMask;
 			break;
 
 		default:

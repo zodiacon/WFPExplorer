@@ -78,6 +78,9 @@
     <ClCompile Include="LayerGeneralPage.cpp">
       <Filter>PropertyPages</Filter>
     </ClCompile>
+    <ClCompile Include="LayerFieldsPage.cpp">
+      <Filter>PropertyPages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -132,6 +135,9 @@
       <Filter>PropertyPages</Filter>
     </ClInclude>
     <ClInclude Include="LayerGeneralPage.h">
+      <Filter>PropertyPages</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerFieldsPage.h">
       <Filter>PropertyPages</Filter>
     </ClInclude>
   </ItemGroup>
@@ -211,6 +217,9 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\Condition.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\field.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include <WFPEngine.h>
 #include "StringHelper.h"
 #include "LayerGeneralPage.h"
+#include "LayerFieldsPage.h"
 #include "FilterGeneralPage.h"
 #include "FilterConditionsPage.h"
 
@@ -56,6 +57,12 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, WFPLayerInfo& layer) {
 	general.m_psp.pszIcon = MAKEINTRESOURCE(IDI_CUBE);
 	sheet.AddPage(general);
 
+	CLayerFieldsPage fields(engine, layer);
+	if (layer.NumFields > 0) {
+		fields.m_psp.dwFlags |= PSP_USEICONID;
+		fields.m_psp.pszIcon = MAKEINTRESOURCE(IDI_FIELD);
+		sheet.AddPage(fields);
+	}
 	return (int)sheet.DoModal();
 }
 

@@ -12,6 +12,7 @@ enum class WFPProviderContextType;
 enum class WFPActionType;
 enum class WFPMatchType;
 enum class WFPDataType;
+enum class WFPFieldType;
 
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
@@ -30,6 +31,7 @@ struct StringHelper abstract final {
 	static CString WFPConditionFieldKeyToString(GUID const& key);
 	static CString FormatBinary(BYTE const* buffer, ULONG size, int lineSize = 16);
 	static CString FormatSID(PSID const sid);
+	static PCWSTR WFPFieldTypeToString(WFPFieldType type);
 
 	template<typename TFlags, typename TValue>
 	static CString FlagsToString(TValue value, TFlags const& data) {

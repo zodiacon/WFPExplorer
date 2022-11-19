@@ -14,11 +14,11 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Layer Key", 0, 250, ColumnType::Key);
-	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 90, ColumnType::Id);
-	cm->AddColumn(L"Name", 0, 180, ColumnType::Name);
-	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
-	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 80, ColumnType::Fields);
+	cm->AddColumn(L"Layer Key", 0, 280, ColumnType::Key);
+	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 70, ColumnType::Id);
+	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
+	cm->AddColumn(L"Flags", LVCFMT_LEFT, 180, ColumnType::Flags);
+	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 60, ColumnType::Fields);
 	cm->AddColumn(L"Default Sublayer", 0, 250, ColumnType::DefaultSubLayer);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 

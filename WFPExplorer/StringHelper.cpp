@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "StringHelper.h"
 #include <WFPEngine.h>
+#include <ip2string.h>
+
+#pragma comment(lib, "ntdll")
 
 CString StringHelper::GuidToString(GUID const& guid) {
 	WCHAR sguid[64];
@@ -38,8 +41,17 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool ful
 			return WFPValueToString(value.rangeValue->Low, hex, full) + L"\r\n to \r\n" + WFPValueToString(value.rangeValue->High, hex, full);
 
 		case WFPDataType::V4_ADDR_MASK:
+		{
+			WCHAR buf[128];
+			str = CString(L"IP: ") + ::RtlIpv4AddressToString((in_addr const*)&value.v4AddrMask->addr, buf) +
+				L"Mask: " + ::RtlIpv4AddressToString((in_addr const*)&value.v4AddrMask->mask, buf);
+			break;
+		}
+
 		case WFPDataType::V6_ADDR_MASK:
-			ATLASSERT(0);
+			WCHAR buf[256];
+			str = CString(L"IP: ") + ::RtlIpv6AddressToString((in6_addr const*)&value.v6AddrMask->addr, buf) +
+				L"Prefix: " + std::format(L"{}", value.v6AddrMask->prefixLength).c_str();
 			break;
 
 		case WFPDataType::EMPTY:
@@ -203,8 +215,13 @@ PCWSTR StringHelper::WFPDataTypeToString(WFPDataType type) {
 		case WFPDataType::TOKEN_ACCESS_INFORMATION_TYPE: return L"Token Access";
 		case WFPDataType::SECURITY_DESCRIPTOR_TYPE: return L"SD";
 		case WFPDataType::UNICODE_STRING_TYPE: return L"Unicode String";
-		case WFPDataType::V4_ADDR_MASK: return L"V4 Address MAsk";
-		case WFPDataType::V6_ADDR_MASK: return L"V6 Address MAsk";
+		case WFPDataType::V4_ADDR_MASK: return L"IPV4 Address & MAsk";
+		case WFPDataType::V6_ADDR_MASK: return L"IPV6 Address & MAsk";
+		case WFPDataType::BITMAP_INDEX_TYPE: return L"Bitmap Index";
+		case WFPDataType::BITMAP_ARRAY64_TYPE: return L"Bitmap Array";
+		default:
+			ATLASSERT(false);
+			break;
 	}
 	return L"";
 }
@@ -333,6 +350,7 @@ CString StringHelper::WFPConditionFieldKeyToString(GUID const& key) {
 		{ FWPM_CONDITION_EMBEDDED_REMOTE_PORT, L"Embedded Remote Port" },
 		{ FWPM_CONDITION_DIRECTION, L"Direction" },
 		{ FWPM_CONDITION_INTERFACE_INDEX, L"Interface Index" },
+		{ FWPM_CONDITION_ALE_SECURITY_ATTRIBUTE_FQBN_VALUE, L"ALE Security Attribute FQBN Value" },
 	};
 	if (auto it = fields.find(key); it != fields.end())
 		return it->second;
@@ -362,6 +380,16 @@ CString StringHelper::FormatSID(PSID const sid) {
 		::LocalFree(ssid);
 		return name;
 	}
+	return L"";
+}
+
+PCWSTR StringHelper::WFPFieldTypeToString(WFPFieldType type) {
+	switch (type) {
+		case WFPFieldType::RawData: return L"Raw Data";
+		case WFPFieldType::IpAddress: return L"IP Address";
+		case WFPFieldType::Flags: return L"Flags";
+	}
+	ATLASSERT(false);
 	return L"";
 }
 

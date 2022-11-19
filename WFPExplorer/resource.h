@@ -29,8 +29,11 @@
 #define IDD_FILTERINFO                  223
 #define IDD_LAYERINFO                   224
 #define IDI_PROPERTIES                  226
+#define IDD_LAYERFIELDS                 226
 #define IDI_CONDITION                   227
 #define IDI_CUBE                        228
+#define IDI_ICON1                       230
+#define IDI_FIELD                       230
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -49,7 +52,6 @@
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
 #define IDC_SUBLAYER_PROP               1014
-#define IDC_DESC2                       1015
 #define IDC_VALUE                       1016
 #define IDC_FLAGS                       1017
 #define ID_WINDOW_CLOSE                 32772
@@ -71,7 +73,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        230
+#define _APS_NEXT_RESOURCE_VALUE        231
 #define _APS_NEXT_COMMAND_VALUE         32789
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
