@@ -232,6 +232,7 @@
     <ClCompile Include="FilterConditionsPage.cpp" />
     <ClCompile Include="FilterGeneralPage.cpp" />
     <ClCompile Include="FiltersView.cpp" />
+    <ClCompile Include="LayerGeneralPage.cpp" />
     <ClCompile Include="LayersView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">
@@ -256,6 +257,7 @@
     <ClInclude Include="FilterGeneralPage.h" />
     <ClInclude Include="FiltersView.h" />
     <ClInclude Include="Interfaces.h" />
+    <ClInclude Include="LayerGeneralPage.h" />
     <ClInclude Include="LayersView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ProcessHelper.h" />

@@ -4,18 +4,17 @@
 #include "resource.h"
 
 class WFPEngine;
-struct WFPFilterInfo;
+struct WFPLayerInfo;
 
-class CFilterGeneralPage :
-	public CPropertyPageImpl<CFilterGeneralPage>,
-	public CDialogHelper<CFilterGeneralPage> {
+class CLayerGeneralPage :
+	public CPropertyPageImpl<CLayerGeneralPage>,
+	public CDialogHelper<CLayerGeneralPage> {
 public:
-	enum { IDD = IDD_FILTERINFO };
+	enum { IDD = IDD_LAYERINFO };
 
-	CFilterGeneralPage(WFPEngine& engine, WFPFilterInfo& filter);
+	CLayerGeneralPage(WFPEngine& engine, WFPLayerInfo& layer);
 
-	BEGIN_MSG_MAP(CFilterGeneralPage)
-		COMMAND_ID_HANDLER(IDC_LAYER_PROP, OnShowLayer)
+	BEGIN_MSG_MAP(CLayerGeneralPage)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	END_MSG_MAP()
 
@@ -26,9 +25,8 @@ private:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnShowLayer(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 	WFPEngine& m_Engine;
-	WFPFilterInfo& m_Filter;
+	WFPLayerInfo& m_Layer;
 };

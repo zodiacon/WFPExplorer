@@ -133,20 +133,8 @@ LRESULT CFiltersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 LRESULT CFiltersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 	ATLASSERT(m_List.GetSelectedIndex() >= 0);
 	auto& filter = m_Filters[m_List.GetSelectedIndex()];
-	CPropertySheet sheet((PCWSTR)(L"Filter Properties (" + WFPHelper::GetFilterName(m_Engine, filter.FilterKey) + L")"));
-	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
-	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
-	CFilterGeneralPage general(m_Engine, filter);
-	general.m_psp.dwFlags |= PSP_USEICONID;
-	general.m_psp.pszIcon = MAKEINTRESOURCE(IDI_CUBE);
-	CFilterConditionsPage cond(m_Engine, filter);
-	sheet.AddPage(general);
-	if (filter.ConditionCount > 0) {
-		cond.m_psp.dwFlags |= PSP_USEICONID;
-		cond.m_psp.pszIcon = MAKEINTRESOURCE(IDI_CONDITION);
-		sheet.AddPage(cond);
-	}
-	sheet.DoModal();
+	WFPHelper::ShowFilterProperties(m_Engine, filter);
+
 	return 0;
 }
 
@@ -195,7 +183,8 @@ int CFiltersView::GetRowImage(HWND, int row, int col) const {
 }
 
 void CFiltersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
-	UpdateUI();
+	if((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+		UpdateUI();
 }
 
 bool CFiltersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {

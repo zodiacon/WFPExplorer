@@ -22,9 +22,27 @@ LRESULT CFilterGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     SetDlgItemText(IDC_WEIGHT, StringHelper::WFPValueToString(m_Filter.Weight, true));
     SetDlgItemText(IDC_EFFECTIVEWEIGHT, StringHelper::WFPValueToString(m_Filter.EffectiveWeight, true));
 
+    auto flags = StringHelper::WFPFilterFlagsToString(m_Filter.Flags);
+    if (!flags.IsEmpty())
+        flags = std::format(L"0x{:X} ({})", (UINT32)m_Filter.Flags, (PCWSTR)flags).c_str();
+    else
+        flags = L"(None)";
+    SetDlgItemText(IDC_FLAGS, flags);
+
     AddIconToButton(IDC_PROVIDER_PROP, IDI_PROVIDER);
     AddIconToButton(IDC_LAYER_PROP, IDI_LAYERS);
     AddIconToButton(IDC_SUBLAYER_PROP, IDI_SUBLAYER);
+
+    return 0;
+}
+
+LRESULT CFilterGeneralPage::OnShowLayer(WORD, WORD, HWND, BOOL&) {
+    auto layer = m_Engine.GetLayerByKey(m_Filter.LayerKey);
+    ATLASSERT(layer);
+    if (!layer)
+        AtlMessageBox(m_hWnd, L"Layer not found", IDS_TITLE, MB_ICONERROR);
+    else
+        WFPHelper::ShowLayerProperties(m_Engine, *layer);
 
     return 0;
 }

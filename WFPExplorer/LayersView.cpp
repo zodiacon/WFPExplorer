@@ -2,14 +2,15 @@
 #include "LayersView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
-#include "resource.h"
+#include "WFPHelper.h"
+#include "LayerGeneralPage.h"
 
 CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
 
 LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
+		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
@@ -31,8 +32,22 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	return 0;
 }
 
+LRESULT CLayersView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) {
+	if (active) {
+		UpdateUI();
+		return 1;
+	}
+	return 0;
+}
+
 LRESULT CLayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	Refresh();
+	return 0;
+}
+
+LRESULT CLayersView::OnProperties(WORD, WORD, HWND, BOOL&) {
+	auto& layer = m_Layers[m_List.GetSelectedIndex()];
+	WFPHelper::ShowLayerProperties(m_Engine, layer);
 	return 0;
 }
 
@@ -99,4 +114,19 @@ int CLayersView::GetSaveColumnRange(HWND, int&) const {
 
 int CLayersView::GetRowImage(HWND, int row, int col) const {
 	return 0;
+}
+
+void CLayersView::UpdateUI() {
+	auto& ui = Frame()->UI();
+	ui.UIEnable(ID_EDIT_PROPERTIES, m_List.GetSelectedCount() == 1);
+}
+
+void CLayersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
+	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+		UpdateUI();
+}
+
+bool CLayersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
+	LRESULT result;
+	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
 }

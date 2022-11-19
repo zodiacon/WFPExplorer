@@ -75,6 +75,9 @@
     <ClCompile Include="FilterConditionsPage.cpp">
       <Filter>PropertyPages</Filter>
     </ClCompile>
+    <ClCompile Include="LayerGeneralPage.cpp">
+      <Filter>PropertyPages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -126,6 +129,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FilterConditionsPage.h">
+      <Filter>PropertyPages</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerGeneralPage.h">
       <Filter>PropertyPages</Filter>
     </ClInclude>
   </ItemGroup>

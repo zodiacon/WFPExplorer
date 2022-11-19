@@ -5,6 +5,7 @@
 #define IDD_ABOUTBOX                    100
 #define IDD_FILTERCONDITIONS            107
 #define IDR_MAINFRAME                   128
+#define IDS_TITLE                       129
 #define IDI_CALLOUT                     202
 #define IDI_COPY                        203
 #define IDI_CUT                         204
@@ -26,6 +27,7 @@
 #define IDI_FILTER_BLOCK                221
 #define IDI_FILTER_PERMIT               222
 #define IDD_FILTERINFO                  223
+#define IDD_LAYERINFO                   224
 #define IDI_PROPERTIES                  226
 #define IDI_CONDITION                   227
 #define IDI_CUBE                        228
@@ -39,6 +41,7 @@
 #define IDC_LAYER                       1006
 #define IDC_LAYER_PROP                  1007
 #define IDC_ACTIONTYPE                  1008
+#define IDC_FIELDS                      1008
 #define IDC_CALLOUT_OR_FILTER           1009
 #define IDC_LIST                        1009
 #define IDC_ID                          1010
@@ -46,8 +49,9 @@
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
 #define IDC_SUBLAYER_PROP               1014
-#define IDC_EDIT1                       1016
+#define IDC_DESC2                       1015
 #define IDC_VALUE                       1016
+#define IDC_FLAGS                       1017
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -67,9 +71,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        229
+#define _APS_NEXT_RESOURCE_VALUE        230
 #define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1017
+#define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
