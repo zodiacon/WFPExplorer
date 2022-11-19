@@ -54,6 +54,11 @@ void WFPValue::Free() {
 			delete[] byteBlob->data;
 			delete byteBlob;
 			break;
+
+		case WFPDataType::RANGE_TYPE:
+			delete rangeValue;
+			break;
+
 	}
 	Type = WFPDataType::EMPTY;
 }
@@ -95,8 +100,17 @@ WFPValue& WFPValue::Init(WFPValue const& value) {
 			wcscpy_s(unicodeString, len, value.unicodeString);
 			break;
 
+		case WFPDataType::RANGE_TYPE:
+			rangeValue = new WFPRange(value.rangeValue->Low, value.rangeValue->High);
+			break;
+
 		default:
 			memcpy(this, &value, sizeof(value));
 	}
 	return *this;
+}
+
+WFPRange::WFPRange(WFPValue low, WFPValue high) noexcept {
+	Low = std::move(low);
+	High = std::move(high);
 }

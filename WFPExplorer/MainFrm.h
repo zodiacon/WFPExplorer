@@ -51,6 +51,7 @@ public:
 private:
 	void SetStatusText(int index, PCWSTR text) override;
 	CUpdateUIBase& UI() override;
+	HFONT GetMonoFont() const override;
 
 	void InitMenu();
 	void UpdateUI();
@@ -74,6 +75,7 @@ private:
 	LRESULT OnPageActivated(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 
 	WFPEngine m_Engine;
+	CFont m_MonoFont;
 	CCustomTabView m_view;
 	CMultiPaneStatusBarCtrl m_StatusBar;
 };

@@ -81,6 +81,11 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	CMenuHandle menuMain = GetMenu();
 	m_view.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
 
+	LOGFONT lf;
+	((CFontHandle)m_view.GetFont()).GetLogFont(lf);
+	wcscpy_s(lf.lfFaceName, L"Consolas");
+	m_MonoFont.CreateFontIndirect(&lf);
+
 	if (!m_Engine.Open()) {
 		AtlMessageBox(nullptr, L"Failed to open WFP Engine", IDR_MAINFRAME, MB_ICONERROR);
 	}
@@ -98,6 +103,10 @@ void CMainFrame::SetStatusText(int index, PCWSTR text) {
 
 CUpdateUIBase& CMainFrame::UI() {
 	return *this;
+}
+
+HFONT CMainFrame::GetMonoFont() const {
+	return m_MonoFont.m_hFont;
 }
 
 void CMainFrame::InitMenu() {
@@ -149,6 +158,11 @@ LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 }
 
 LRESULT CMainFrame::OnRebuildWindowMenu(UINT, WPARAM, LPARAM, BOOL& bHandled) {
+	auto il = CImageList(m_view.GetImageList());
+	for (int i = 0; i < m_view.GetPageCount(); i++) {
+		auto image = m_view.GetPageImage(i);
+		AddCommand(ID_WINDOW_TABFIRST + i, il.GetIcon(image));
+	}
 	AddSubMenu(GetSubMenu(GetMenu(), WINDOW_MENU_POSITION));
 
 	return 0;
@@ -163,7 +177,6 @@ LRESULT CMainFrame::OnViewSessions(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 	auto view = new CSessionsView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Sessions", 0, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_SESSION);
 
 	return 0;
 }
@@ -172,7 +185,6 @@ LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 	auto view = new CFiltersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Filters", 1, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_FILTER);
 
 	return 0;
 }
@@ -181,7 +193,6 @@ LRESULT CMainFrame::OnViewProviders(WORD, WORD, HWND, BOOL&) {
 	auto view = new CProvidersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Providers", 2, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_PROVIDER);
 
 	return 0;
 }
@@ -190,7 +201,6 @@ LRESULT CMainFrame::OnViewProviderContexts(WORD, WORD, HWND, BOOL&) {
 	auto view = new CProviderContextView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Provider Contexts", 6, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_CONTEXT);
 
 	return 0;
 }
@@ -199,7 +209,6 @@ LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CLayersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Layers", 3, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_LAYERS);
 
 	return 0;
 }
@@ -208,7 +217,6 @@ LRESULT CMainFrame::OnViewSublayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CSublayersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Sublayers", 4, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_SUBLAYER);
 
 	return 0;
 }
@@ -217,7 +225,6 @@ LRESULT CMainFrame::OnViewCallouts(WORD, WORD, HWND, BOOL&) {
 	auto view = new CCalloutsView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Callouts", 5, view);
-	AddCommand(ID_WINDOW_TABFIRST + m_view.GetPageCount() - 1, IDI_CALLOUT);
 
 	return 0;
 }

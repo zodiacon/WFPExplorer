@@ -10,6 +10,7 @@ class WFPEngine;
 
 class CFiltersView :
 	public CFrameView<CFiltersView, IMainFrame>,
+	public CCustomDraw<CFiltersView>,
 	public CVirtualListView<CFiltersView> {
 public:
 	CFiltersView(IMainFrame* frame, WFPEngine& engine);
@@ -23,10 +24,15 @@ public:
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
 	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
 
+	DWORD OnPrePaint(int, LPNMCUSTOMDRAW cd);
+	DWORD OnItemPrePaint(int, LPNMCUSTOMDRAW cd);
+	DWORD OnSubItemPrePaint(int, LPNMCUSTOMDRAW cd);
+
 	BEGIN_MSG_MAP(CFiltersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CVirtualListView<CFiltersView>)
+		CHAIN_MSG_MAP(CCustomDraw<CFiltersView>)
 		CHAIN_MSG_MAP(BaseFrame)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)

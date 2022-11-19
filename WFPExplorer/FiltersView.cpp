@@ -97,12 +97,12 @@ CString const& CFiltersView::GetSublayerName(FilterInfo& info) const {
 LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL);
-	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
+	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Filter Key", 0, 270, ColumnType::Key);
-	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 90, ColumnType::Weight);
-	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 90, ColumnType::EffectiveWeight);
+	cm->AddColumn(L"Filter Key", 0, 300, ColumnType::Key);
+	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 140, ColumnType::Weight);
+	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 140, ColumnType::EffectiveWeight);
 	cm->AddColumn(L"Conditions", LVCFMT_RIGHT, 70, ColumnType::ConditionCount);
 	cm->AddColumn(L"Action", LVCFMT_LEFT, 110, ColumnType::Action);
 	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);
@@ -201,4 +201,24 @@ void CFiltersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT ne
 bool CFiltersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
 	LRESULT result;
 	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
+}
+
+DWORD CFiltersView::OnPrePaint(int, LPNMCUSTOMDRAW cd) {
+	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYITEMDRAW : 0;
+}
+
+DWORD CFiltersView::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) {
+	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYSUBITEMDRAW : 0;
+}
+
+DWORD CFiltersView::OnSubItemPrePaint(int, LPNMCUSTOMDRAW cd) {
+	auto lv = (LPNMLVCUSTOMDRAW)cd;
+	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(lv->iSubItem);
+	if (col == ColumnType::Key || col == ColumnType::Weight || col == ColumnType::EffectiveWeight) {
+		::SelectObject(cd->hdc, Frame()->GetMonoFont());
+	}
+	else {
+		::SelectObject(cd->hdc, m_List.GetFont());
+	}
+	return CDRF_NEWFONT;
 }

@@ -44,6 +44,7 @@ LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     LOGFONT lf;
     hfont.GetLogFont(lf);
     wcscpy_s(lf.lfFaceName, L"Consolas");
+    lf.lfHeight = lf.lfHeight * 120 / 100;
     CFont font;
     font.CreateFontIndirect(&lf);
     edit.SetFont(font.Detach());

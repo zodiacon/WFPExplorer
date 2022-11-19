@@ -34,6 +34,16 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool ful
 				::LocalFree(sddl);
 			}
 			break;
+		case WFPDataType::RANGE_TYPE:
+			return WFPValueToString(value.rangeValue->Low, hex, full) + L"\r\n to \r\n" + WFPValueToString(value.rangeValue->High, hex, full);
+
+		case WFPDataType::V4_ADDR_MASK:
+		case WFPDataType::V6_ADDR_MASK:
+			ATLASSERT(0);
+			break;
+
+		case WFPDataType::EMPTY:
+			return L"(Empty)";
 	}
 	return str;
 }
@@ -186,15 +196,15 @@ PCWSTR StringHelper::WFPDataTypeToString(WFPDataType type) {
 		case WFPDataType::DOUBLE: return L"DOUBLE";
 		case WFPDataType::BYTE_BLOB_TYPE: return L"BLOB";
 		case WFPDataType::BYTE_ARRAY6_TYPE: return L"BYTE[6]";
-		case WFPDataType::RANGE_TYPE: return L"RANGE";
+		case WFPDataType::RANGE_TYPE: return L"Range";
 		case WFPDataType::BYTE_ARRAY16_TYPE: return L"BYTE[16]";
 		case WFPDataType::SID: return L"SID";
 		case WFPDataType::TOKEN_INFORMATION_TYPE: return L"Token Info";
 		case WFPDataType::TOKEN_ACCESS_INFORMATION_TYPE: return L"Token Access";
 		case WFPDataType::SECURITY_DESCRIPTOR_TYPE: return L"SD";
 		case WFPDataType::UNICODE_STRING_TYPE: return L"Unicode String";
-		case WFPDataType::V4_ADDR_MASK: return L"V4 Address";
-		case WFPDataType::V6_ADDR_MASK: return L"V6 Address";
+		case WFPDataType::V4_ADDR_MASK: return L"V4 Address MAsk";
+		case WFPDataType::V6_ADDR_MASK: return L"V6 Address MAsk";
 	}
 	return L"";
 }

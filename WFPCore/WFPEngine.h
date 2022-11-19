@@ -157,6 +157,12 @@ struct WFPValue {
 				wcscpy_s(unicodeString, len, value.unicodeString);
 				break;
 
+			case WFPDataType::RANGE_TYPE:
+				if constexpr (std::is_base_of_v<T, FWP_CONDITION_VALUE>) {
+					rangeValue = new WFPRange(value.rangeValue->valueLow, value.rangeValue->valueHigh);
+				}
+				break;
+
 			case WFPDataType::INT64: int64 = *value.int64; break;
 			case WFPDataType::UINT64: uint64 = *value.uint64; break;
 			case WFPDataType::DOUBLE: double64 = *value.double64; break;
@@ -171,6 +177,19 @@ struct WFPValue {
 struct WFPRange {
 	WFPValue Low;
 	WFPValue High;
+
+	WFPRange() = default;
+	WFPRange(WFPRange const&) = default;
+	WFPRange(WFPRange&&) = default;
+	WFPRange& operator=(WFPRange const&) = default;
+	WFPRange& operator=(WFPRange&&) = default;
+
+	WFPRange(WFPValue low, WFPValue high) noexcept;
+	template<typename T>
+	WFPRange(T const& low, T const& high) noexcept {
+		Low.Init(low);
+		High.Init(high);
+	}
 };
 
 enum class WFPLayerFlags {
