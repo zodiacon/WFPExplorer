@@ -42,7 +42,7 @@ void CHierarchyView::OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew)
 			break;
 		}
 
-		case TreeItemType::Layer:
+		default:
 			m_Splitter.SetSinglePaneMode(0);
 			break;
 	}
@@ -75,8 +75,13 @@ void CHierarchyView::BuildTree() {
 			if (!view.empty()) {
 				auto hFilters = InsertTreeItem(m_Tree, L"Filters", 0, TreeItemType::Filters, hLayer, TVI_LAST);
 				uint32_t count = 0;
-				for (auto& v : view)
+				for (auto& v : view) {
+					auto name = WFPHelper::GetFilterName(m_Engine, v.FilterKey);
+					if (name[0] != L'{')
+						name += L" " + StringHelper::GuidToString(v.FilterKey);
+					InsertTreeItem(m_Tree, name, 0, TreeItemType::Filter, hFilters, TVI_SORT);
 					count++;
+				}
 				m_Tree.SetItemText(hFilters, std::format(L"Filters ({})", count).c_str());
 			}
 		}
@@ -85,8 +90,13 @@ void CHierarchyView::BuildTree() {
 			if (!view.empty()) {
 				auto hCallouts = InsertTreeItem(m_Tree, L"Callouts", 2, TreeItemType::Callouts, hLayer, TVI_LAST);
 				uint32_t count = 0;
-				for (auto& v : view)
+				for (auto& v : view) {
+					CString name = v.Name.c_str();
+					if (name[0] != L'{')
+						name += L" " + StringHelper::GuidToString(v.CalloutKey);
+					InsertTreeItem(m_Tree, name, 0, TreeItemType::Callout, hCallouts, TVI_SORT);
 					count++;
+				}
 				m_Tree.SetItemText(hCallouts, std::format(L"Callouts ({})", count).c_str());
 			}
 		}
@@ -120,7 +130,7 @@ LRESULT CHierarchyView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_Tree.SetImageList(images);
 
 	m_Splitter.SetSplitterPane(0, m_Tree);
-	m_Splitter.SetSplitterPosPct(25);
+	m_Splitter.SetSplitterPosPct(20);
 
 	Refresh();
 

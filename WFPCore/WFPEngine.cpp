@@ -274,8 +274,8 @@ std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool include
 			info.emplace_back(std::move(InitProviderContext(p, includeData)));
 		}
 		FwpmFreeMemory((void**)&contexts);
-		m_LastError = FwpmProviderContextDestroyEnumHandle(m_hEngine, hEnum);
 	}
+	m_LastError = FwpmProviderContextDestroyEnumHandle(m_hEngine, hEnum);
 
 	return info;
 }
@@ -287,4 +287,48 @@ std::optional<WFPCalloutInfo> WFPEngine::GetCalloutByKey(GUID const& key) const 
 	FwpmFreeMemory((void**)&co);
 	return info;
 }
+
+uint32_t WFPEngine::GetFilterCount(GUID const& layer) const {
+	HANDLE hEnum;
+	m_LastError = FwpmFilterCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+	if (m_LastError)
+		return 0;
+	FWPM_FILTER** filters;
+	UINT32 count;
+	uint32_t total = 0;
+	m_LastError = FwpmFilterEnum(m_hEngine, hEnum, 4096, &filters, &count);
+	if (m_LastError == ERROR_SUCCESS) {
+		for (UINT32 i = 0; i < count; i++) {
+			auto filter = filters[i];
+			if (filter->layerKey == layer)
+				total++;
+		}
+		FwpmFreeMemory((void**)&filters);
+	}
+	m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
+	return total;
+}
+
+uint32_t WFPEngine::GetCalloutCount(GUID const& layer) const {
+	HANDLE hEnum;
+	m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+	if (m_LastError)
+		return 0;
+	FWPM_CALLOUT** callouts;
+	UINT32 count;
+	uint32_t total = 0;
+	m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
+	if (m_LastError == ERROR_SUCCESS) {
+		for (UINT32 i = 0; i < count; i++) {
+			auto c = callouts[i];
+			if (c->applicableLayer == layer)
+				total++;
+		}
+		FwpmFreeMemory((void**)&callouts);
+	}
+	m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
+	return total;
+}
+
+
 

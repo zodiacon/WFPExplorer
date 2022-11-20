@@ -17,7 +17,6 @@ class CHierarchyView :
 public:
 	CHierarchyView(IMainFrame* frame, WFPEngine& engine);
 
-	BOOL PreTranslateMessage(MSG* pMsg);
 	void Refresh();
 	void OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew);
 
@@ -37,7 +36,7 @@ public:
 
 private:
 	enum class TreeItemType {
-		None, Layers, Layer, Filters, Callouts,
+		None, Layers, Layer, Filters, Callouts, Filter, Callout,
 	};
 
 	void BuildTree();

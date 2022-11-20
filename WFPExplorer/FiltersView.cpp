@@ -19,6 +19,7 @@ void CFiltersView::SetLayer(GUID const& layer) {
 void CFiltersView::Refresh() {
 	CWaitCursor wait;
 	m_Filters = m_Engine.EnumFilters<FilterInfo>(m_Layer);
+	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Filters.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(3, std::format(L"{} Filters", m_Filters.size()).c_str());
 }

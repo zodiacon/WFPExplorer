@@ -562,6 +562,9 @@ public:
 	// enumerations
 	//
 
+	uint32_t GetFilterCount(GUID const& layer = GUID_NULL) const;
+	uint32_t GetCalloutCount(GUID const& layer = GUID_NULL) const;
+
 	std::vector<WFPNetEventInfo> EnumNetEvents();
 	std::vector<WFPConnectionInfo> EnumConnections(bool includeData = false);
 	std::vector<WFPSystemPortByType> EnumSystemPorts();
@@ -600,6 +603,11 @@ public:
 
 	template<typename TFilter = WFPFilterInfo> requires std::is_base_of_v<WFPFilterInfo, TFilter>
 	std::vector<TFilter> EnumFilters(GUID const& layer, bool full = false) const {
+		if (layer == GUID_NULL)
+			return EnumFilters<TFilter>(full);
+		if (layer == GUID_NULL)
+			return EnumFilters<TFilter>(full);
+
 		HANDLE hEnum;
 		std::vector<TFilter> info;
 		m_LastError = FwpmFilterCreateEnumHandle(m_hEngine, nullptr, &hEnum);
@@ -618,8 +626,8 @@ public:
 				}
 			}
 			FwpmFreeMemory((void**)&filters);
-			m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
 		}
+		m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
 		return info;
 	}
 
@@ -641,8 +649,8 @@ public:
 				info.emplace_back(std::move(fi));
 			}
 			FwpmFreeMemory((void**)&filters);
-			m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
 		}
+		m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
 		return info;
 	}
 
@@ -664,8 +672,8 @@ public:
 				info.emplace_back(std::move(li));
 			}
 			FwpmFreeMemory((void**)&layers);
-			m_LastError = FwpmLayerDestroyEnumHandle(m_hEngine, hEnum);
 		}
+		m_LastError = FwpmLayerDestroyEnumHandle(m_hEngine, hEnum);
 		return info;
 	}
 
@@ -687,8 +695,8 @@ public:
 				info.emplace_back(std::move(li));
 			}
 			FwpmFreeMemory((void**)&layers);
-			m_LastError = FwpmSubLayerDestroyEnumHandle(m_hEngine, hEnum);
 		}
+		m_LastError = FwpmSubLayerDestroyEnumHandle(m_hEngine, hEnum);
 		return info;
 
 	}
@@ -714,14 +722,16 @@ public:
 				info.emplace_back(std::move(ci));
 			}
 			FwpmFreeMemory((void**)&callouts);
-			m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
 		}
-
+		m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
 		return info;
 	}
 
 	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
 	std::vector<TCallout> EnumCallouts(GUID const& layer) const {
+		if (layer == GUID_NULL)
+			return EnumCallouts<TCallout>();
+
 		HANDLE hEnum;
 		std::vector<TCallout> info;
 		m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
@@ -740,8 +750,8 @@ public:
 				}
 			}
 			FwpmFreeMemory((void**)&callouts);
-			m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
 		}
+		m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
 
 		return info;
 	}

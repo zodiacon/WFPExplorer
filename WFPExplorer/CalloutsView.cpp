@@ -40,6 +40,7 @@ void CCalloutsView::SetLayer(GUID const& layer) {
 
 void CCalloutsView::Refresh() {
 	m_Callouts = m_Engine.EnumCallouts<CalloutInfo>(m_LayerKey);
+	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Callouts.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(5, std::format(L"{} Callouts", m_Callouts.size()).c_str());
 }

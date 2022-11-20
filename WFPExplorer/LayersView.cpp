@@ -19,6 +19,8 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 180, ColumnType::Flags);
 	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 60, ColumnType::Fields);
+	//cm->AddColumn(L"Filters", LVCFMT_RIGHT, 60, ColumnType::Filters);
+	//cm->AddColumn(L"Callouts", LVCFMT_RIGHT, 60, ColumnType::Callouts);
 	cm->AddColumn(L"Default Sublayer", 0, 250, ColumnType::DefaultSubLayer);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 
@@ -53,6 +55,7 @@ LRESULT CLayersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 
 void CLayersView::Refresh() {
 	m_Layers = m_Engine.EnumLayers<LayerInfo>();
+	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Layers.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(4, std::format(L"{} Layers", m_Layers.size()).c_str());
 }
@@ -72,6 +75,9 @@ CString CLayersView::GetColumnText(HWND, int row, int col) {
 				}
 			}
 			return info.DefaultSublayer;
+
+		case ColumnType::Filters: return std::to_wstring(info.FilterCount).c_str();
+		case ColumnType::Callouts: return std::to_wstring(info.CalloutCount).c_str();
 
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
@@ -119,6 +125,18 @@ int CLayersView::GetRowImage(HWND, int row, int col) const {
 void CLayersView::UpdateUI() {
 	auto& ui = Frame()->UI();
 	ui.UIEnable(ID_EDIT_PROPERTIES, m_List.GetSelectedCount() == 1);
+}
+
+int CLayersView::GetFilterCount(LayerInfo& layer) const {
+	if (layer.FilterCount < 0)
+		layer.FilterCount = m_Engine.GetFilterCount(layer.LayerKey);
+	return layer.FilterCount;
+}
+
+int CLayersView::GetCalloutCount(LayerInfo& layer) const {
+	if (layer.CalloutCount < 0)
+		layer.CalloutCount = m_Engine.GetCalloutCount(layer.LayerKey);
+	return layer.CalloutCount;
 }
 
 void CLayersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {

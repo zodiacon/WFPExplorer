@@ -39,14 +39,18 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
-	void UpdateUI();
-
-	enum class ColumnType {
-		Key, Name, Desc, Flags, Fields, DefaultSubLayer, Id,
-	};
-
 	struct LayerInfo : WFPLayerInfo {
 		CString DefaultSublayer;
+		int FilterCount;
+		int CalloutCount;
+	};
+
+	void UpdateUI();
+	int GetFilterCount(LayerInfo& layer) const;
+	int GetCalloutCount(LayerInfo& layer) const;
+
+	enum class ColumnType {
+		Key, Name, Desc, Flags, Fields, DefaultSubLayer, Id, Filters, Callouts,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
