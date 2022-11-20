@@ -35,7 +35,7 @@ public:
 
 private:
 	enum class ColumnType {
-		Key, Name, Desc, Flags, ProcessId, ProcessName,
+		Key, Name, Desc, Flags, ProcessId, ProcessName, UserName, SID, KernelMode,
 	};
 	struct SessionInfo : WFPSessionInfo {
 		CString ProcessName;

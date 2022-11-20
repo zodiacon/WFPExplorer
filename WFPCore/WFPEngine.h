@@ -266,6 +266,7 @@ struct WFPSubLayerInfo {
 	WFPSubLayerFlags Flags;
 	GUID ProviderKey;
 	std::vector<BYTE> ProviderData;
+	uint32_t ProviderDataSize;
 	UINT16 Weight;
 };
 
@@ -364,6 +365,7 @@ struct WFPFilterInfo {
 	WFPFilterFlags Flags;
 	GUID ProviderKey;
 	std::vector<BYTE> ProviderData;
+	uint32_t ProviderDataSize;
 	GUID LayerKey;
 	GUID SubLayerKey;
 	WFPValue Weight;
@@ -393,6 +395,7 @@ struct WFPCalloutInfo {
 	WFPCalloutFlags Flags;
 	GUID ProviderKey;
 	std::vector<BYTE> ProviderData;
+	uint32_t ProviderDataSize;
 	GUID ApplicableLayer;
 	UINT32 CalloutId;
 };
@@ -700,8 +703,8 @@ public:
 	//
 	// Filters API
 	//
-	std::optional<WFPFilterInfo> GetFilterByKey(GUID const& key, bool includeConditions = false) const;
-	std::optional<WFPFilterInfo> GetFilterById(UINT64 id, bool includeConditions = false) const;
+	std::optional<WFPFilterInfo> GetFilterByKey(GUID const& key, bool full = true) const;
+	std::optional<WFPFilterInfo> GetFilterById(UINT64 id, bool full = true) const;
 
 	//
 	// layer API
@@ -721,12 +724,12 @@ public:
 	// helpers
 	//
 	static std::wstring ParseMUIString(PCWSTR input);
-	static WFPProviderInfo InitProvider(FWPM_PROVIDER* p, bool includeData = false);
-	static WFPConnectionInfo InitConnection(FWPM_CONNECTION* p, bool includeData);
-	static WFPProviderContextInfo InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool includeData);
+	static WFPProviderInfo InitProvider(FWPM_PROVIDER* p, bool full = false);
+	static WFPConnectionInfo InitConnection(FWPM_CONNECTION* p, bool full = false);
+	static WFPProviderContextInfo InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool full = false);
 
 	template<typename TFilter = WFPFilterInfo> requires std::is_base_of_v<WFPFilterInfo, TFilter>
-	static TFilter InitFilter(FWPM_FILTER* filter, bool includeConditions = false) {
+	static TFilter InitFilter(FWPM_FILTER* filter, bool full = false) {
 		TFilter fi;
 		fi.FilterKey = filter->filterKey;
 		fi.FilterId = filter->filterId;
@@ -741,7 +744,8 @@ public:
 		fi.Weight.Init(filter->weight);
 		fi.Action.Type = static_cast<WFPActionType>(filter->action.type);
 		fi.Action.FilterType = filter->action.filterType;
-		if (includeConditions) {
+		fi.ProviderDataSize = filter->providerData.size;
+		if (full) {
 			fi.Conditions.reserve(fi.ConditionCount);
 			for (uint32_t i = 0; i < fi.ConditionCount; i++) {
 				auto& cond = filter->filterCondition[i];
@@ -750,6 +754,10 @@ public:
 				c.MatchType = static_cast<WFPMatchType>(cond.matchType);
 				c.Value.Init(cond.conditionValue);
 				fi.Conditions.emplace_back(std::move(c));
+			}
+			if (fi.ProviderDataSize) {
+				fi.ProviderData.resize(fi.ProviderDataSize);
+				memcpy(fi.ProviderData.data(), filter->providerData.data, fi.ProviderDataSize);
 			}
 		}
 		return fi;
@@ -780,7 +788,7 @@ public:
 	}
 
 	template<typename TLayer = WFPSubLayerInfo> requires std::is_base_of_v<WFPSubLayerInfo, TLayer>
-	static TLayer InitSubLayer(FWPM_SUBLAYER* layer) {
+	static TLayer InitSubLayer(FWPM_SUBLAYER* layer, bool full = false) {
 		TLayer li;
 		li.Name = ParseMUIString(layer->displayData.name);
 		li.Desc = ParseMUIString(layer->displayData.description);
@@ -788,13 +796,16 @@ public:
 		li.Flags = static_cast<WFPSubLayerFlags>(layer->flags);
 		li.Weight = layer->weight;
 		li.ProviderKey = layer->providerKey ? *layer->providerKey : GUID_NULL;
-		li.ProviderData.resize(layer->providerData.size);
-		memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
+		li.ProviderDataSize = layer->providerData.size;
+		if (full && li.ProviderDataSize) {
+			li.ProviderData.resize(li.ProviderDataSize);
+			memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
+		}
 		return li;
 	}
 
 	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
-	static TCallout InitCallout(FWPM_CALLOUT* c) {
+	static TCallout InitCallout(FWPM_CALLOUT* c, bool full = false) {
 		TCallout ci;
 		ci.Name = ParseMUIString(c->displayData.name);
 		ci.Desc = ParseMUIString(c->displayData.description);
@@ -802,8 +813,11 @@ public:
 		ci.Flags = static_cast<WFPCalloutFlags>(c->flags);
 		ci.CalloutKey = c->calloutKey;
 		ci.ApplicableLayer = c->applicableLayer;
-		ci.ProviderData.resize(c->providerData.size);
-		memcpy(ci.ProviderData.data(), c->providerData.data, c->providerData.size);
+		ci.ProviderDataSize = c->providerData.size;
+		if (full && ci.ProviderDataSize) {
+			ci.ProviderData.resize(ci.ProviderDataSize);
+			memcpy(ci.ProviderData.data(), c->providerData.data, ci.ProviderDataSize);
+		}
 		ci.CalloutId = c->calloutId;
 		ci.ApplicableLayer = c->applicableLayer;
 		return ci;

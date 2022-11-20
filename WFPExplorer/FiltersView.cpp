@@ -31,6 +31,7 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::SubLayerKey: return StringHelper::GuidToString(info.SubLayerKey);
 		case ColumnType::Weight: return StringHelper::WFPValueToString(info.Weight, true);
 		case ColumnType::Action: return StringHelper::WFPFilterActionTypeToString(info.Action.Type);
+		case ColumnType::ProviderData: return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
 		case ColumnType::ActionKey:
 			if (info.FilterAction.IsEmpty()) {
 				if (info.Action.CalloutKey == GUID_NULL)
@@ -107,6 +108,7 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	cm->AddColumn(L"Action", LVCFMT_LEFT, 110, ColumnType::Action);
 	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
+	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 100, ColumnType::ProviderData);
 	cm->AddColumn(L"Filter Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 	cm->AddColumn(L"Provider", 0, 240, ColumnType::ProviderName);
@@ -162,6 +164,7 @@ void CFiltersView::DoSort(SortInfo const* si) {
 			case ColumnType::Layer: return SortHelper::Sort(GetLayerName(f1), GetLayerName(f2), asc);
 			case ColumnType::SubLayer: return SortHelper::Sort(GetSublayerName(f1), GetSublayerName(f2), asc);
 			case ColumnType::ConditionCount: return SortHelper::Sort(f1.ConditionCount, f2.ConditionCount, asc);
+			case ColumnType::ProviderData: return SortHelper::Sort(f1.ProviderDataSize, f2.ProviderDataSize, asc);
 		}
 		return false;
 	};

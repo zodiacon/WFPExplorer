@@ -13,11 +13,12 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Provider Key", 0, 250, ColumnType::Key);
+	cm->AddColumn(L"Provider Key", 0, 280, ColumnType::Key);
+	cm->AddColumn(L"Provider Name", 0, 220, ColumnType::Name);
 	cm->AddColumn(L"Service Name", 0, 180, ColumnType::ServiceName);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
-	cm->AddColumn(L"Provider Name", 0, 180, ColumnType::Name);
-	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
+	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 90, ColumnType::ProviderData);
+	cm->AddColumn(L"Description", 0, 250, ColumnType::Desc);
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
@@ -47,7 +48,8 @@ CString CProvidersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(info.ProviderKey);
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: 
+		case ColumnType::ProviderData: return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
+		case ColumnType::Flags:
 			if (info.Flags == WFPProviderFlags::None)
 				return L"0";
 			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, StringHelper::WFPProviderFlagsToString(info.Flags)).c_str();
@@ -67,6 +69,7 @@ void CProvidersView::DoSort(SortInfo const* si) {
 			case ColumnType::Desc: return SortHelper::Sort(p1.Desc, p2.Desc, asc);
 			case ColumnType::Flags: return SortHelper::Sort(p1.Flags, p2.Flags, asc);
 			case ColumnType::ServiceName: return SortHelper::Sort(p1.ServiceName, p2.ServiceName, asc);
+			case ColumnType::ProviderData: return SortHelper::Sort(p1.ProviderDataSize, p2.ProviderDataSize, asc);
 		}
 		return false;
 	};

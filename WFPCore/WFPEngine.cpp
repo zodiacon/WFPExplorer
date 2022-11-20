@@ -104,13 +104,13 @@ std::optional<WFPProviderInfo> WFPEngine::GetProviderByKey(GUID const& guid) con
 	return p;
 }
 
-std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key, bool includeConditions) const {
+std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key, bool full) const {
 	FWPM_FILTER* filter;
 	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
-	auto info = InitFilter(filter, includeConditions);
+	auto info = InitFilter(filter, full);
 	FwpmFreeMemory((void**)&filter);
 	return info;
 }
@@ -283,7 +283,7 @@ std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool include
 std::optional<WFPCalloutInfo> WFPEngine::GetCalloutByKey(GUID const& key) const {
 	FWPM_CALLOUT* co;
 	FwpmCalloutGetByKey(m_hEngine, &key, &co);
-	auto info = InitCallout(co);
+	auto info = InitCallout(co, true);
 	FwpmFreeMemory((void**)&co);
 	return info;
 }

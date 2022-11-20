@@ -49,7 +49,7 @@ private:
 
 	enum class ColumnType {
 		Key, Name, Desc, Flags, ProviderGUID, ProviderName, LayerKey, SubLayerKey,
-		Weight, ConditionCount, Action, Id, EffectiveWeight, Layer, SubLayer, ActionKey,
+		Weight, ConditionCount, Action, Id, EffectiveWeight, Layer, SubLayer, ActionKey, ProviderData,
 	};
 
 	struct FilterInfo : WFPFilterInfo {

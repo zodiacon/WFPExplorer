@@ -17,6 +17,7 @@ LRESULT CSublayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	cm->AddColumn(L"Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 80, ColumnType::Weight);
+	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 90, ColumnType::ProviderData);
 	cm->AddColumn(L"Provider", 0, 180, ColumnType::Provider);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 
@@ -47,7 +48,8 @@ CString CSublayersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(info.SubLayerKey);
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Flags: 
+		case ColumnType::ProviderData: return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
+		case ColumnType::Flags:
 			if (info.Flags == WFPSubLayerFlags::None)
 				return L"0";
 			return std::format(L"0x{:X} ({})", (UINT32)info.Flags,
@@ -82,6 +84,7 @@ void CSublayersView::DoSort(SortInfo const* si) {
 			case ColumnType::Flags: return SortHelper::Sort(l1.Flags, l2.Flags, asc);
 			case ColumnType::Provider: return SortHelper::Sort(l1.ProviderName, l2.ProviderName, asc);
 			case ColumnType::Weight: return SortHelper::Sort(l1.Weight, l2.Weight, asc);
+			case ColumnType::ProviderData: return SortHelper::Sort(l1.ProviderDataSize, l2.ProviderDataSize, asc);
 		}
 		return false;
 	};

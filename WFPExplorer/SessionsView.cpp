@@ -30,6 +30,9 @@ CString CSessionsView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(session.SessionKey);
 		case ColumnType::Name: return session.Name.c_str();
 		case ColumnType::Desc: return session.Desc.c_str();
+		case ColumnType::SID: return StringHelper::FormatSID((PSID const)session.Sid);
+		case ColumnType::KernelMode: return session.KernelMode ? L"Yes" : L"";
+		case ColumnType::UserName: return session.UserName.c_str();
 		case ColumnType::ProcessId: return std::to_wstring(session.ProcessId).c_str();
 		case ColumnType::Flags: 
 			if (session.Flags == WFPSessionFlags::None)
@@ -55,6 +58,8 @@ void CSessionsView::DoSort(SortInfo const* si) {
 			case ColumnType::Flags: return SortHelper::Sort(s1.Flags, s2.Flags, asc);
 			case ColumnType::ProcessId: return SortHelper::Sort(s1.ProcessId, s2.ProcessId, asc);
 			case ColumnType::ProcessName: return SortHelper::Sort(s1.ProcessName, s2.ProcessName, asc);
+			case ColumnType::UserName: return SortHelper::Sort(s1.UserName, s2.UserName, asc);
+			case ColumnType::KernelMode: return SortHelper::Sort(s1.KernelMode, s2.KernelMode, asc);
 		}
 		return false;
 	};
@@ -74,8 +79,10 @@ LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Session Key", 0, 250, ColumnType::Key);
 	cm->AddColumn(L"PID", LVCFMT_RIGHT, 90, ColumnType::ProcessId);
 	cm->AddColumn(L"Process Name", LVCFMT_LEFT, 180, ColumnType::ProcessName);
+	cm->AddColumn(L"User Name", LVCFMT_LEFT, 220, ColumnType::UserName);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 120, ColumnType::Flags);
 	cm->AddColumn(L"Session Name", 0, 180, ColumnType::Name);
+	cm->AddColumn(L"Kernel?", 0, 80, ColumnType::KernelMode);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 
 	CImageList images;

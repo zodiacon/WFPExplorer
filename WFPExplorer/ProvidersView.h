@@ -35,7 +35,7 @@ public:
 
 private:
 	enum class ColumnType {
-		Key, Name, Desc, Flags, ServiceName,
+		Key, Name, Desc, Flags, ServiceName, ProviderData,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

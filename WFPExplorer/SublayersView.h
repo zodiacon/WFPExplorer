@@ -35,7 +35,7 @@ public:
 
 private:
 	enum class ColumnType {
-		Key, Name, Desc, Flags, Weight, Provider, 
+		Key, Name, Desc, Flags, Weight, Provider, ProviderData,
 	};
 
 	struct SubLayerInfo : WFPSubLayerInfo {
