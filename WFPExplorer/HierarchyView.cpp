@@ -1,0 +1,140 @@
+#include "pch.h"
+#include "HierarchyView.h"
+#include "resource.h"
+#include "WFPHelper.h"
+#include "StringHelper.h"
+#include <ranges>
+#include "LayersView.h"
+#include "CalloutsView.h"
+#include "FiltersView.h"
+
+CHierarchyView::CHierarchyView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+}
+
+void CHierarchyView::Refresh() {
+	BuildTree();
+}
+
+void CHierarchyView::OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew) {
+	auto type = GetItemData<TreeItemType>(m_Tree, hNew);
+	HWND hNewView = nullptr;
+	auto hOldView = m_Splitter.GetSplitterPane(SPLIT_PANE_RIGHT);
+	switch (type) {
+		case TreeItemType::Layers:
+			hNewView = m_LayersView->m_hWnd;
+			break;
+
+		case TreeItemType::Filters:
+		{
+			hNewView = m_FiltersView->m_hWnd;
+			auto hLayer = m_Tree.GetParentItem(hNew);
+			m_FiltersView->SetLayer(m_LayersMap[hLayer]);
+			m_FiltersView->Refresh();
+			break;
+		}
+
+		case TreeItemType::Callouts:
+		{
+			hNewView = m_CalloutsView->m_hWnd;
+			auto hLayer = m_Tree.GetParentItem(hNew);
+			m_CalloutsView->SetLayer(m_LayersMap[hLayer]);
+			m_CalloutsView->Refresh();
+			break;
+		}
+
+		case TreeItemType::Layer:
+			m_Splitter.SetSinglePaneMode(0);
+			break;
+	}
+	if (hNewView) {
+		m_Splitter.SetSinglePaneMode();
+		::ShowWindow(hNewView, SW_SHOW);
+		m_Splitter.SetSplitterPane(SPLIT_PANE_RIGHT, hNewView);
+	}
+	if (hOldView && hOldView != hNewView)
+		::ShowWindow(hOldView, SW_HIDE);
+}
+
+void CHierarchyView::BuildTree() {
+	CWaitCursor wait;
+	m_Tree.SetRedraw(FALSE);
+	m_Tree.DeleteAllItems();
+
+	using namespace std;
+
+	auto hLayers = InsertTreeItem(m_Tree, L"Layers", 1, TreeItemType::Layers, TVI_ROOT);
+	auto filters = m_Engine.EnumFilters();
+	auto callouts = m_Engine.EnumCallouts();
+	m_LayersMap.clear();
+
+	for (auto& layer : m_Engine.EnumLayers()) {
+		auto hLayer = InsertTreeItem(m_Tree, WFPHelper::GetLayerName(m_Engine, layer.LayerKey), 1, TreeItemType::Layer, hLayers, TVI_SORT);
+		m_LayersMap.insert({ hLayer, layer.LayerKey });
+		{
+			auto view = (filters | views::filter([&](auto& f) { return f.LayerKey == layer.LayerKey; }));
+			if (!view.empty()) {
+				auto hFilters = InsertTreeItem(m_Tree, L"Filters", 0, TreeItemType::Filters, hLayer, TVI_LAST);
+				uint32_t count = 0;
+				for (auto& v : view)
+					count++;
+				m_Tree.SetItemText(hFilters, std::format(L"Filters ({})", count).c_str());
+			}
+		}
+		{
+			auto view = callouts | views::filter([&](auto& c) { return c.ApplicableLayer == layer.LayerKey; });
+			if (!view.empty()) {
+				auto hCallouts = InsertTreeItem(m_Tree, L"Callouts", 2, TreeItemType::Callouts, hLayer, TVI_LAST);
+				uint32_t count = 0;
+				for (auto& v : view)
+					count++;
+				m_Tree.SetItemText(hCallouts, std::format(L"Callouts ({})", count).c_str());
+			}
+		}
+	}
+
+	m_Tree.Expand(hLayers, TVE_EXPAND);
+	m_Tree.SelectItem(hLayers);
+	m_Tree.SetRedraw();
+}
+
+LRESULT CHierarchyView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
+	m_hWndClient = m_Splitter.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+	m_Tree.Create(m_Splitter, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT);
+
+	m_LayersView = new CLayersView(Frame(), m_Engine);
+	m_LayersView->Create(m_Splitter, rcDefault, nullptr, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+
+	m_FiltersView = new CFiltersView(Frame(), m_Engine);
+	m_FiltersView->Create(m_Splitter, rcDefault, nullptr, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+
+	m_CalloutsView = new CCalloutsView(Frame(), m_Engine);
+	m_CalloutsView->Create(m_Splitter, rcDefault, nullptr, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32, 8, 4);
+	UINT icons[] = {
+		IDI_FILTER, IDI_LAYERS, IDI_CALLOUT,
+	};
+	for (auto icon : icons)
+		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
+	m_Tree.SetImageList(images);
+
+	m_Splitter.SetSplitterPane(0, m_Tree);
+	m_Splitter.SetSplitterPosPct(25);
+
+	Refresh();
+
+	return 0;
+}
+
+LRESULT CHierarchyView::OnRefresh(WORD, WORD, HWND, BOOL&) {
+	Refresh();
+
+	return 0;
+}
+
+LRESULT CHierarchyView::OnSetFocus(UINT, WPARAM, LPARAM, BOOL&) {
+	m_Tree.SetFocus();
+
+	return 0;
+}

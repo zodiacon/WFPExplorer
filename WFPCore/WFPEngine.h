@@ -599,7 +599,7 @@ public:
 	}
 
 	template<typename TFilter = WFPFilterInfo> requires std::is_base_of_v<WFPFilterInfo, TFilter>
-	std::vector<TFilter> EnumFilters(bool includeConditions = false) const {
+	std::vector<TFilter> EnumFilters(GUID const& layer, bool full = false) const {
 		HANDLE hEnum;
 		std::vector<TFilter> info;
 		m_LastError = FwpmFilterCreateEnumHandle(m_hEngine, nullptr, &hEnum);
@@ -612,7 +612,32 @@ public:
 			info.reserve(count);
 			for (UINT32 i = 0; i < count; i++) {
 				auto filter = filters[i];
-				auto fi = InitFilter<TFilter>(filter, includeConditions);
+				if (filter->layerKey == layer) {
+					auto fi = InitFilter<TFilter>(filter, full);
+					info.emplace_back(std::move(fi));
+				}
+			}
+			FwpmFreeMemory((void**)&filters);
+			m_LastError = FwpmFilterDestroyEnumHandle(m_hEngine, hEnum);
+		}
+		return info;
+	}
+
+	template<typename TFilter = WFPFilterInfo> requires std::is_base_of_v<WFPFilterInfo, TFilter>
+	std::vector<TFilter> EnumFilters(bool full = false) const {
+		HANDLE hEnum;
+		std::vector<TFilter> info;
+		m_LastError = FwpmFilterCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+		if (m_LastError)
+			return info;
+		FWPM_FILTER** filters;
+		UINT32 count;
+		m_LastError = FwpmFilterEnum(m_hEngine, hEnum, 4096, &filters, &count);
+		if (m_LastError == ERROR_SUCCESS) {
+			info.reserve(count);
+			for (UINT32 i = 0; i < count; i++) {
+				auto filter = filters[i];
+				auto fi = InitFilter<TFilter>(filter, full);
 				info.emplace_back(std::move(fi));
 			}
 			FwpmFreeMemory((void**)&filters);
@@ -687,6 +712,32 @@ public:
 				auto c = callouts[i];
 				auto ci = InitCallout(c);
 				info.emplace_back(std::move(ci));
+			}
+			FwpmFreeMemory((void**)&callouts);
+			m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
+		}
+
+		return info;
+	}
+
+	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
+	std::vector<TCallout> EnumCallouts(GUID const& layer) const {
+		HANDLE hEnum;
+		std::vector<TCallout> info;
+		m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+		if (m_LastError)
+			return info;
+		FWPM_CALLOUT** callouts;
+		UINT32 count;
+		m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
+		if (m_LastError == ERROR_SUCCESS) {
+			info.reserve(count);
+			for (UINT32 i = 0; i < count; i++) {
+				auto c = callouts[i];
+				if (c->applicableLayer == layer) {
+					auto ci = InitCallout(c);
+					info.emplace_back(std::move(ci));
+				}
 			}
 			FwpmFreeMemory((void**)&callouts);
 			m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);

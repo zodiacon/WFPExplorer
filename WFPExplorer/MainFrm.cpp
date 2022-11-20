@@ -14,6 +14,8 @@
 #include "ProviderContextView.h"
 #include "MainFrm.h"
 #include <ToolbarHelper.h>
+#include "AppSettings.h"
+#include "HierarchyView.h"
 
 const int WINDOW_MENU_POSITION = 4;
 
@@ -46,6 +48,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		{ 0 },
 		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
 		{ 0 },
+		{ ID_VIEW_HIERARCHY, IDI_TREE },
 		{ ID_VIEW_SESSIONS, IDI_SESSION },
 		{ ID_VIEW_PROVIDERS, IDI_PROVIDER },
 		{ ID_VIEW_FILTERS, IDI_FILTER },
@@ -66,7 +69,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
 	UINT icons[] = { 
 		IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_SUBLAYER, IDI_CALLOUT,
-		IDI_CONTEXT,
+		IDI_CONTEXT, IDI_TREE,
 	};
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
@@ -93,6 +96,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UIAddMenu(menuMain);
 	AddMenu(menuMain);
 	UpdateUI();
+
+	PostMessage(WM_COMMAND, ID_VIEW_HIERARCHY);
 
 	return 0;
 }
@@ -128,6 +133,7 @@ void CMainFrame::InitMenu() {
 		{ ID_EDIT_DELETE, IDI_DELETE },
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
 		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
+		{ ID_VIEW_HIERARCHY, IDI_TREE },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)
@@ -148,13 +154,37 @@ void CMainFrame::UpdateUI() {
 	UIEnable(ID_EDIT_PROPERTIES, false);
 }
 
+void CMainFrame::SetAlwaysOnTop(bool onTop) {
+	SetWindowPos(onTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	UISetCheck(ID_OPTIONS_ALWAYSONTOP, onTop);
+}
+
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
+	WINDOWPLACEMENT wp{ sizeof(wp) };
+	GetWindowPlacement(&wp);
+	AppSettings::Get().MainWindowPlacement(wp);
+	auto pLoop = _Module.GetMessageLoop();
 	pLoop->RemoveMessageFilter(this);
 	pLoop->RemoveIdleHandler(this);
 
 	bHandled = FALSE;
 	return 1;
+}
+
+LRESULT CMainFrame::OnEraseBkgnd(UINT, WPARAM, LPARAM, BOOL& bHandled) {
+	return 1;
+}
+
+LRESULT CMainFrame::OnShowWindow(UINT, WPARAM, LPARAM, BOOL&) {
+	static bool shown = false;
+	if (!shown) {
+		shown = true;
+		auto wp = AppSettings::Get().MainWindowPlacement();
+		if (wp.showCmd)
+			SetWindowPlacement(&wp);
+		SetAlwaysOnTop(AppSettings::Get().AlwaysOnTop());
+	}
+	return 0;
 }
 
 LRESULT CMainFrame::OnRebuildWindowMenu(UINT, WPARAM, LPARAM, BOOL& bHandled) {
@@ -185,6 +215,7 @@ LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 	auto view = new CFiltersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Filters", 1, view);
+	view->Refresh();
 
 	return 0;
 }
@@ -213,6 +244,14 @@ LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CMainFrame::OnViewHierarchy(WORD, WORD, HWND, BOOL&) {
+	auto view = new CHierarchyView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Hierarchy", 7, view);
+
+	return 0;
+}
+
 LRESULT CMainFrame::OnViewSublayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CSublayersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
@@ -225,6 +264,7 @@ LRESULT CMainFrame::OnViewCallouts(WORD, WORD, HWND, BOOL&) {
 	auto view = new CCalloutsView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Callouts", 5, view);
+	view->Refresh();
 
 	return 0;
 }
@@ -275,5 +315,12 @@ LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
 	if(!handled) {
 		UpdateUI();
 	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnAlwaysOnTop(WORD, WORD, HWND, BOOL&) {
+	auto& settings = AppSettings::Get();
+	settings.AlwaysOnTop(!settings.AlwaysOnTop());
+	SetAlwaysOnTop(settings.AlwaysOnTop());
 	return 0;
 }

@@ -15,6 +15,8 @@ class CFiltersView :
 public:
 	CFiltersView(IMainFrame* frame, WFPEngine& engine);
 
+	void SetLayer(GUID const& layer);
+
 	void Refresh();
 
 	CString GetColumnText(HWND, int row, int col);
@@ -71,4 +73,5 @@ private:
 
 	CListViewCtrl m_List;
 	std::vector<FilterInfo> m_Filters;
+	GUID m_Layer{ GUID_NULL };
 };

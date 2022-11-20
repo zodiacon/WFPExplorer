@@ -34,6 +34,7 @@
 #define IDI_CUBE                        228
 #define IDI_FIELD                       230
 #define IDD_PROPSHEET                   231
+#define IDI_TREE                        233
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -54,14 +55,12 @@
 #define IDC_SUBLAYER_PROP               1014
 #define IDC_VALUE                       1016
 #define IDC_FLAGS                       1017
-#define IDC_TAB1                        1018
 #define IDC_TABS                        1018
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
 #define ID_OPTIONS_DARKMODE             32776
 #define ID_OPTIONS_FONT                 32777
-#define ID_VIEW_REFRESH32778            32778
 #define ID_VIEW_SESSIONS                32779
 #define ID_VIEW_FILTERS                 32780
 #define ID_VIEW_LAYERS                  32781
@@ -70,13 +69,14 @@
 #define ID_VIEW_PROVIDERS               32784
 #define ID_VIEW_PROVIDERCONTEXTS        32785
 #define ID_EDIT_PROPERTIES              32786
+#define ID_VIEW_HIERARCHY               32778
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        233
-#define _APS_NEXT_COMMAND_VALUE         32789
+#define _APS_NEXT_RESOURCE_VALUE        234
+#define _APS_NEXT_COMMAND_VALUE         32787
 #define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

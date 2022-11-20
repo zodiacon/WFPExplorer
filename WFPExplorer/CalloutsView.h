@@ -13,6 +13,7 @@ class CCalloutsView :
 public:
 	CCalloutsView(IMainFrame* frame, WFPEngine& engine);
 
+	void SetLayer(GUID const& layer);
 	void Refresh();
 
 	CString GetColumnText(HWND, int row, int col);
@@ -50,4 +51,5 @@ private:
 
 	CListViewCtrl m_List;
 	std::vector<CalloutInfo> m_Callouts;
+	GUID m_LayerKey{ GUID_NULL };
 };

@@ -12,9 +12,13 @@
 CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
 
+void CFiltersView::SetLayer(GUID const& layer) {
+	m_Layer = layer;
+}
+
 void CFiltersView::Refresh() {
 	CWaitCursor wait;
-	m_Filters = m_Engine.EnumFilters<FilterInfo>();
+	m_Filters = m_Engine.EnumFilters<FilterInfo>(m_Layer);
 	m_List.SetItemCountEx((int)m_Filters.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(3, std::format(L"{} Filters", m_Filters.size()).c_str());
 }
@@ -97,7 +101,7 @@ CString const& CFiltersView::GetSublayerName(FilterInfo& info) const {
 
 LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL);
+		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SINGLESEL);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	auto cm = GetColumnManager(m_List);
@@ -121,8 +125,6 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	for(auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
-
-	Refresh();
 
 	return 0;
 }

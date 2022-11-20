@@ -228,10 +228,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="CalloutsView.cpp" />
     <ClCompile Include="FilterConditionsPage.cpp" />
     <ClCompile Include="FilterGeneralPage.cpp" />
     <ClCompile Include="FiltersView.cpp" />
+    <ClCompile Include="HierarchyView.cpp" />
     <ClCompile Include="LayerFieldsPage.cpp" />
     <ClCompile Include="LayerGeneralPage.cpp" />
     <ClCompile Include="LayersView.cpp" />
@@ -253,10 +255,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="AppSettings.h" />
     <ClInclude Include="CalloutsView.h" />
     <ClInclude Include="FilterConditionsPage.h" />
     <ClInclude Include="FilterGeneralPage.h" />
     <ClInclude Include="FiltersView.h" />
+    <ClInclude Include="HierarchyView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="LayerFieldsPage.h" />
     <ClInclude Include="LayerGeneralPage.h" />
@@ -300,6 +304,7 @@
     <Image Include="res\Session-synamic.ico" />
     <Image Include="res\Session.ico" />
     <Image Include="res\sublayers.ico" />
+    <Image Include="res\tree.ico" />
     <Image Include="res\WFPExplorer.ico" />
   </ItemGroup>
   <ItemGroup>

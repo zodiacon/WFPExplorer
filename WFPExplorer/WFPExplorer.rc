@@ -68,6 +68,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "&Hierarchy",                  ID_VIEW_HIERARCHY
+        MENUITEM SEPARATOR
         MENUITEM "&Sessions",                   ID_VIEW_SESSIONS
         MENUITEM "&Providers",                  ID_VIEW_PROVIDERS
         MENUITEM "&Filters",                    ID_VIEW_FILTERS
@@ -154,6 +156,8 @@ IDI_CONDITION           ICON                    "res\\Condition.ico"
 IDI_CUBE                ICON                    "res\\Object.ico"
 
 IDI_FIELD               ICON                    "res\\field.ico"
+
+IDI_TREE                ICON                    "res\\tree.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

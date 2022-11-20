@@ -25,6 +25,9 @@
     <Filter Include="PropertyPages">
       <UniqueIdentifier>{194f6333-698f-4887-bc77-19bf2a1a09ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{f85ec35b-60c8-4884-9113-6b5cc6c848fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -41,12 +44,6 @@
     </ClCompile>
     <ClCompile Include="SessionsView.cpp">
       <Filter>Views</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessHelper.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FiltersView.cpp">
       <Filter>Views</Filter>
@@ -69,9 +66,6 @@
     <ClCompile Include="FilterGeneralPage.cpp">
       <Filter>PropertyPages</Filter>
     </ClCompile>
-    <ClCompile Include="WFPHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FilterConditionsPage.cpp">
       <Filter>PropertyPages</Filter>
     </ClCompile>
@@ -80,6 +74,21 @@
     </ClCompile>
     <ClCompile Include="LayerFieldsPage.cpp">
       <Filter>PropertyPages</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessHelper.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelper.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="WFPHelper.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="HierarchyView.cpp">
+      <Filter>Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,12 +105,6 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="Interfaces.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FiltersView.h">
@@ -128,9 +131,6 @@
     <ClInclude Include="FilterGeneralPage.h">
       <Filter>PropertyPages</Filter>
     </ClInclude>
-    <ClInclude Include="WFPHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FilterConditionsPage.h">
       <Filter>PropertyPages</Filter>
     </ClInclude>
@@ -139,6 +139,21 @@
     </ClInclude>
     <ClInclude Include="LayerFieldsPage.h">
       <Filter>PropertyPages</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessHelper.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="StringHelper.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="WFPHelper.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="HierarchyView.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +235,9 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\field.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\tree.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

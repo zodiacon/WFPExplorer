@@ -61,6 +61,10 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool ful
 }
 
 CString StringHelper::WFPFilterFlagsToString(WFPFilterFlags flags) {
+	static std::unordered_map<WFPFilterFlags, CString> cache;
+	if (auto it = cache.find(flags); it != cache.end())
+		return it->second;
+
 	static const struct {
 		WFPFilterFlags flag;
 		PCWSTR text;
@@ -79,7 +83,9 @@ CString StringHelper::WFPFilterFlagsToString(WFPFilterFlags flags) {
 		{ WFPFilterFlags::IPSecNoAcquireInitiate, L"IPSec No Acquire Initiate" },
 	};
 
-	return FlagsToString(flags, data);
+	auto result = FlagsToString(flags, data);
+	cache.insert({ flags, result });
+	return result;
 }
 
 CString StringHelper::WFPLayerFlagsToString(WFPLayerFlags flags) {

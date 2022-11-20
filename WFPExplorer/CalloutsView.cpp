@@ -26,8 +26,6 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	images.AddIcon(AtlLoadIconImage(IDI_CALLOUT, 0, 16, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
-	Refresh();
-
 	return 0;
 }
 
@@ -36,8 +34,12 @@ LRESULT CCalloutsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+void CCalloutsView::SetLayer(GUID const& layer) {
+	m_LayerKey = layer;
+}
+
 void CCalloutsView::Refresh() {
-	m_Callouts = m_Engine.EnumCallouts<CalloutInfo>();
+	m_Callouts = m_Engine.EnumCallouts<CalloutInfo>(m_LayerKey);
 	m_List.SetItemCountEx((int)m_Callouts.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(5, std::format(L"{} Callouts", m_Callouts.size()).c_str());
 }
