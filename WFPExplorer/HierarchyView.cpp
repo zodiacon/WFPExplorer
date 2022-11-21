@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "HierarchyView.h"
-#include "resource.h"
 #include "WFPHelper.h"
 #include "StringHelper.h"
 #include <ranges>
@@ -53,6 +52,11 @@ void CHierarchyView::OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew)
 	}
 	if (hOldView && hOldView != hNewView)
 		::ShowWindow(hOldView, SW_HIDE);
+	UpdateUI();
+}
+
+bool CHierarchyView::OnTreeDoubleClick(HWND tree, HTREEITEM hItem) {
+	return ShowProperties(hItem);
 }
 
 void CHierarchyView::BuildTree() {
@@ -66,6 +70,8 @@ void CHierarchyView::BuildTree() {
 	auto filters = m_Engine.EnumFilters();
 	auto callouts = m_Engine.EnumCallouts();
 	m_LayersMap.clear();
+	m_FiltersMap.clear();
+	m_CalloutsMap.clear();
 
 	for (auto& layer : m_Engine.EnumLayers()) {
 		auto hLayer = InsertTreeItem(m_Tree, WFPHelper::GetLayerName(m_Engine, layer.LayerKey), 1, TreeItemType::Layer, hLayers, TVI_SORT);
@@ -79,7 +85,8 @@ void CHierarchyView::BuildTree() {
 					auto name = WFPHelper::GetFilterName(m_Engine, v.FilterKey);
 					if (name[0] != L'{')
 						name += L" " + StringHelper::GuidToString(v.FilterKey);
-					InsertTreeItem(m_Tree, name, 0, TreeItemType::Filter, hFilters, TVI_SORT);
+					auto hFilter = InsertTreeItem(m_Tree, name, 0, TreeItemType::Filter, hFilters, TVI_SORT);
+					m_FiltersMap.insert({ hFilter, v.FilterKey });
 					count++;
 				}
 				m_Tree.SetItemText(hFilters, std::format(L"Filters ({})", count).c_str());
@@ -94,7 +101,8 @@ void CHierarchyView::BuildTree() {
 					CString name = v.Name.c_str();
 					if (name[0] != L'{')
 						name += L" " + StringHelper::GuidToString(v.CalloutKey);
-					InsertTreeItem(m_Tree, name, 0, TreeItemType::Callout, hCallouts, TVI_SORT);
+					auto hCallout = InsertTreeItem(m_Tree, name, 2, TreeItemType::Callout, hCallouts, TVI_SORT);
+					m_CalloutsMap.insert({ hCallout, v.CalloutKey });
 					count++;
 				}
 				m_Tree.SetItemText(hCallouts, std::format(L"Callouts ({})", count).c_str());
@@ -105,6 +113,32 @@ void CHierarchyView::BuildTree() {
 	m_Tree.Expand(hLayers, TVE_EXPAND);
 	m_Tree.SelectItem(hLayers);
 	m_Tree.SetRedraw();
+}
+
+void CHierarchyView::UpdateUI() {
+	auto& ui = Frame()->UI();
+	auto hItem = m_Tree.GetSelectedItem();
+	auto type = hItem ? GetItemData<TreeItemType>(m_Tree, hItem) : TreeItemType::None;
+	ui.UIEnable(ID_EDIT_PROPERTIES, type == TreeItemType::Filter || type == TreeItemType::Layer);
+	ui.UIEnable(ID_EDIT_COPY, type != TreeItemType::None);
+}
+
+bool CHierarchyView::ShowProperties(HTREEITEM hItem) {
+	auto type = GetItemData<TreeItemType>(m_Tree, hItem);
+	switch (type) {
+		case TreeItemType::Layer:
+			WFPHelper::ShowLayerProperties(m_Engine, *m_Engine.GetLayerByKey(m_LayersMap[hItem]));
+			return true;
+
+		case TreeItemType::Filter:
+			WFPHelper::ShowFilterProperties(m_Engine, *m_Engine.GetFilterByKey(m_FiltersMap[hItem], false));
+			return true;
+
+		case TreeItemType::Callout:
+			//WFPHelper::ShowCalloutProperties(m_Engine, *m_Engine.GetCalloutByKey(m_CalloutsMap[hItem], false));
+			return true;
+	}
+	return false;
 }
 
 LRESULT CHierarchyView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
@@ -146,5 +180,10 @@ LRESULT CHierarchyView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 LRESULT CHierarchyView::OnSetFocus(UINT, WPARAM, LPARAM, BOOL&) {
 	m_Tree.SetFocus();
 
+	return 0;
+}
+
+LRESULT CHierarchyView::OnProperties(WORD, WORD, HWND, BOOL&) {
+	ShowProperties(m_Tree.GetSelectedItem());
 	return 0;
 }

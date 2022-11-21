@@ -4,7 +4,7 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 
-CLayerFieldsPage::CLayerFieldsPage(WFPEngine& engine, WFPLayerInfo& layer) : m_Engine(engine), m_Layer(layer) {
+CLayerFieldsPage::CLayerFieldsPage(WFPEngine& engine, WFPLayerInfo const& layer) : m_Engine(engine), m_Layer(layer) {
 }
 
 CString CLayerFieldsPage::GetColumnText(HWND, int row, int col) const {

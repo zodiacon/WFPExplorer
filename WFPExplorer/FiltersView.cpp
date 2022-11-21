@@ -8,6 +8,7 @@
 #include "FilterConditionsPage.h"
 #include "WFPHelper.h"
 #include <ResizablePropertySheet.h>
+#include "AppSettings.h"
 
 CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }

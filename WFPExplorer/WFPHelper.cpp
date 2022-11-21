@@ -47,7 +47,7 @@ CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 	return L"";
 }
 
-int WFPHelper::ShowLayerProperties(WFPEngine& engine, WFPLayerInfo& layer) {
+int WFPHelper::ShowLayerProperties(WFPEngine& engine, WFPLayerInfo const& layer) {
 	auto name = L"Layer Properties (" + GetLayerName(engine, layer.LayerKey) + L")";
 	CPropertySheet sheet((PCWSTR)name);
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
@@ -66,7 +66,7 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, WFPLayerInfo& layer) {
 	return (int)sheet.DoModal();
 }
 
-int WFPHelper::ShowFilterProperties(WFPEngine& engine, WFPFilterInfo& filter) {
+int WFPHelper::ShowFilterProperties(WFPEngine& engine, WFPFilterInfo const& filter) {
 	auto name = L"Filter Properties (" + GetFilterName(engine, filter.FilterKey) + L")";
 	CPropertySheet sheet((PCWSTR)name);
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
@@ -82,4 +82,12 @@ int WFPHelper::ShowFilterProperties(WFPEngine& engine, WFPFilterInfo& filter) {
 		sheet.AddPage(cond);
 	}
 	return (int)sheet.DoModal();
+}
+
+int WFPHelper::ShowSublayerProperties(WFPEngine& engine, WFPSubLayerInfo& layer) {
+	return 0;
+}
+
+int WFPHelper::ShowProviderProperties(WFPEngine& engine, WFPProviderInfo& layer) {
+	return 0;
 }

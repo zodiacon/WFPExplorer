@@ -4,7 +4,7 @@
 #include <WFPEngine.h>
 #include "WFPHelper.h"
 
-CFilterGeneralPage::CFilterGeneralPage(WFPEngine& engine, WFPFilterInfo& filter) : m_Engine(engine), m_Filter(filter) {
+CFilterGeneralPage::CFilterGeneralPage(WFPEngine& engine, WFPFilterInfo const& filter) : m_Engine(engine), m_Filter(filter) {
 }
 
 LRESULT CFilterGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
@@ -45,4 +45,17 @@ LRESULT CFilterGeneralPage::OnShowLayer(WORD, WORD, HWND, BOOL&) {
         WFPHelper::ShowLayerProperties(m_Engine, *layer);
 
     return 0;
+}
+
+LRESULT CFilterGeneralPage::OnShowProvider(WORD, WORD, HWND, BOOL&) {
+    auto provider = m_Engine.GetProviderByKey(m_Filter.ProviderKey);
+    if (!provider)
+        AtlMessageBox(m_hWnd, L"Provider not found", IDS_TITLE, MB_ICONERROR);
+    else
+        WFPHelper::ShowProviderProperties(m_Engine, *provider);
+    return 0;
+}
+
+LRESULT CFilterGeneralPage::OnShowSublayer(WORD, WORD, HWND, BOOL&) {
+    return LRESULT();
 }

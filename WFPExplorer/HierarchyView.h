@@ -5,6 +5,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include "resource.h"
 
 class WFPEngine;
 class CLayersView;
@@ -19,13 +20,15 @@ public:
 
 	void Refresh();
 	void OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew);
+	bool OnTreeDoubleClick(HWND tree, HTREEITEM hItem);
 
 	BEGIN_MSG_MAP(CHierarchyView)
 		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CTreeViewHelper<CHierarchyView>)
 		CHAIN_MSG_MAP(BaseFrame)
-		ALT_MSG_MAP(1)
+	ALT_MSG_MAP(1)
+		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 	END_MSG_MAP()
 
@@ -40,10 +43,13 @@ private:
 	};
 
 	void BuildTree();
+	void UpdateUI();
+	bool ShowProperties(HTREEITEM hItem);
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;
 
@@ -53,4 +59,6 @@ private:
 	CFiltersView* m_FiltersView;
 	CCalloutsView* m_CalloutsView;
 	std::unordered_map<HTREEITEM, GUID> m_LayersMap;
+	std::unordered_map<HTREEITEM, GUID> m_FiltersMap;
+	std::unordered_map<HTREEITEM, GUID> m_CalloutsMap;
 };

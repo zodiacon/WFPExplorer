@@ -48,8 +48,11 @@
 #define IDC_FIELDS                      1008
 #define IDC_CALLOUT_OR_FILTER           1009
 #define IDC_LIST                        1009
+#define IDC_FILTERS                     1009
 #define IDC_ID                          1010
 #define IDC_WEIGHT                      1011
+#define IDC_FILTERS2                    1011
+#define IDC_CALLOUTS                    1011
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
 #define IDC_SUBLAYER_PROP               1014
@@ -61,6 +64,7 @@
 #define ID_OPTIONS_ALWAYSONTOP          32775
 #define ID_OPTIONS_DARKMODE             32776
 #define ID_OPTIONS_FONT                 32777
+#define ID_VIEW_HIERARCHY               32778
 #define ID_VIEW_SESSIONS                32779
 #define ID_VIEW_FILTERS                 32780
 #define ID_VIEW_LAYERS                  32781
@@ -69,7 +73,6 @@
 #define ID_VIEW_PROVIDERS               32784
 #define ID_VIEW_PROVIDERCONTEXTS        32785
 #define ID_EDIT_PROPERTIES              32786
-#define ID_VIEW_HIERARCHY               32778
 
 // Next default values for new objects
 // 

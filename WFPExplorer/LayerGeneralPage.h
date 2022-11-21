@@ -12,7 +12,7 @@ class CLayerGeneralPage :
 public:
 	enum { IDD = IDD_LAYERINFO };
 
-	CLayerGeneralPage(WFPEngine& engine, WFPLayerInfo& layer);
+	CLayerGeneralPage(WFPEngine& engine, WFPLayerInfo const& layer);
 
 	BEGIN_MSG_MAP(CLayerGeneralPage)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
@@ -28,5 +28,5 @@ private:
 
 private:
 	WFPEngine& m_Engine;
-	WFPLayerInfo& m_Layer;
+	WFPLayerInfo const& m_Layer;
 };

@@ -4,7 +4,7 @@
 #include "StringHelper.h"
 #include "WFPHelper.h"
 
-CLayerGeneralPage::CLayerGeneralPage(WFPEngine& engine, WFPLayerInfo& layer) : m_Engine(engine), m_Layer(layer) {
+CLayerGeneralPage::CLayerGeneralPage(WFPEngine& engine, WFPLayerInfo const& layer) : m_Engine(engine), m_Layer(layer) {
 }
 
 LRESULT CLayerGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
@@ -20,6 +20,8 @@ LRESULT CLayerGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 		flags = L"(None)";
 	SetDlgItemText(IDC_FLAGS, flags);
 	SetDlgItemText(IDC_SUBLAYER, WFPHelper::GetSublayerName(m_Engine, m_Layer.DefaultSubLayerKey));
+	SetDlgItemInt(IDC_FILTERS, m_Engine.GetFilterCount(m_Layer.LayerKey), false);
+	SetDlgItemInt(IDC_CALLOUTS, m_Engine.GetCalloutCount(m_Layer.LayerKey), false);
 
 	AddIconToButton(IDC_SUBLAYER_PROP, IDI_SUBLAYER);
 

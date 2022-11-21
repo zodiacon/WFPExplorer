@@ -3,7 +3,7 @@
 #include "StringHelper.h"
 #include <WFPEngine.h>
 
-CFilterConditionsPage::CFilterConditionsPage(WFPEngine& engine, WFPFilterInfo& filter) : m_Engine(engine), m_Filter(filter) {
+CFilterConditionsPage::CFilterConditionsPage(WFPEngine& engine, WFPFilterInfo const& filter) : m_Engine(engine), m_Filter(filter) {
 }
 
 CString CFilterConditionsPage::GetColumnText(HWND, int row, int col) const {

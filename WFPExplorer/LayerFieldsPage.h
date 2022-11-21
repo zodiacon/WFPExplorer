@@ -16,7 +16,7 @@ class CLayerFieldsPage :
 public:
 	enum { IDD = IDD_LAYERFIELDS };
 
-	CLayerFieldsPage(WFPEngine& engine, WFPLayerInfo& layer);
+	CLayerFieldsPage(WFPEngine& engine, WFPLayerInfo const& layer);
 
 	CString GetColumnText(HWND, int row, int col) const;
 	void DoSort(SortInfo const* si);
@@ -37,7 +37,7 @@ private:
 
 private:
 	WFPEngine& m_Engine;
-	WFPLayerInfo& m_Layer;
+	WFPLayerInfo const& m_Layer;
 	std::vector<WFPFieldInfo> m_Fields;
 	CListViewCtrl m_List;
 };
