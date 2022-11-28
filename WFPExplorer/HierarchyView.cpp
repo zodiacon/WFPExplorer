@@ -6,6 +6,7 @@
 #include "LayersView.h"
 #include "CalloutsView.h"
 #include "FiltersView.h"
+#include "AppSettings.h"
 
 CHierarchyView::CHierarchyView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -72,6 +73,7 @@ void CHierarchyView::BuildTree() {
 	m_LayersMap.clear();
 	m_FiltersMap.clear();
 	m_CalloutsMap.clear();
+	auto hideEmptyLayers = AppSettings::Get().HideEmptyLayers();
 
 	for (auto& layer : m_Engine.EnumLayers()) {
 		auto hLayer = InsertTreeItem(m_Tree, WFPHelper::GetLayerName(m_Engine, layer.LayerKey), 1, TreeItemType::Layer, hLayers, TVI_SORT);
@@ -107,6 +109,13 @@ void CHierarchyView::BuildTree() {
 				}
 				m_Tree.SetItemText(hCallouts, std::format(L"Callouts ({})", count).c_str());
 			}
+		}
+		if (hideEmptyLayers && m_Tree.GetChildItem(hLayer) == nullptr) {
+			//
+			// layer has no callouts nor filters
+			//
+			m_Tree.DeleteItem(hLayer);
+			m_LayersMap.erase(hLayer);
 		}
 	}
 

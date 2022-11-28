@@ -19,6 +19,7 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider", 0, 250, ColumnType::Provider);
 	cm->AddColumn(L"Applicable Layer", 0, 250, ColumnType::Layer);
+	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 90, ColumnType::ProviderData);
 	cm->AddColumn(L"Description", 0, 300, ColumnType::Desc);
 
 	CImageList images;
@@ -75,6 +76,9 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 
 		case ColumnType::Name: return info.Name.c_str();
 		case ColumnType::Desc: return info.Desc.c_str();
+		case ColumnType::ProviderData:
+			return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
+
 		case ColumnType::Flags:
 			if (info.Flags == WFPCalloutFlags::None)
 				return L"0";

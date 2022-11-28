@@ -108,6 +108,8 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Filter Key", 0, 300, ColumnType::Key);
+	cm->AddColumn(L"Filter Name", 0, 180, ColumnType::Name);
+	cm->AddColumn(L"Layer", LVCFMT_LEFT, 250, ColumnType::Layer);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 140, ColumnType::Weight);
 	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 140, ColumnType::EffectiveWeight);
 	cm->AddColumn(L"Conditions", LVCFMT_RIGHT, 70, ColumnType::ConditionCount);
@@ -115,10 +117,8 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
 	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 100, ColumnType::ProviderData);
-	cm->AddColumn(L"Filter Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
 	cm->AddColumn(L"Provider", 0, 240, ColumnType::ProviderName);
-	cm->AddColumn(L"Layer", LVCFMT_LEFT, 250, ColumnType::Layer);
 	cm->AddColumn(L"Sublayer", LVCFMT_LEFT, 250, ColumnType::SubLayer);
 
 	CImageList images;

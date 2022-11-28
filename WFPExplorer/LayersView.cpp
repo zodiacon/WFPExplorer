@@ -17,7 +17,7 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	cm->AddColumn(L"Layer Key", 0, 280, ColumnType::Key);
 	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 70, ColumnType::Id);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
-	cm->AddColumn(L"Flags", LVCFMT_LEFT, 180, ColumnType::Flags);
+	cm->AddColumn(L"Flags", LVCFMT_LEFT, 250, ColumnType::Flags);
 	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 60, ColumnType::Fields);
 	//cm->AddColumn(L"Filters", LVCFMT_RIGHT, 60, ColumnType::Filters);
 	//cm->AddColumn(L"Callouts", LVCFMT_RIGHT, 60, ColumnType::Callouts);

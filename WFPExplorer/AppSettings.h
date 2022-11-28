@@ -12,6 +12,7 @@ public:
 		SETTING(ViewStatusBar, 1, SettingType::Bool);
 		SETTING(DarkMode, 0, SettingType::Bool);
 		SETTING(SingleInstance, 0, SettingType::Bool);
+		SETTING(HideEmptyLayers, 1, SettingType::Bool);
 	END_SETTINGS
 
 	DEF_SETTING(DarkMode, int)
@@ -20,5 +21,6 @@ public:
 	DEF_SETTING(ViewStatusBar, int)
 	DEF_SETTING(SingleInstance, int)
 	DEF_SETTING(MainWindowPlacement, WINDOWPLACEMENT)
+	DEF_SETTING(HideEmptyLayers, bool)
 };
 

@@ -36,7 +36,7 @@ public:
 
 private:
 	enum class ColumnType {
-		Key, Name, Desc, Flags, Fields, Provider, Id, Layer,
+		Key, Name, Desc, Flags, Fields, Provider, Id, Layer, ProviderData,
 	};
 
 	struct CalloutInfo : WFPCalloutInfo {
