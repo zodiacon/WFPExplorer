@@ -5,6 +5,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include <CustomSplitterWindow.h>
 #include "resource.h"
 
 class WFPEngine;
@@ -54,7 +55,7 @@ private:
 	WFPEngine& m_Engine;
 
 	CTreeViewCtrl m_Tree;
-	CSplitterWindow m_Splitter;
+	CCustomSplitterWindow m_Splitter;
 	CLayersView* m_LayersView;
 	CFiltersView* m_FiltersView;
 	CCalloutsView* m_CalloutsView;

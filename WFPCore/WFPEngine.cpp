@@ -126,9 +126,30 @@ std::optional<WFPFilterInfo> WFPEngine::GetFilterById(UINT64 id, bool includeCon
 	return info;
 }
 
+bool WFPEngine::DeleteFilter(GUID const& key) {
+	m_LastError = ::FwpmFilterDeleteByKey(m_hEngine, &key);
+	return m_LastError == ERROR_SUCCESS;
+}
+
+bool WFPEngine::DeleteFilter(UINT64 id) {
+	m_LastError = ::FwpmFilterDeleteById(m_hEngine, id);
+	return m_LastError == ERROR_SUCCESS;
+}
+
 std::optional<WFPLayerInfo> WFPEngine::GetLayerByKey(GUID const& key) const {
 	FWPM_LAYER* layer;
 	m_LastError = FwpmLayerGetByKey(m_hEngine, &key, &layer);
+	if (m_LastError != ERROR_SUCCESS)
+		return {};
+
+	auto info = InitLayer(layer, true);
+	FwpmFreeMemory((void**)&layer);
+	return info;
+}
+
+std::optional<WFPLayerInfo> WFPEngine::GetLayerById(UINT16 id) const {
+	FWPM_LAYER* layer;
+	m_LastError = FwpmLayerGetById(m_hEngine, id, &layer);
 	if (m_LastError != ERROR_SUCCESS)
 		return {};
 
@@ -241,21 +262,6 @@ std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 			return result;
 	}
 	return input;
-}
-
-std::vector<WFPNetEventInfo> WFPEngine::EnumNetEvents() {
-	std::vector<WFPNetEventInfo> events;
-	HANDLE hEnum;
-	m_LastError = FwpmNetEventCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError != ERROR_SUCCESS)
-		return {};
-
-	FWPM_NET_EVENT** pEvents;
-	UINT32 count;
-	m_LastError = FwpmNetEventEnum(m_hEngine, hEnum, 128, &pEvents, &count);
-	if (ERROR_SUCCESS == m_LastError) {
-	}
-	return events;
 }
 
 std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool includeData) const {

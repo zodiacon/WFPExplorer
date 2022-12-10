@@ -35,6 +35,8 @@
 #define IDI_FIELD                       230
 #define IDD_PROPSHEET                   231
 #define IDI_TREE                        233
+#define IDR_MENU1                       234
+#define IDR_CONTEXT                     234
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -51,7 +53,6 @@
 #define IDC_FILTERS                     1009
 #define IDC_ID                          1010
 #define IDC_WEIGHT                      1011
-#define IDC_FILTERS2                    1011
 #define IDC_CALLOUTS                    1011
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
@@ -78,7 +79,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        234
+#define _APS_NEXT_RESOURCE_VALUE        235
 #define _APS_NEXT_COMMAND_VALUE         32787
 #define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101

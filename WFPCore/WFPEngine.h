@@ -13,6 +13,12 @@ enum class WFPSessionFlags {
 };
 DEFINE_ENUM_FLAG_OPERATORS(WFPSessionFlags);
 
+enum class WFPIPVersion {
+	V4 = 0,
+	V6,
+	NONE,
+};
+
 struct WFPSessionInfo {
 	GUID SessionKey;
 	std::wstring Name;
@@ -20,7 +26,7 @@ struct WFPSessionInfo {
 	WFPSessionFlags Flags;
 	UINT32 TxWaitTimeoutInMSec;
 	DWORD ProcessId;
-	BYTE Sid[SECURITY_MAX_SID_SIZE];
+	std::vector<BYTE> Sid;
 	std::wstring UserName;
 	bool KernelMode;
 };
@@ -401,24 +407,79 @@ struct WFPCalloutInfo {
 };
 
 enum class WFPNetEventType {
-	IKEEXT_MM_FAILURE = 0,
-	IKEEXT_QM_FAILURE,
-	IKEEXT_EM_FAILURE,
-	CLASSIFY_DROP,
-	IPSEC_KERNEL_DROP,
-	IPSEC_DOSP_DROP,
-	CLASSIFY_ALLOW,
-	CAPABILITY_DROP,
-	CAPABILITY_ALLOW,
-	CLASSIFY_DROP_MAC,
-	LPM_PACKET_ARRIVAL,
-	MAX,
+	IkeextMmFailure = 0,
+	IkeextQmFailure,
+	IkeextEmFailure,
+	ClassifyDrop,
+	IpsecKernelDrop,
+	IpsecDospDrop,
+	ClassifyAllow,
+	CapabilityDrop,
+	CapabilityAllow,
+	ClassifyDropMac,
+	LpmPacketArrival,
 };
 
-struct WFPNetEventInfo {
-	//WFPNetEventHeader Header;
-	WFPNetEventType Type;
+struct WFPNetEventHeader0 {
+	FILETIME TimeStamp;
+	UINT32 Flags;
+	WFPIPVersion IpVersion;
+	UINT8 IpProtocol;
+	union {
+		uint32_t LocalAddrV4;
+		uint8_t LocalAddrV6[16];
+	};
+	union {
+		uint32_t RemoteAddrV4;
+		uint8_t RemoteAddrV6[16];
+	};
+	uint16_t LocalPort;
+	uint16_t RemotePort;
+	uint32_t ScopeId;
+	std::vector<uint8_t> AppId;
+	std::vector<uint8_t> UserId;
+};
 
+enum class WFPAddressFamily {
+	Inet = FWP_IP_VERSION_V4,
+	Inet6 = FWP_IP_VERSION_V6,
+	Ether = FWP_IP_VERSION_NONE,
+	None = (FWP_AF_ETHER + 1)
+};
+
+#if (NTDDI_VERSION >= NTDDI_WIN8)
+struct WFPNetEventHeader2 : WFPNetEventHeader0 {
+	WFPAddressFamily AddressFamily;
+	std::vector<uint8_t> PackageSid;
+};
+
+#endif //(NTDDI_VERSION >= NTDDI_WIN8)
+
+#if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
+struct WFPNetEventHeader3 : WFPNetEventHeader2 {
+	std::wstring EnterpriseId;
+	uint64_t PolicyFlags;
+	std::vector<uint8_t> EffectiveName;
+};
+#endif
+
+template<typename T> requires std::is_base_of_v<WFPNetEventHeader0, T>
+struct WFPNetEventInfo {
+	T Header;
+	WFPNetEventType Type;
+	union {
+		FWPM_NET_EVENT_IKEEXT_MM_FAILURE2* ikeMmFailure;
+		FWPM_NET_EVENT_IKEEXT_QM_FAILURE1* ikeQmFailure;
+		FWPM_NET_EVENT_IKEEXT_EM_FAILURE1* ikeEmFailure;
+		FWPM_NET_EVENT_CLASSIFY_DROP2* classifyDrop2;
+		FWPM_NET_EVENT_CLASSIFY_DROP1* classifyDrop1;
+		FWPM_NET_EVENT_IPSEC_KERNEL_DROP0* ipsecDrop;
+		FWPM_NET_EVENT_IPSEC_DOSP_DROP0* idpDrop;
+		FWPM_NET_EVENT_CLASSIFY_ALLOW0* classifyAllow;
+		FWPM_NET_EVENT_CAPABILITY_DROP0* capabilityDrop;
+		FWPM_NET_EVENT_CAPABILITY_ALLOW0* capabilityAllow;
+		FWPM_NET_EVENT_CLASSIFY_DROP_MAC0* classifyDropMac;
+	};
 };
 
 enum class WFPIPSecTrafficType {
@@ -509,12 +570,6 @@ struct WFPIkeExtCredential {
 	};
 };
 
-enum class WFPIPVersion {
-	V4 = 0,
-	V6,
-	NONE,
-};
-
 struct WFPConnectionInfo {
 	uint64_t ConnectionId;
 	WFPIPVersion IpVersion;
@@ -550,6 +605,29 @@ struct WFPSystemPortByType {
 	std::vector<uint16_t> Ports;
 };
 
+struct WFPAleEndpointProperties {
+	uint64_t EndpointId;
+	WFPIPVersion IpVersion;
+	union {
+		uint32_t LocalV4Address;
+		uint8_t LocalV6Address[16];
+	};
+	union {
+		uint32_t RemoteV4Address;
+		uint8_t RemoteV6Address[16];
+	};
+	uint8_t IpProtocol;
+	uint16_t LocalPort;
+	uint16_t RemotePort;
+	uint64_t LocalTokenModifiedId;
+	uint64_t MmmSaId;
+	uint64_t QmSaId;
+	uint32_t IpsecStatus;
+	uint32_t Flags;
+	uint32_t AppIdSize;
+	std::vector<BYTE> AppId;
+};
+
 class WFPEngine {
 public:
 	bool Open(DWORD auth = RPC_C_AUTHN_WINNT);
@@ -565,7 +643,56 @@ public:
 	uint32_t GetFilterCount(GUID const& layer = GUID_NULL) const;
 	uint32_t GetCalloutCount(GUID const& layer = GUID_NULL) const;
 
-	std::vector<WFPNetEventInfo> EnumNetEvents();
+	template<typename T> requires std::is_base_of_v<WFPNetEventHeader0, T>
+	std::vector<WFPNetEventInfo<T>> EnumNetEvents() {
+		std::vector<WFPNetEventInfo<T>> events;
+
+		HANDLE hEnum;
+		m_LastError = FwpmNetEventCreateEnumHandle(m_hEngine, nullptr, &hEnum);
+		if (m_LastError != ERROR_SUCCESS)
+			return events;
+
+		FWPM_NET_EVENT** pEvents;
+		UINT32 count;
+		m_LastError = FwpmNetEventEnum(m_hEngine, hEnum, 1024, &pEvents, &count);
+		if (ERROR_SUCCESS == m_LastError) {
+			for (UINT32 i = 0; i < count; i++) {
+				auto& e = pEvents[i];
+				WFPNetEventInfo<T> ei;
+
+				//
+				// copy header
+				//
+				auto& header = ei.Header;
+				auto const& eh = e->header;
+				header.TimeStamp = eh.timeStamp;
+				header.IpProtocol = eh.ipProtocol;
+				header.IpVersion = static_cast<WFPIPVersion>(eh.ipVersion);
+				header.Flags = eh.flags;
+				memcpy(header.LocalAddrV6, &eh.localAddrV6, sizeof(eh.localAddrV6));
+				memcpy(header.RemoteAddrV6, &eh.remoteAddrV6, sizeof(eh.remoteAddrV6));
+				header.LocalPort = eh.localPort;
+				header.RemotePort = eh.remotePort;
+				header.ScopeId = eh.scopeId;
+
+				if constexpr (std::is_base_of_v<WFPNetEventHeader2, T>) {
+					header.AddressFamily = static_cast<WFPAddressFamily>(eh.addressFamily);
+				}
+				if constexpr (std::is_base_of_v<WFPNetEventHeader3, T>) {
+					if (eh.enterpriseId)
+						header.EnterpriseId = eh.enterpriseId;
+				}
+				ei.Type = static_cast<WFPNetEventType>(e->type);
+
+				events.push_back(std::move(ei));
+			}
+			::FwpmFreeMemory((void**)&pEvents);
+			m_LastError = FwpmNetEventDestroyEnumHandle(m_hEngine, hEnum);
+		}
+
+		return events;
+	}
+
 	std::vector<WFPConnectionInfo> EnumConnections(bool includeData = false);
 	std::vector<WFPSystemPortByType> EnumSystemPorts();
 
@@ -590,7 +717,9 @@ public:
 				si.ProcessId = session->processId;
 				si.UserName = session->username;
 				si.Flags = static_cast<WFPSessionFlags>(session->flags);
-				::CopySid(sizeof(si.Sid), (PSID)si.Sid, session->sid);
+				auto len = ::GetLengthSid(session->sid);
+				si.Sid.resize(len);
+				::CopySid(len, (PSID)si.Sid.data(), session->sid);
 				si.KernelMode = session->kernelMode;
 				info.emplace_back(std::move(si));
 			}
@@ -766,11 +895,14 @@ public:
 	//
 	std::optional<WFPFilterInfo> GetFilterByKey(GUID const& key, bool full = true) const;
 	std::optional<WFPFilterInfo> GetFilterById(UINT64 id, bool full = true) const;
+	bool DeleteFilter(GUID const& key);
+	bool DeleteFilter(UINT64 id);
 
 	//
 	// layer API
 	//
 	std::optional<WFPLayerInfo> GetLayerByKey(GUID const& key) const;
+	std::optional<WFPLayerInfo> GetLayerById(UINT16 id) const;
 
 	//
 	// sublayer API
@@ -781,6 +913,7 @@ public:
 
 	std::optional<WFPCalloutInfo> GetCalloutByKey(GUID const& key) const;
 
+private:
 	//
 	// helpers
 	//
@@ -809,7 +942,7 @@ public:
 		if (full) {
 			fi.Conditions.reserve(fi.ConditionCount);
 			for (uint32_t i = 0; i < fi.ConditionCount; i++) {
-				auto& cond = filter->filterCondition[i];
+				auto const& cond = filter->filterCondition[i];
 				WFPFilterCondition c;
 				c.FieldKey = cond.fieldKey;
 				c.MatchType = static_cast<WFPMatchType>(cond.matchType);
@@ -838,7 +971,7 @@ public:
 			li.Fields.reserve(layer->numFields);
 			for (UINT32 f = 0; f < layer->numFields; f++) {
 				WFPFieldInfo fi;
-				auto& field = layer->field[f];
+				auto const& field = layer->field[f];
 				fi.DataType = (WFPDataType)field.dataType;
 				fi.Type = (WFPFieldType)field.type;
 				fi.FieldKey = *field.fieldKey;
@@ -884,7 +1017,6 @@ public:
 		return ci;
 	}
 
-private:
 	static std::wstring PoorParseMUIString(std::wstring const& path);
 
 	HANDLE m_hEngine{ nullptr };

@@ -109,6 +109,8 @@ int main(int argc, const char* argv[]) {
 
 	auto ports = engine.EnumSystemPorts();
 	auto conns = engine.EnumConnections();
+	auto contexts = engine.EnumProviderContexts();
+	auto events = engine.EnumNetEvents<WFPNetEventHeader3>();
 
 	switch (argv[1][0]) {
 		case 's': case 'S':

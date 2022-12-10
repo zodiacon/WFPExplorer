@@ -70,7 +70,9 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 
 void CFiltersView::UpdateUI() {
 	auto& ui = Frame()->UI();
-	ui.UIEnable(ID_EDIT_PROPERTIES, m_List.GetSelectedCount() == 1);
+	auto selected = m_List.GetSelectedCount();
+	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
+	ui.UIEnable(ID_EDIT_DELETE, selected > 0);
 }
 
 CString const& CFiltersView::GetProviderName(FilterInfo& info) const {
@@ -103,7 +105,7 @@ CString const& CFiltersView::GetSublayerName(FilterInfo& info) const {
 
 LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SINGLESEL);
+		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	auto cm = GetColumnManager(m_List);
@@ -137,8 +139,8 @@ LRESULT CFiltersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CFiltersView::OnProperties(WORD, WORD, HWND, BOOL&) {
-	ATLASSERT(m_List.GetSelectedIndex() >= 0);
-	auto& filter = m_Filters[m_List.GetSelectedIndex()];
+	ATLASSERT(m_List.GetSelectedCount() == 1);
+	auto& filter = m_Filters[m_List.GetNextItem(-1, LVIS_SELECTED)];
 	WFPHelper::ShowFilterProperties(m_Engine, filter);
 
 	return 0;
@@ -147,6 +149,26 @@ LRESULT CFiltersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 LRESULT CFiltersView::OnActivate(UINT, WPARAM activate, LPARAM, BOOL&) {
 	if(activate)
 		UpdateUI();
+	return 0;
+}
+
+LRESULT CFiltersView::OnDeleteFilter(WORD, WORD, HWND, BOOL&) {
+	ATLASSERT(m_List.GetSelectedCount() > 0);
+	if (AtlMessageBox(m_hWnd, L"Delete selected filter(s)?", IDS_TITLE, MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2) == IDNO)
+		return 0;
+
+	int deleted = 0;
+	for (auto index : SelectedItemsView(m_List)) {
+		auto const& fi = m_Filters[index];
+		if (m_Engine.DeleteFilter(fi.FilterKey))
+			deleted++;
+	}
+	if (deleted > 0) {
+		m_List.SelectAllItems(false);
+		Refresh();
+	}
+	AtlMessageBox(m_hWnd, std::format(L"Deleted {} filters", deleted).c_str(), IDS_TITLE, MB_ICONINFORMATION);
+
 	return 0;
 }
 

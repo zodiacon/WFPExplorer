@@ -356,6 +356,7 @@ CString StringHelper::WFPConditionFieldKeyToString(GUID const& key) {
 		{ FWPM_CONDITION_EMBEDDED_REMOTE_PORT, L"Embedded Remote Port" },
 		{ FWPM_CONDITION_DIRECTION, L"Direction" },
 		{ FWPM_CONDITION_INTERFACE_INDEX, L"Interface Index" },
+		{ FWPM_CONDITION_SOURCE_SUB_INTERFACE_INDEX, L"Source Subinterface Index" },
 		{ FWPM_CONDITION_ALE_SECURITY_ATTRIBUTE_FQBN_VALUE, L"ALE Security Attribute FQBN Value" },
 	};
 	if (auto it = fields.find(key); it != fields.end())

@@ -30,7 +30,7 @@ CString CSessionsView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(session.SessionKey);
 		case ColumnType::Name: return session.Name.c_str();
 		case ColumnType::Desc: return session.Desc.c_str();
-		case ColumnType::SID: return StringHelper::FormatSID((PSID const)session.Sid);
+		case ColumnType::SID: return StringHelper::FormatSID((PSID const)session.Sid.data());
 		case ColumnType::KernelMode: return session.KernelMode ? L"Yes" : L"";
 		case ColumnType::UserName: return session.UserName.c_str();
 		case ColumnType::ProcessId: return std::to_wstring(session.ProcessId).c_str();
