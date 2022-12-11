@@ -1,37 +1,31 @@
 #pragma once
 
-struct WFPValue;
-enum class WFPFilterFlags;
-enum class WFPLayerFlags;
 enum class WFPSessionFlags;
 enum class WFPProviderFlags;
 enum class WFPSubLayerFlags;
-enum class WFPCalloutFlags;
 enum class WFPProviderContextFlags;
 enum class WFPProviderContextType;
-enum class WFPActionType;
-enum class WFPMatchType;
-enum class WFPDataType;
 
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
 	static CString ParseMUIString(PCWSTR input);
-	static CString WFPValueToString(WFPValue const& value, bool hex = false, bool full = false);
-	static CString WFPFilterFlagsToString(WFPFilterFlags flags);
-	static CString WFPLayerFlagsToString(DWORD flags);
+	static CString WFPValueToString(FWP_VALUE const& value, bool hex = false, bool full = false);
+	static CString WFPConditionValueToString(FWP_CONDITION_VALUE const& value, bool hex = false, bool full = false);
+	static CString WFPFilterFlagsToString(UINT32 flags);
+	static CString WFPLayerFlagsToString(UINT32 flags);
 	static CString WFPSessionFlagsToString(WFPSessionFlags flags);
 	static CString WFPProviderFlagsToString(DWORD flags);
-	static CString WFPSubLayerFlagsToString(WFPSubLayerFlags flags);
+	static CString WFPSubLayerFlagsToString(UINT32 flags);
 	static CString WFPCalloutFlagsToString(DWORD flags);
 	static CString WFPProviderContextFlagsToString(WFPProviderContextFlags flags);
 	static PCWSTR WFPProviderContextTypeToString(WFPProviderContextType type);
-	static PCWSTR WFPFilterActionTypeToString(WFPActionType type);
-	static PCWSTR WFPConditionMatchToString(WFPMatchType type);
-	static PCWSTR WFPDataTypeToString(WFPDataType type);
+	static PCWSTR WFPFilterActionTypeToString(FWP_ACTION_TYPE type);
+	static PCWSTR WFPConditionMatchToString(FWP_MATCH_TYPE type);
+	static PCWSTR WFPDataTypeToString(FWP_DATA_TYPE type);
 	static CString WFPConditionFieldKeyToString(GUID const& key);
 	static CString FormatBinary(BYTE const* buffer, ULONG size, int lineSize = 16);
 	static CString FormatSID(PSID const sid);
-	static PCWSTR WFPFieldTypeToString(DWORD type);
+	static PCWSTR WFPFieldTypeToString(FWPM_FIELD_TYPE type);
 
 	template<typename TFlags, typename TValue>
 	static CString FlagsToString(TValue value, TFlags const& data) {

@@ -69,35 +69,36 @@ void CHierarchyView::BuildTree() {
 	using namespace std;
 
 	auto hLayers = InsertTreeItem(m_Tree, L"Layers", 1, TreeItemType::Layers, TVI_ROOT);
-	auto filters = m_Engine.EnumFilters();
+	auto filters = WFPFilterEnumerator(m_Engine.Handle()).Next(8192);
 	WFPCalloutEnumerator cenum(m_Engine.Handle());
 	auto callouts = cenum.Next(1024);
 	m_LayersMap.clear();
 	m_FiltersMap.clear();
 	m_CalloutsMap.clear();
 	auto hideEmptyLayers = AppSettings::Get().HideEmptyLayers();
+	auto layers = WFPLayerEnumerator(m_Engine.Handle()).Next(1024);
 
-	for (auto& layer : m_Engine.EnumLayers()) {
-		auto hLayer = InsertTreeItem(m_Tree, WFPHelper::GetLayerName(m_Engine, layer.LayerKey), 1, TreeItemType::Layer, hLayers, TVI_SORT);
-		m_LayersMap.insert({ hLayer, layer.LayerKey });
+	for (auto layer : layers) {
+		auto hLayer = InsertTreeItem(m_Tree, WFPHelper::GetLayerName(m_Engine, layer->layerKey), 1, TreeItemType::Layer, hLayers, TVI_SORT);
+		m_LayersMap.insert({ hLayer, layer->layerKey });
 		{
-			auto view = (filters | views::filter([&](auto& f) { return f.LayerKey == layer.LayerKey; }));
+			auto view = (filters | views::filter([&](auto& f) { return f->layerKey == layer->layerKey; }));
 			if (!view.empty()) {
 				auto hFilters = InsertTreeItem(m_Tree, L"Filters", 0, TreeItemType::Filters, hLayer, TVI_LAST);
 				uint32_t count = 0;
 				for (auto& v : view) {
-					auto name = WFPHelper::GetFilterName(m_Engine, v.FilterKey);
+					auto name = WFPHelper::GetFilterName(m_Engine, v->filterKey);
 					if (name[0] != L'{')
-						name += L" " + StringHelper::GuidToString(v.FilterKey);
+						name += L" " + StringHelper::GuidToString(v->filterKey);
 					auto hFilter = InsertTreeItem(m_Tree, name, 0, TreeItemType::Filter, hFilters, TVI_SORT);
-					m_FiltersMap.insert({ hFilter, v.FilterKey });
+					m_FiltersMap.insert({ hFilter, v->filterKey });
 					count++;
 				}
 				m_Tree.SetItemText(hFilters, std::format(L"Filters ({})", count).c_str());
 			}
 		}
 		{
-			auto view = callouts | views::filter([&](auto& c) { return c->applicableLayer == layer.LayerKey; });
+			auto view = callouts | views::filter([&](auto& c) { return c->applicableLayer == layer->layerKey; });
 			if (!view.empty()) {
 				auto hCallouts = InsertTreeItem(m_Tree, L"Callouts", 2, TreeItemType::Callouts, hLayer, TVI_LAST);
 				uint32_t count = 0;
@@ -142,7 +143,7 @@ bool CHierarchyView::ShowProperties(HTREEITEM hItem) {
 			return true;
 
 		case TreeItemType::Filter:
-			WFPHelper::ShowFilterProperties(m_Engine, *m_Engine.GetFilterByKey(m_FiltersMap[hItem], false));
+			WFPHelper::ShowFilterProperties(m_Engine, *m_Engine.GetFilterByKey(m_FiltersMap[hItem]));
 			return true;
 
 		case TreeItemType::Callout:

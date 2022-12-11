@@ -13,7 +13,7 @@ CString CLayerFieldsPage::GetColumnText(HWND, int row, int col) const {
 	switch (col) {
 		case 0: return StringHelper::WFPConditionFieldKeyToString(*field.fieldKey);
 		case 1: return StringHelper::WFPFieldTypeToString(field.type);
-		case 2: return StringHelper::WFPDataTypeToString((WFPDataType)field.dataType);
+		case 2: return StringHelper::WFPDataTypeToString(field.dataType);
 	}
 	return CString();
 }
@@ -23,7 +23,7 @@ void CLayerFieldsPage::DoSort(SortInfo const* si) {
 		switch (si->SortColumn) {
 			case 0: return SortHelper::Sort(StringHelper::WFPConditionFieldKeyToString(*f1.fieldKey), StringHelper::WFPConditionFieldKeyToString(*f2.fieldKey), si->SortAscending);
 			case 1: return SortHelper::Sort(f1.type, f2.type, si->SortAscending);
-			case 2: return SortHelper::Sort(StringHelper::WFPDataTypeToString((WFPDataType)f1.dataType), StringHelper::WFPDataTypeToString((WFPDataType)f2.dataType), si->SortAscending);
+			case 2: return SortHelper::Sort(StringHelper::WFPDataTypeToString(f1.dataType), StringHelper::WFPDataTypeToString(f2.dataType), si->SortAscending);
 		}
 		return false;
 	};

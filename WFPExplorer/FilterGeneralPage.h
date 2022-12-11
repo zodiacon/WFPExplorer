@@ -12,7 +12,7 @@ class CFilterGeneralPage :
 public:
 	enum { IDD = IDD_FILTERINFO };
 
-	CFilterGeneralPage(WFPEngine& engine, WFPFilterInfo const& filter);
+	CFilterGeneralPage(WFPEngine& engine, FWPM_FILTER* filter);
 
 	BEGIN_MSG_MAP(CFilterGeneralPage)
 		COMMAND_ID_HANDLER(IDC_LAYER_PROP, OnShowLayer)
@@ -34,5 +34,5 @@ private:
 
 private:
 	WFPEngine& m_Engine;
-	WFPFilterInfo const& m_Filter;
+	FWPM_FILTER* m_Filter;
 };

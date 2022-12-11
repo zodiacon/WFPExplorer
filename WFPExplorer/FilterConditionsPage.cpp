@@ -3,23 +3,23 @@
 #include "StringHelper.h"
 #include <WFPEngine.h>
 
-CFilterConditionsPage::CFilterConditionsPage(WFPEngine& engine, WFPFilterInfo const& filter) : m_Engine(engine), m_Filter(filter) {
+CFilterConditionsPage::CFilterConditionsPage(WFPEngine& engine, FWPM_FILTER* filter) : m_Engine(engine), m_Filter(filter) {
 }
 
 CString CFilterConditionsPage::GetColumnText(HWND, int row, int col) const {
     auto& cond = m_Conditions[row];
     switch (col) {
-        case 0: return StringHelper::WFPConditionFieldKeyToString(cond.FieldKey);
-        case 1: return StringHelper::WFPConditionMatchToString(cond.MatchType);
-        case 2: return StringHelper::WFPDataTypeToString(cond.Value.Type);
-        case 3: return StringHelper::WFPValueToString(cond.Value, true);
+        case 0: return StringHelper::WFPConditionFieldKeyToString(cond.fieldKey);
+        case 1: return StringHelper::WFPConditionMatchToString(cond.matchType);
+        case 2: return StringHelper::WFPDataTypeToString(cond.conditionValue.type);
+        case 3: return StringHelper::WFPConditionValueToString(cond.conditionValue, true);
     }
     return CString();
 }
 
 void CFilterConditionsPage::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
     if (newState & LVIS_SELECTED)
-        SetDlgItemText(IDC_VALUE, StringHelper::WFPValueToString(m_Conditions[from].Value, true, true));
+        SetDlgItemText(IDC_VALUE, StringHelper::WFPConditionValueToString(m_Conditions[from].conditionValue, true, true));
 }
 
 LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
@@ -34,10 +34,9 @@ LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     cm->AddColumn(L"Value", 0, 170);
     cm->UpdateColumns();
 
-    auto filter = m_Engine.GetFilterByKey(m_Filter.FilterKey, true);
-    ATLASSERT(filter);
-    m_Conditions = filter->Conditions;
-    m_List.SetItemCount(m_Filter.ConditionCount);
+    m_Conditions.resize(m_Filter->numFilterConditions);
+    memcpy(m_Conditions.data(), m_Filter->filterCondition, sizeof(FWPM_FILTER_CONDITION) * m_Filter->numFilterConditions);
+    m_List.SetItemCount(m_Filter->numFilterConditions);
 
     CWindow edit(GetDlgItem(IDC_VALUE));
     CFontHandle hfont(edit.GetFont());

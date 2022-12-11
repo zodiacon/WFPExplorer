@@ -16,7 +16,7 @@ class CFilterConditionsPage :
 public:
 	enum { IDD = IDD_FILTERCONDITIONS };
 
-	CFilterConditionsPage(WFPEngine& engine, WFPFilterInfo const& filter);
+	CFilterConditionsPage(WFPEngine& engine, FWPM_FILTER* filter);
 
 	CString GetColumnText(HWND, int row, int col) const;
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
@@ -37,7 +37,7 @@ private:
 
 private:
 	WFPEngine& m_Engine;
-	WFPFilterInfo const& m_Filter;
-	std::vector<WFPFilterCondition> m_Conditions;
+	FWPM_FILTER* m_Filter;
+	std::vector<FWPM_FILTER_CONDITION> m_Conditions;
 	CListViewCtrl m_List;
 };

@@ -22,26 +22,26 @@ CString StringHelper::GuidToString(GUID const& guid) {
 	return ::StringFromGUID2(guid, sguid, _countof(sguid)) ? sguid : L"";
 }
 
-CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool full) {
+CString StringHelper::WFPValueToString(FWP_VALUE const& value, bool hex, bool full) {
 	CString str;
-	switch (value.Type) {
-		case WFPDataType::INT8: str.Format(hex ? L"0x%X" : L"%d", (int)value.int8); break;
-		case WFPDataType::UINT8: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint8); break;
-		case WFPDataType::INT16: str.Format(hex ? L"0x%X" : L"%d", (int)value.int16); break;
-		case WFPDataType::INT32: str.Format(hex ? L"0x%X" : L"%d", value.int32); break;
-		case WFPDataType::UINT16: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint16); break;
-		case WFPDataType::UINT32: str.Format(hex ? L"0x%X" : L"%u", value.uint32); break;
-		case WFPDataType::INT64: str.Format(hex ? L"0x%llX" : L"%lld", value.int64); break;
-		case WFPDataType::UINT64: str.Format(hex ? L"0x%llX" : L"%llu", value.uint64); break;
-		case WFPDataType::FLOAT: str.Format(L"%f", value.float32); break;
-		case WFPDataType::DOUBLE: str.Format(L"%lf", value.double64); break;
-		case WFPDataType::UNICODE_STRING_TYPE: return value.unicodeString;
-		case WFPDataType::BYTE_ARRAY6_TYPE: return FormatBinary(value.byteArray6, 6);
-		case WFPDataType::BYTE_ARRAY16_TYPE: return FormatBinary(value.byteArray16, 16);
-		case WFPDataType::BYTE_BLOB_TYPE: return std::format(L"({} bytes) \r\n", value.byteBlob->size).c_str() +
+	switch (value.type) {
+		case FWP_INT8: str.Format(hex ? L"0x%X" : L"%d", (int)value.int8); break;
+		case FWP_UINT8: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint8); break;
+		case FWP_INT16: str.Format(hex ? L"0x%X" : L"%d", (int)value.int16); break;
+		case FWP_INT32: str.Format(hex ? L"0x%X" : L"%d", value.int32); break;
+		case FWP_UINT16: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint16); break;
+		case FWP_UINT32: str.Format(hex ? L"0x%X" : L"%u", value.uint32); break;
+		case FWP_INT64: str.Format(hex ? L"0x%llX" : L"%lld", value.int64); break;
+		case FWP_UINT64: str.Format(hex ? L"0x%llX" : L"%llu", value.uint64); break;
+		case FWP_FLOAT: str.Format(L"%f", value.float32); break;
+		case FWP_DOUBLE: str.Format(L"%lf", value.double64); break;
+		case FWP_UNICODE_STRING_TYPE: return value.unicodeString;
+		case FWP_BYTE_ARRAY6_TYPE: return FormatBinary(value.byteArray6->byteArray6, 6);
+		case FWP_BYTE_ARRAY16_TYPE: return FormatBinary(value.byteArray16->byteArray16, 16);
+		case FWP_BYTE_BLOB_TYPE: return std::format(L"({} bytes) \r\n", value.byteBlob->size).c_str() +
 			FormatBinary(value.byteBlob->data, full ? value.byteBlob->size : min(16, value.byteBlob->size));
-		case WFPDataType::SID: return FormatSID(value.sid);
-		case WFPDataType::SECURITY_DESCRIPTOR_TYPE:
+		case FWP_SID: return FormatSID(value.sid);
+		case FWP_SECURITY_DESCRIPTOR_TYPE:
 			PWSTR sddl;
 			if (::ConvertSecurityDescriptorToStringSecurityDescriptor(value.byteBlob->data, SDDL_REVISION_1,
 				DACL_SECURITY_INFORMATION | OWNER_SECURITY_INFORMATION, &sddl, nullptr)) {
@@ -49,10 +49,20 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool ful
 				::LocalFree(sddl);
 			}
 			break;
-		case WFPDataType::RANGE_TYPE:
-			return WFPValueToString(value.rangeValue->Low, hex, full) + L"\r\n to \r\n" + WFPValueToString(value.rangeValue->High, hex, full);
 
-		case WFPDataType::V4_ADDR_MASK:
+		case FWP_EMPTY:
+			return L"(Empty)";
+	}
+	return str;
+}
+
+CString StringHelper::WFPConditionValueToString(FWP_CONDITION_VALUE const& value, bool hex, bool full) {
+	CString str;
+	switch (value.type) {
+		case FWP_RANGE_TYPE:
+			return WFPValueToString(value.rangeValue->valueLow, hex, full) + L"\r\n to \r\n" + WFPValueToString(value.rangeValue->valueHigh, hex, full);
+
+		case FWP_V4_ADDR_MASK:
 		{
 			WCHAR buf[128];
 			str = CString(L"IP: ") + ::RtlIpv4AddressToString((in_addr const*)&value.v4AddrMask->addr, buf) +
@@ -60,39 +70,39 @@ CString StringHelper::WFPValueToString(WFPValue const& value, bool hex, bool ful
 			break;
 		}
 
-		case WFPDataType::V6_ADDR_MASK:
+		case FWP_V6_ADDR_MASK:
 			WCHAR buf[256];
 			str = CString(L"IP: ") + ::RtlIpv6AddressToString((in6_addr const*)&value.v6AddrMask->addr, buf) +
 				L"Prefix: " + std::format(L"{}", value.v6AddrMask->prefixLength).c_str();
 			break;
 
-		case WFPDataType::EMPTY:
-			return L"(Empty)";
+		default:
+			return WFPValueToString(*(FWP_VALUE*)&value, hex, full);
 	}
-	return str;
+	return L"";
 }
 
-CString StringHelper::WFPFilterFlagsToString(WFPFilterFlags flags) {
-	static std::unordered_map<WFPFilterFlags, CString> cache;
+CString StringHelper::WFPFilterFlagsToString(UINT32 flags) {
+	static std::unordered_map<UINT32, CString> cache;
 	if (auto it = cache.find(flags); it != cache.end())
 		return it->second;
 
 	static const struct {
-		WFPFilterFlags flag;
+		UINT32 flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPFilterFlags::Persistent, L"Persistent" },
-		{ WFPFilterFlags::BootTime, L"Boot Time" },
-		{ WFPFilterFlags::HasProviderContext, L"Provider Context" },
-		{ WFPFilterFlags::ClearActionRight, L"Clear Acyion Right" },
-		{ WFPFilterFlags::PermitIfCalloutUnregistered, L"Permit if Callout Unregistered" },
-		{ WFPFilterFlags::Disabled, L"Disabled" },
-		{ WFPFilterFlags::Indexed, L"Indexed" },
-		{ WFPFilterFlags::HasSecurityRealmProviderContext, L"Security Realm Provider Context" },
-		{ WFPFilterFlags::SystemOsOnly, L"System OS Only" },
-		{ WFPFilterFlags::GameOsOnly, L"Game OS Only" },
-		{ WFPFilterFlags::SilentMode, L"Silent Mode" },
-		{ WFPFilterFlags::IPSecNoAcquireInitiate, L"IPSec No Acquire Initiate" },
+		{ FWPM_FILTER_FLAG_PERSISTENT,							L"Persistent" },
+		{ FWPM_FILTER_FLAG_BOOTTIME,							L"Boot Time" },
+		{ FWPM_FILTER_FLAG_HAS_PROVIDER_CONTEXT,				L"Provider Context" },
+		{ FWPM_FILTER_FLAG_CLEAR_ACTION_RIGHT,					L"Clear Acyion Right" },
+		{ FWPM_FILTER_FLAG_PERMIT_IF_CALLOUT_UNREGISTERED,		L"Permit if Callout Unregistered" },
+		{ FWPM_FILTER_FLAG_DISABLED,							L"Disabled" },
+		{ FWPM_FILTER_FLAG_INDEXED,								L"Indexed" },
+		{ FWPM_FILTER_FLAG_HAS_SECURITY_REALM_PROVIDER_CONTEXT,	L"Security Realm Provider Context" },
+		{ FWPM_FILTER_FLAG_SYSTEMOS_ONLY,						L"System OS Only" },
+		{ FWPM_FILTER_FLAG_GAMEOS_ONLY,							L"Game OS Only" },
+		{ FWPM_FILTER_FLAG_SILENT_MODE,							L"Silent Mode" },
+		{ FWPM_FILTER_FLAG_IPSEC_NO_ACQUIRE_INITIATE,			L"IPSec No Acquire Initiate" },
 	};
 
 	auto result = FlagsToString(flags, data);
@@ -100,9 +110,9 @@ CString StringHelper::WFPFilterFlagsToString(WFPFilterFlags flags) {
 	return result;
 }
 
-CString StringHelper::WFPLayerFlagsToString(DWORD flags) {
+CString StringHelper::WFPLayerFlagsToString(UINT32 flags) {
 	static const struct {
-		DWORD flag;
+		UINT32 flag;
 		PCWSTR text;
 	} data[] = {
 		{ FWPM_LAYER_FLAG_KERNEL,			L"Kernel" },
@@ -136,12 +146,12 @@ CString StringHelper::WFPProviderFlagsToString(DWORD flags) {
 	return FlagsToString(flags, data);
 }
 
-CString StringHelper::WFPSubLayerFlagsToString(WFPSubLayerFlags flags) {
+CString StringHelper::WFPSubLayerFlagsToString(UINT32 flags) {
 	static const struct {
-		WFPSubLayerFlags flag;
+		UINT32 flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPSubLayerFlags::Persistent, L"Persistent" },
+		{ FWPM_SUBLAYER_FLAG_PERSISTENT, L"Persistent" },
 	};
 
 	return FlagsToString(flags, data);
@@ -192,51 +202,51 @@ PCWSTR StringHelper::WFPProviderContextTypeToString(WFPProviderContextType type)
 	return types[(int)type];
 }
 
-PCWSTR StringHelper::WFPConditionMatchToString(WFPMatchType type) {
+PCWSTR StringHelper::WFPConditionMatchToString(FWP_MATCH_TYPE type) {
 	switch(type) {
-		case WFPMatchType::Equal: return L"Equal";
-		case WFPMatchType::Greater: return L"Greater";
-		case WFPMatchType::Less: return L"Less";
-		case WFPMatchType::GreaterOrEqual: return L"Greater or Equal";
-		case WFPMatchType::LessOrEqual: return L"Less or Equal";
-		case WFPMatchType::Range: return L"Range";
-		case WFPMatchType::FlagsAllSet: return L"Flags All Set";
-		case WFPMatchType::FlagsAnySet: return L"Flags Any Set";
-		case WFPMatchType::FlagsNoneSet: return L"Flags Non Set";
-		case WFPMatchType::EqualCaseInsensitive: return L"Equal Case Insensitive";
-		case WFPMatchType::NotEqual: return L"Not Equal";
-		case WFPMatchType::Prefix: return L"Prefix";
-		case WFPMatchType::NotPrefix: return L"Not Prefix";
+		case FWP_MATCH_EQUAL:					return L"Equal";
+		case FWP_MATCH_GREATER:					return L"Greater";
+		case FWP_MATCH_LESS:					return L"Less";
+		case FWP_MATCH_GREATER_OR_EQUAL:		return L"Greater or Equal";
+		case FWP_MATCH_LESS_OR_EQUAL:			return L"Less or Equal";
+		case FWP_MATCH_RANGE:					return L"Range";
+		case FWP_MATCH_FLAGS_ALL_SET:			return L"Flags All Set";
+		case FWP_MATCH_FLAGS_ANY_SET:			return L"Flags Any Set";
+		case FWP_MATCH_FLAGS_NONE_SET:			return L"Flags Non Set";
+		case FWP_MATCH_EQUAL_CASE_INSENSITIVE:	return L"Equal Case Insensitive";
+		case FWP_MATCH_NOT_EQUAL:				return L"Not Equal";
+		case FWP_MATCH_PREFIX:					return L"Prefix";
+		case FWP_MATCH_NOT_PREFIX:				return L"Not Prefix";
 	}
 	ATLASSERT(false);
 	return L"";
 }
 
-PCWSTR StringHelper::WFPDataTypeToString(WFPDataType type) {
+PCWSTR StringHelper::WFPDataTypeToString(FWP_DATA_TYPE type) {
 	switch (type) {
-		case WFPDataType::UINT8: return L"UINT8";
-		case WFPDataType::UINT16: return L"UINT16";
-		case WFPDataType::UINT32: return L"UINT32";
-		case WFPDataType::UINT64: return L"UINT64";
-		case WFPDataType::INT8: return L"INT8";
-		case WFPDataType::INT16: return L"INT16";
-		case WFPDataType::INT32: return L"INT32";
-		case WFPDataType::INT64: return L"INT64";
-		case WFPDataType::FLOAT: return L"FLOAT";
-		case WFPDataType::DOUBLE: return L"DOUBLE";
-		case WFPDataType::BYTE_BLOB_TYPE: return L"BLOB";
-		case WFPDataType::BYTE_ARRAY6_TYPE: return L"BYTE[6]";
-		case WFPDataType::RANGE_TYPE: return L"Range";
-		case WFPDataType::BYTE_ARRAY16_TYPE: return L"BYTE[16]";
-		case WFPDataType::SID: return L"SID";
-		case WFPDataType::TOKEN_INFORMATION_TYPE: return L"Token Info";
-		case WFPDataType::TOKEN_ACCESS_INFORMATION_TYPE: return L"Token Access";
-		case WFPDataType::SECURITY_DESCRIPTOR_TYPE: return L"SD";
-		case WFPDataType::UNICODE_STRING_TYPE: return L"Unicode String";
-		case WFPDataType::V4_ADDR_MASK: return L"IPV4 Address & MAsk";
-		case WFPDataType::V6_ADDR_MASK: return L"IPV6 Address & MAsk";
-		case WFPDataType::BITMAP_INDEX_TYPE: return L"Bitmap Index";
-		case WFPDataType::BITMAP_ARRAY64_TYPE: return L"Bitmap Array";
+		case FWP_UINT8: return L"UINT8";
+		case FWP_UINT16: return L"UINT16";
+		case FWP_UINT32: return L"UINT32";
+		case FWP_UINT64: return L"UINT64";
+		case FWP_INT8: return L"INT8";
+		case FWP_INT16: return L"INT16";
+		case FWP_INT32: return L"INT32";
+		case FWP_INT64: return L"INT64";
+		case FWP_FLOAT: return L"FLOAT";
+		case FWP_DOUBLE: return L"DOUBLE";
+		case FWP_BYTE_BLOB_TYPE: return L"BLOB";
+		case FWP_BYTE_ARRAY6_TYPE: return L"BYTE[6]";
+		case FWP_RANGE_TYPE: return L"Range";
+		case FWP_BYTE_ARRAY16_TYPE: return L"BYTE[16]";
+		case FWP_SID: return L"SID";
+		case FWP_TOKEN_INFORMATION_TYPE: return L"Token Info";
+		case FWP_TOKEN_ACCESS_INFORMATION_TYPE: return L"Token Access";
+		case FWP_SECURITY_DESCRIPTOR_TYPE: return L"SD";
+		case FWP_UNICODE_STRING_TYPE: return L"Unicode String";
+		case FWP_V4_ADDR_MASK: return L"IPV4 Address & MAsk";
+		case FWP_V6_ADDR_MASK: return L"IPV6 Address & MAsk";
+		case FWP_BYTE_ARRAY6_TYPE + 1: return L"Bitmap Index";
+		case FWP_BYTE_ARRAY6_TYPE + 2: return L"Bitmap Array";
 		default:
 			ATLASSERT(false);
 			break;
@@ -402,7 +412,7 @@ CString StringHelper::FormatSID(PSID const sid) {
 	return L"";
 }
 
-PCWSTR StringHelper::WFPFieldTypeToString(DWORD type) {
+PCWSTR StringHelper::WFPFieldTypeToString(FWPM_FIELD_TYPE type) {
 	switch (type) {
 		case FWPM_FIELD_RAW_DATA: return L"Raw Data";
 		case FWPM_FIELD_IP_ADDRESS: return L"IP Address";
@@ -412,16 +422,16 @@ PCWSTR StringHelper::WFPFieldTypeToString(DWORD type) {
 	return L"";
 }
 
-PCWSTR StringHelper::WFPFilterActionTypeToString(WFPActionType type) {
+PCWSTR StringHelper::WFPFilterActionTypeToString(FWP_ACTION_TYPE type) {
 	switch (type) {
-		case WFPActionType::Block: return L"Block";
-		case WFPActionType::Permit: return L"Permit";
-		case WFPActionType::CalloutTerminating: return L"Callout Terminating";
-		case WFPActionType::CalloutInspection: return L"Callout Inspection";
-		case WFPActionType::CalloutUnknown: return L"Callout Unknown";
-		case WFPActionType::Continue: return L"Continue";
-		case WFPActionType::None: return L"None";
-		case WFPActionType::NoneNoMatch: return L"None (No Match)";
+		case FWP_ACTION_BLOCK:					return L"Block";
+		case FWP_ACTION_PERMIT:					return L"Permit";
+		case FWP_ACTION_CALLOUT_TERMINATING:	return L"Callout Terminating";
+		case FWP_ACTION_CALLOUT_INSPECTION:		return L"Callout Inspection";
+		case FWP_ACTION_CALLOUT_UNKNOWN:		return L"Callout Unknown";
+		case FWP_ACTION_CONTINUE:				return L"Continue";
+		case FWP_ACTION_NONE:					return L"None";
+		case FWP_ACTION_NONE_NO_MATCH:			return L"None (No Match)";
 	}
-	return PCWSTR();
+	return L"";
 }

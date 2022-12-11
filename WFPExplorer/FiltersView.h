@@ -5,6 +5,7 @@
 #include "Interfaces.h"
 #include <WFPEngine.h>
 #include "resource.h"
+#include <WFPEnumerator.h>
 
 class WFPEngine;
 
@@ -55,10 +56,16 @@ private:
 		Weight, ConditionCount, Action, Id, EffectiveWeight, Layer, SubLayer, ActionKey, ProviderData,
 	};
 
-	struct FilterInfo : WFPFilterInfo {
+	struct FilterInfo {
+		FWPM_FILTER* Data;
 		CString ProviderName;
 		CString Layer, SubLayer;
 		CString FilterAction;
+		CString const& Name() const;
+		CString const& Desc() const;
+
+	private:
+		mutable CString m_Name, m_Desc;
 	};
 
 	CString const& GetProviderName(FilterInfo& info) const;
@@ -74,6 +81,6 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<FilterInfo> m_Filters;
+	WFPObjectVector<FWPM_FILTER, FilterInfo> m_Filters;
 	GUID m_Layer{ GUID_NULL };
 };

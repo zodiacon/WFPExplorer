@@ -28,75 +28,22 @@ HANDLE WFPEngine::Handle() const {
 	return m_hEngine;
 }
 
-std::vector<WFPConnectionInfo> WFPEngine::EnumConnections(bool includeData) {
-	HANDLE hEnum;
-	std::vector<WFPConnectionInfo> info;
-	m_LastError = FwpmConnectionCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_CONNECTION** connections;
-	UINT32 count;
-	m_LastError = FwpmConnectionEnum(m_hEngine, hEnum, 128, &connections, &count);
-	if (m_LastError == ERROR_SUCCESS && count > 0) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto p = connections[i];
-			info.emplace_back(std::move(InitConnection(p, includeData)));
-		}
-		FwpmFreeMemory((void**)&connections);
-		m_LastError = FwpmConnectionDestroyEnumHandle(m_hEngine, hEnum);
-	}
-	return info;
-}
-
-std::vector<WFPSystemPortByType> WFPEngine::EnumSystemPorts() {
-	FWPM_SYSTEM_PORTS* ports;
-	m_LastError = ::FwpmSystemPortsGet(m_hEngine, &ports);
-	if (m_LastError)
-		return {};
-
-	std::vector<WFPSystemPortByType> sports;
-	sports.reserve(ports->numTypes);
-	for (UINT32 i = 0; i < ports->numTypes; i++) {
-		WFPSystemPortByType p;
-		auto& port = ports->types[i];
-		p.Type = static_cast<WFPSystemPortType>(port.type);
-		if (port.numPorts) {
-			p.Ports.resize(port.numPorts);
-			memcpy(p.Ports.data(), port.ports, sizeof(uint16_t) * port.numPorts);
-		}
-		sports.emplace_back(std::move(p));
-	}
-	::FwpmFreeMemory((void**)&ports);
-	return sports;
-}
-
 WFPObject<FWPM_PROVIDER> WFPEngine::GetProviderByKey(GUID const& guid) const {
 	FWPM_PROVIDER* provider = nullptr;
 	m_LastError = FwpmProviderGetByKey(m_hEngine, &guid, &provider);
 	return WFPObject(provider);
 }
 
-std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key, bool full) const {
-	FWPM_FILTER* filter;
+WFPObject<FWPM_FILTER> WFPEngine::GetFilterByKey(GUID const& key) const {
+	FWPM_FILTER* filter = nullptr;
 	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);
-	if (m_LastError != ERROR_SUCCESS)
-		return {};
-
-	auto info = InitFilter(filter, full);
-	FwpmFreeMemory((void**)&filter);
-	return info;
+	return WFPObject(filter);
 }
 
-std::optional<WFPFilterInfo> WFPEngine::GetFilterById(UINT64 id, bool includeConditions) const {
-	FWPM_FILTER* filter;
+WFPObject<FWPM_FILTER>  WFPEngine::GetFilterById(UINT64 id, bool includeConditions) const {
+	FWPM_FILTER* filter = nullptr;
 	m_LastError = FwpmFilterGetById(m_hEngine, id, &filter);
-	if (m_LastError != ERROR_SUCCESS)
-		return {};
-
-	auto info = InitFilter(filter, includeConditions);
-	FwpmFreeMemory((void**)&filter);
-	return info;
+	return WFPObject(filter);
 }
 
 bool WFPEngine::DeleteFilter(GUID const& key) {
@@ -111,19 +58,14 @@ bool WFPEngine::DeleteFilter(UINT64 id) {
 
 WFPObject<FWPM_LAYER> WFPEngine::GetLayerByKey(GUID const& key) const {
 	FWPM_LAYER* layer = nullptr;
-	FwpmLayerGetByKey(m_hEngine, &key, &layer);
-	return WFPObject<FWPM_LAYER>(layer);
+	m_LastError = FwpmLayerGetByKey(m_hEngine, &key, &layer);
+	return WFPObject(layer);
 }
 
-std::optional<WFPLayerInfo> WFPEngine::GetLayerById(UINT16 id) const {
+WFPObject<FWPM_LAYER>  WFPEngine::GetLayerById(UINT16 id) const {
 	FWPM_LAYER* layer;
 	m_LastError = FwpmLayerGetById(m_hEngine, id, &layer);
-	if (m_LastError != ERROR_SUCCESS)
-		return {};
-
-	auto info = InitLayer(layer, true);
-	FwpmFreeMemory((void**)&layer);
-	return info;
+	return WFPObject(layer);
 }
 
 std::optional<WFPSubLayerInfo> WFPEngine::GetSublayerByKey(GUID const& key) const {
@@ -149,27 +91,6 @@ WFPProviderContextInfo WFPEngine::InitProviderContext(FWPM_PROVIDER_CONTEXT* p, 
 		memcpy(pi.ProviderData.data(), p->providerData.data, p->providerData.size);
 	}
 	return pi;
-}
-
-WFPConnectionInfo WFPEngine::InitConnection(FWPM_CONNECTION* p, bool includeData) {
-	WFPConnectionInfo ci;
-	ci.ConnectionId = p->connectionId;
-	ci.ProviderKey = p->providerKey ? *p->providerKey : GUID_NULL;
-	ci.IpVersion = static_cast<WFPIPVersion>(p->ipVersion);
-	if (ci.IpVersion == WFPIPVersion::V4) {
-		ci.LocalV4Address = p->localV4Address;
-		ci.RemoteV4Address = p->remoteV4Address;
-	}
-	else {
-		memcpy(ci.LocalV6Address, p->localV6Address, sizeof(ci.LocalV6Address));
-		memcpy(ci.RemoteV6Address, p->remoteV6Address, sizeof(ci.RemoteV6Address));
-	}
-	ci.IpSecTrafficModeType = static_cast<WFPIPSecTrafficType>(p->ipsecTrafficModeType);
-	ci.KeyModuleType = static_cast<WFPIkeExtKeyModuleType>(p->keyModuleType);
-
-	if (includeData) {
-	}
-	return ci;
 }
 
 std::wstring WFPEngine::ParseMUIString(PCWSTR input) {

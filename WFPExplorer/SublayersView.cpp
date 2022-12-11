@@ -50,9 +50,9 @@ CString CSublayersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Desc: return info.Desc.c_str();
 		case ColumnType::ProviderData: return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
 		case ColumnType::Flags:
-			if (info.Flags == WFPSubLayerFlags::None)
+			if (info.Flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", (UINT32)info.Flags,
+			return std::format(L"0x{:X} ({})", info.Flags,
 				(PCWSTR)StringHelper::WFPSubLayerFlagsToString(info.Flags)).c_str();
 
 		case ColumnType::Weight: return std::to_wstring(info.Weight).c_str();

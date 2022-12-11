@@ -21,7 +21,7 @@ void DisplaySessions(WFPEngine& engine) {
 		"Key", "PID", "User name", "Flags", "Name", "Description");
 	printf("%s\n", std::string(n, '-').c_str());
 
-	for (auto& session : sessions) {
+	for (auto session : sessions) {
 		printf("%ws %6u %-28ws %6X %-28ws %ws\n",
 			GuidToString(session->sessionKey).c_str(),
 			session->processId,
@@ -32,38 +32,44 @@ void DisplaySessions(WFPEngine& engine) {
 	}
 }
 
-void DisplayFilters(std::vector<WFPFilterInfo> const& filters) {
+void DisplayFilters(WFPEngine& engine) {
+	WFPFilterEnumerator enumerator(engine.Handle());
+	auto filters = enumerator.Next(8192);
 	printf("Total filters: %u\n", (UINT32)filters.size());
-	for (auto& f : filters) {
+	for (auto f : filters) {
 		printf("%ws %ws %-20ws %-20ws\n",
-			GuidToString(f.FilterKey).c_str(),
-			GuidToString(f.LayerKey).c_str(),
-			f.Name.c_str(),
-			f.Desc.c_str());
+			GuidToString(f->filterKey).c_str(),
+			GuidToString(f->layerKey).c_str(),
+			f->displayData.name,
+			f->displayData.description);
 	}
 }
 
-void DisplayCallouts(std::vector<WFPCalloutInfo> const& callouts) {
+void DisplayCallouts(WFPEngine& engine) {
+	WFPCalloutEnumerator enumerator(engine.Handle());
+	auto callouts = enumerator.Next(1024);
 	printf("Total callouts: %u\n", (UINT32)callouts.size());
-	for (auto& c : callouts) {
+	for (auto c : callouts) {
 		printf("%ws %ws %-20ws %-20ws\n",
-			GuidToString(c.CalloutKey).c_str(),
-			GuidToString(c.ProviderKey).c_str(),
-			c.Name.c_str(),
-			c.Desc.c_str());
+			GuidToString(c->calloutKey).c_str(),
+			c->providerKey ? GuidToString(*c->providerKey).c_str() : L"",
+			c->displayData.name,
+			c->displayData.description);
 	}
 }
 
-void DisplayLayers(std::vector<WFPLayerInfo> const& layers) {
+void DisplayLayers(WFPEngine& engine) {
+	WFPLayerEnumerator enumerator(engine.Handle());
+	auto layers = enumerator.Next(1024);
 	printf("Total layers: %u\n", (UINT32)layers.size());
-	for (auto& layer : layers) {
+	for (auto layer : layers) {
 		printf("%ws %5u %ws %2d fields %-20ws %-20ws\n",
-			GuidToString(layer.LayerKey).c_str(),
-			layer.LayerId,
-			GuidToString(layer.DefaultSubLayerKey).c_str(),
-			(int)layer.NumFields,
-			layer.Name.c_str(),
-			layer.Desc.c_str());
+			GuidToString(layer->layerKey).c_str(),
+			layer->layerId,
+			GuidToString(layer->defaultSubLayerKey).c_str(),
+			layer->numFields,
+			layer->displayData.name,
+			layer->displayData.description);
 	}
 }
 
@@ -99,17 +105,6 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	auto ports = engine.EnumSystemPorts();
-	auto conns = engine.EnumConnections();
-	auto contexts = engine.EnumProviderContexts();
-	
-	//WFPNetEventEnumerator events(engine.Handle());
-	//for (auto& event : events.Next()) {
-	//}
-
-	WFPSessionEnumerator sessionsEnum(engine.Handle());
-	auto sessins = sessionsEnum.Next();
-
 	switch (argv[1][0]) {
 		case 's': case 'S':
 			DisplaySessions(engine);
@@ -120,15 +115,15 @@ int main(int argc, const char* argv[]) {
 			break;
 
 		case 'l': case 'L':
-			DisplayLayers(engine.EnumLayers());
+			DisplayLayers(engine);
 			break;
 
 		case 'f': case 'F':
-			DisplayFilters(engine.EnumFilters());
+			DisplayFilters(engine);
 			break;
 
 		case 'c': case 'C':
-			//DisplayCallouts(engine.EnumCallouts());
+			DisplayCallouts(engine);
 			break;
 
 		default:
