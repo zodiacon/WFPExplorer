@@ -170,19 +170,19 @@ CString StringHelper::WFPCalloutFlagsToString(DWORD flags) {
 	return FlagsToString(flags, data);
 }
 
-CString StringHelper::WFPProviderContextFlagsToString(WFPProviderContextFlags flags) {
+CString StringHelper::WFPProviderContextFlagsToString(UINT32 flags) {
 	static const struct {
-		WFPProviderContextFlags flag;
+		UINT32 flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPProviderContextFlags::Persistent, L"Persistent" },
-		{ WFPProviderContextFlags::DownLevel, L"Downlevel" },
+		{ FWPM_PROVIDER_CONTEXT_FLAG_PERSISTENT, L"Persistent" },
+		{ FWPM_PROVIDER_CONTEXT_FLAG_DOWNLEVEL, L"Downlevel" },
 	};
 
 	return FlagsToString(flags, data);
 }
 
-PCWSTR StringHelper::WFPProviderContextTypeToString(WFPProviderContextType type) {
+PCWSTR StringHelper::WFPProviderContextTypeToString(FWPM_PROVIDER_CONTEXT_TYPE type) {
 	static PCWSTR types[] = {
 		L"IPSec Keying",
 		L"IPSec Ike Quick Mode Transport",

@@ -161,7 +161,6 @@
     </ClCompile>
     <ClCompile Include="WFPCore.cpp" />
     <ClCompile Include="WFPEngine.cpp" />
-    <ClCompile Include="WFPEnumerator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

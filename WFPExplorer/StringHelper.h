@@ -1,8 +1,5 @@
 #pragma once
 
-enum class WFPProviderContextFlags;
-enum class WFPProviderContextType;
-
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
 	static CString ParseMUIString(PCWSTR input);
@@ -14,8 +11,8 @@ struct StringHelper abstract final {
 	static CString WFPProviderFlagsToString(DWORD flags);
 	static CString WFPSubLayerFlagsToString(UINT32 flags);
 	static CString WFPCalloutFlagsToString(DWORD flags);
-	static CString WFPProviderContextFlagsToString(WFPProviderContextFlags flags);
-	static PCWSTR WFPProviderContextTypeToString(WFPProviderContextType type);
+	static CString WFPProviderContextFlagsToString(UINT32 flags);
+	static PCWSTR WFPProviderContextTypeToString(FWPM_PROVIDER_CONTEXT_TYPE type);
 	static PCWSTR WFPFilterActionTypeToString(FWP_ACTION_TYPE type);
 	static PCWSTR WFPConditionMatchToString(FWP_MATCH_TYPE type);
 	static PCWSTR WFPDataTypeToString(FWP_DATA_TYPE type);

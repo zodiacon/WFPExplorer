@@ -4,6 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include <WFPEnumerator.h>
 
 class WFPEngine;
 
@@ -34,6 +35,8 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
+	CString GetProviderName(GUID const* key) const;
+
 	enum class ColumnType {
 		Key, Name, Desc, Flags, Provider, DataSize, Id, Type,
 	};
@@ -44,5 +47,5 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<WFPProviderContextInfo> m_Contexts;
+	WFPObjectVector<FWPM_PROVIDER_CONTEXT> m_Contexts;
 };

@@ -3,8 +3,21 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
+#include <Enumerators.h>
 
 CProviderContextView::CProviderContextView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+}
+
+CString CProviderContextView::GetProviderName(GUID const* key) const {
+	CString name;
+	if (key) {
+		auto provider = m_Engine.GetProviderByKey(*key);
+		if (provider)
+			name = StringHelper::ParseMUIString(provider->displayData.name);
+		if(name.IsEmpty() || name[0] == L'@')
+			name =StringHelper::GuidToString(*key);
+	}
+	return name;
 }
 
 LRESULT CProviderContextView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -39,31 +52,24 @@ LRESULT CProviderContextView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 void CProviderContextView::Refresh() {
-	m_Contexts = m_Engine.EnumProviderContexts();
+	m_Contexts = WFPProviderContextEnumerator(m_Engine.Handle()).Next(256);
 	m_List.SetItemCountEx((int)m_Contexts.size(), LVSICF_NOSCROLL);
 }
 
 CString CProviderContextView::GetColumnText(HWND, int row, int col) {
-	auto& info = m_Contexts[row];
+	auto info = m_Contexts[row];
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
-		case ColumnType::Key: return StringHelper::GuidToString(info.ProviderKey);
-		case ColumnType::Name: return info.Name.c_str();
-		case ColumnType::Type: return std::format(L"{} ({})", StringHelper::WFPProviderContextTypeToString(info.Type), (int)info.Type).c_str();
-		case ColumnType::Provider:
-			if (info.ProviderKey != GUID_NULL) {
-				auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
-				if (provider && provider->displayData.name && provider->displayData.name[0] != L'@')
-					return provider->displayData.name;
-				return StringHelper::GuidToString(info.ProviderKey);
-			}
-			break;
-		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::Id: return std::format(L"0x{:X}", info.ProviderContextId).c_str();
-		case ColumnType::DataSize: return std::format(L"{}", info.ProviderDataSize).c_str();
+		case ColumnType::Key: return StringHelper::GuidToString(info->providerContextKey);
+		case ColumnType::Name: return StringHelper::ParseMUIString(info->displayData.name);
+		case ColumnType::Type: return std::format(L"{} ({})", StringHelper::WFPProviderContextTypeToString(info->type), (UINT32)info->type).c_str();
+		case ColumnType::Provider: return GetProviderName(info->providerKey);
+		case ColumnType::Desc: return StringHelper::ParseMUIString(info->displayData.description);
+		case ColumnType::Id: return std::format(L"0x{:X}", info->providerContextId).c_str();
+		case ColumnType::DataSize: return std::format(L"{}", info->providerData.size).c_str();
 		case ColumnType::Flags:
-			if (info.Flags == WFPProviderContextFlags::None)
+			if (info->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, StringHelper::WFPProviderContextFlagsToString(info.Flags)).c_str();
+			return std::format(L"0x{:X} ({})", info->flags, StringHelper::WFPProviderContextFlagsToString(info->flags)).c_str();
 	}
 	return CString();
 }
@@ -72,16 +78,16 @@ void CProviderContextView::DoSort(SortInfo const* si) {
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
 
-	auto compare = [&](auto& p1, auto& p2) {
+	auto compare = [&](auto p1, auto p2) {
 		switch (col) {
-			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(p1.ProviderKey), StringHelper::GuidToString(p2.ProviderKey), asc);
-			case ColumnType::Name: return SortHelper::Sort(p1.Name, p2.Name, asc);
-			case ColumnType::Desc: return SortHelper::Sort(p1.Desc, p2.Desc, asc);
-			case ColumnType::Flags: return SortHelper::Sort(p1.Flags, p2.Flags, asc);
-			case ColumnType::Type: return SortHelper::Sort(p1.Type, p2.Type, asc);
-			case ColumnType::Id: return SortHelper::Sort(p1.ProviderContextId, p2.ProviderContextId, asc);
-			case ColumnType::DataSize: return SortHelper::Sort(p1.ProviderDataSize, p2.ProviderDataSize, asc);
-			case ColumnType::Provider: return SortHelper::Sort(StringHelper::GuidToString(p1.ProviderKey), StringHelper::GuidToString(p2.ProviderKey), asc);
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(p1->providerContextKey), StringHelper::GuidToString(p2->providerContextKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(StringHelper::ParseMUIString(p1->displayData.name), StringHelper::ParseMUIString(p2->displayData.name), asc);
+			case ColumnType::Desc: return SortHelper::Sort(StringHelper::ParseMUIString(p1->displayData.description), StringHelper::ParseMUIString(p2->displayData.description), asc);
+			case ColumnType::Flags: return SortHelper::Sort(p1->flags, p2->flags, asc);
+			case ColumnType::Type: return SortHelper::Sort(p1->type, p2->type, asc);
+			case ColumnType::Id: return SortHelper::Sort(p1->providerContextId, p2->providerContextId, asc);
+			case ColumnType::DataSize: return SortHelper::Sort(p1->providerData.size, p2->providerData.size, asc);
+			case ColumnType::Provider: return SortHelper::Sort(GetProviderName(p1->providerKey), GetProviderName(p2->providerKey), asc);
 		}
 		return false;
 	};

@@ -76,3 +76,14 @@ struct WFPSubLayerEnumerator : WFPEnumerator<
 		WFPEnumerator(hEngine, ::FwpmSubLayerCreateEnumHandle, ::FwpmSubLayerDestroyEnumHandle, ::FwpmSubLayerEnum) {
 	}
 };
+
+struct WFPProviderContextEnumerator : WFPEnumerator<
+	decltype(&::FwpmProviderContextCreateEnumHandle),
+	decltype(&::FwpmProviderContextDestroyEnumHandle),
+	decltype(&::FwpmProviderContextEnum),
+	FWPM_PROVIDER_CONTEXT> {
+
+	explicit WFPProviderContextEnumerator(HANDLE hEngine) :
+		WFPEnumerator(hEngine, ::FwpmProviderContextCreateEnumHandle, ::FwpmProviderContextDestroyEnumHandle, ::FwpmProviderContextEnum) {
+	}
+};
