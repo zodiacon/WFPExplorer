@@ -19,7 +19,9 @@ BOOL CSessionsView::PreTranslateMessage(MSG* pMsg) {
 }
 
 void CSessionsView::Refresh() {
+	m_Enum.Close();
 	m_Sessions = m_Enum.Next<SessionInfo>();
+	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Sessions.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(1, std::format(L"{} Sessions", m_Sessions.size()).c_str());
 }

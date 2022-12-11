@@ -4,6 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include <Enumerators.h>
 
 class WFPEngine;
 
@@ -39,7 +40,8 @@ private:
 		Key, Name, Desc, Flags, Fields, Provider, Id, Layer, ProviderData,
 	};
 
-	struct CalloutInfo : WFPCalloutInfo {
+	struct CalloutInfo {
+		FWPM_CALLOUT* Data;
 		CString Provider;
 		CString Layer;
 	};
@@ -52,4 +54,5 @@ private:
 	CListViewCtrl m_List;
 	std::vector<CalloutInfo> m_Callouts;
 	GUID m_LayerKey{ GUID_NULL };
+	WFPCalloutEnumerator m_Enum;
 };

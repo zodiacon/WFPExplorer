@@ -43,3 +43,14 @@ struct WFPProviderEnumerator : WFPEnumerator<
 		WFPEnumerator(hEngine, ::FwpmProviderCreateEnumHandle, ::FwpmProviderDestroyEnumHandle, ::FwpmProviderEnum) {
 	}
 };
+
+struct WFPCalloutEnumerator : WFPEnumerator<
+	decltype(&::FwpmCalloutCreateEnumHandle),
+	decltype(&::FwpmCalloutDestroyEnumHandle),
+	decltype(&::FwpmCalloutEnum),
+	FWPM_CALLOUT> {
+
+	explicit WFPCalloutEnumerator(HANDLE hEngine) :
+		WFPEnumerator(hEngine, ::FwpmCalloutCreateEnumHandle, ::FwpmCalloutDestroyEnumHandle, ::FwpmCalloutEnum) {
+	}
+};

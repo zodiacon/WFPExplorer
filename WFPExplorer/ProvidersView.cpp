@@ -37,7 +37,9 @@ LRESULT CProvidersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 void CProvidersView::Refresh() {
+	m_Enum.Close();
 	m_Providers = m_Enum.Next(256);
+	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Providers.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(2, std::format(L"{} Providers", m_Providers.size()).c_str());
 }

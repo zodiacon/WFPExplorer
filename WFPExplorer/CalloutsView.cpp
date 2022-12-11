@@ -3,8 +3,9 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
+#include <ranges>
 
-CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine), m_Enum(engine.Handle()) {
 }
 
 LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -40,7 +41,14 @@ void CCalloutsView::SetLayer(GUID const& layer) {
 }
 
 void CCalloutsView::Refresh() {
-	m_Callouts = m_Engine.EnumCallouts<CalloutInfo>(m_LayerKey);
+	m_Enum.Close();
+	if (m_LayerKey != GUID_NULL) {
+		auto callouts = m_Enum.Next<CalloutInfo>(2048) | std::views::filter([&](auto& c) { return c.Data->applicableLayer == m_LayerKey; });
+		m_Callouts.assign(callouts.begin(), callouts.end());
+	}
+	else {
+		m_Callouts = m_Enum.Next<CalloutInfo>(2048);
+	}
 	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Callouts.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(5, std::format(L"{} Callouts", m_Callouts.size()).c_str());
@@ -49,43 +57,43 @@ void CCalloutsView::Refresh() {
 CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 	auto& info = m_Callouts[row];
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
-		case ColumnType::Key: return StringHelper::GuidToString(info.CalloutKey);
+		case ColumnType::Key: return StringHelper::GuidToString(info.Data->calloutKey);
 		case ColumnType::Layer: 
 			if (info.Layer.IsEmpty()) {
-				auto layer = m_Engine.GetLayerByKey(info.ApplicableLayer);
+				auto layer = m_Engine.GetLayerByKey(info.Data->applicableLayer);
 				if (layer && !layer->Name.empty()) {
 					info.Layer = layer->Name.c_str();
 				}
 				else {
-					info.Layer = StringHelper::GuidToString(info.ApplicableLayer);
+					info.Layer = StringHelper::GuidToString(info.Data->applicableLayer);
 				}
 			}
 			return info.Layer;
 
 		case ColumnType::Provider:
 			if (info.Provider.IsEmpty()) {
-				if (info.ProviderKey != GUID_NULL) {
-					auto sl = m_Engine.GetProviderByKey(info.ProviderKey);
+				if (info.Data->providerKey) {
+					auto sl = m_Engine.GetProviderByKey(*info.Data->providerKey);
 					if (sl && sl->displayData.name && sl->displayData.name[0] != L'@')
 						info.Provider = sl->displayData.name;
 					else
-						info.Provider = StringHelper::GuidToString(info.ProviderKey);
+						info.Provider = StringHelper::GuidToString(*info.Data->providerKey);
 				}
 			}
 			return info.Provider;
 
-		case ColumnType::Name: return info.Name.c_str();
-		case ColumnType::Desc: return info.Desc.c_str();
+		case ColumnType::Name: return info.Data->displayData.name;
+		case ColumnType::Desc: return info.Data->displayData.description;
 		case ColumnType::ProviderData:
-			return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
+			return info.Data->providerData.size == 0 ? L"" : std::format(L"{} Bytes", info.Data->providerData.size).c_str();
 
 		case ColumnType::Flags:
-			if (info.Flags == WFPCalloutFlags::None)
+			if (info.Data->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", (UINT32)info.Flags,
-				(PCWSTR)StringHelper::WFPCalloutFlagsToString(info.Flags)).c_str();
+			return std::format(L"0x{:X} ({})", info.Data->flags,
+				(PCWSTR)StringHelper::WFPCalloutFlagsToString(info.Data->flags)).c_str();
 
-		case ColumnType::Id: return std::to_wstring(info.CalloutId).c_str();
+		case ColumnType::Id: return std::to_wstring(info.Data->calloutId).c_str();
 	}
 	return CString();
 }
@@ -95,14 +103,15 @@ void CCalloutsView::DoSort(SortInfo const* si) {
 	auto asc = si->SortAscending;
 
 	auto compare = [&](auto& c1, auto& c2) {
+		auto d1 = c1.Data, d2 = c2.Data;
 		switch (col) {
-			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(c1.CalloutKey), StringHelper::GuidToString(c2.CalloutKey), asc);
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(d1->calloutKey), StringHelper::GuidToString(d2->calloutKey), asc);
 			case ColumnType::Layer: return SortHelper::Sort(c1.Layer, c2.Layer, asc);
-			case ColumnType::Name: return SortHelper::Sort(c1.Name, c2.Name, asc);
-			case ColumnType::Desc: return SortHelper::Sort(c1.Desc, c2.Desc, asc);
-			case ColumnType::Flags: return SortHelper::Sort(c1.Flags, c2.Flags, asc);
+			case ColumnType::Name: return SortHelper::Sort(d1->displayData.name, d2->displayData.name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(d1->displayData.description, d2->displayData.description, asc);
+			case ColumnType::Flags: return SortHelper::Sort(d1->flags, d2->flags, asc);
 			case ColumnType::Provider: return SortHelper::Sort(c1.Provider, c2.Provider, asc);
-			case ColumnType::Id: return SortHelper::Sort(c1.CalloutId, c2.CalloutId, asc);
+			case ColumnType::Id: return SortHelper::Sort(d1->calloutId, d2->calloutId, asc);
 		}
 		return false;
 	};

@@ -135,14 +135,14 @@ CString StringHelper::WFPSubLayerFlagsToString(WFPSubLayerFlags flags) {
 	return FlagsToString(flags, data);
 }
 
-CString StringHelper::WFPCalloutFlagsToString(WFPCalloutFlags flags) {
+CString StringHelper::WFPCalloutFlagsToString(DWORD flags) {
 	static const struct {
-		WFPCalloutFlags flag;
+		DWORD flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPCalloutFlags::Persistent, L"Persistent" },
-		{ WFPCalloutFlags::UsesProviderContext, L"Provider Context" },
-		{ WFPCalloutFlags::Registered, L"Registered" },
+		{ FWPM_CALLOUT_FLAG_PERSISTENT,				L"Persistent" },
+		{ FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,	L"Provider Context" },
+		{ FWPM_CALLOUT_FLAG_REGISTERED,				L"Registered" },
 	};
 
 	return FlagsToString(flags, data);
