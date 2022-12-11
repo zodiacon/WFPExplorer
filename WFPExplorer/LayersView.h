@@ -5,6 +5,7 @@
 #include "Interfaces.h"
 #include <WFPEngine.h>
 #include "resource.h"
+#include <WFPEnumerator.h>
 
 class WFPEngine;
 
@@ -39,10 +40,16 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
-	struct LayerInfo : WFPLayerInfo {
+	struct LayerInfo {
+		FWPM_LAYER* Data;
 		CString DefaultSublayer;
 		int FilterCount;
 		int CalloutCount;
+		CString const& Name() const;
+		CString const& Desc() const;
+
+	private:
+		mutable CString m_Name, m_Desc;
 	};
 
 	void UpdateUI();
@@ -61,5 +68,5 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<LayerInfo> m_Layers;
+	WFPObjectVector<FWPM_LAYER, LayerInfo> m_Layers;
 };

@@ -52,7 +52,6 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<CalloutInfo> m_Callouts;
+	WFPObjectVector<FWPM_CALLOUT, CalloutInfo> m_Callouts;
 	GUID m_LayerKey{ GUID_NULL };
-	WFPCalloutEnumerator m_Enum;
 };

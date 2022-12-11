@@ -109,15 +109,10 @@ bool WFPEngine::DeleteFilter(UINT64 id) {
 	return m_LastError == ERROR_SUCCESS;
 }
 
-std::optional<WFPLayerInfo> WFPEngine::GetLayerByKey(GUID const& key) const {
-	FWPM_LAYER* layer;
-	m_LastError = FwpmLayerGetByKey(m_hEngine, &key, &layer);
-	if (m_LastError != ERROR_SUCCESS)
-		return {};
-
-	auto info = InitLayer(layer, true);
-	FwpmFreeMemory((void**)&layer);
-	return info;
+WFPObject<FWPM_LAYER> WFPEngine::GetLayerByKey(GUID const& key) const {
+	FWPM_LAYER* layer = nullptr;
+	FwpmLayerGetByKey(m_hEngine, &key, &layer);
+	return WFPObject<FWPM_LAYER>(layer);
 }
 
 std::optional<WFPLayerInfo> WFPEngine::GetLayerById(UINT16 id) const {
@@ -177,39 +172,6 @@ WFPConnectionInfo WFPEngine::InitConnection(FWPM_CONNECTION* p, bool includeData
 	return ci;
 }
 
-std::wstring WFPEngine::PoorParseMUIString(std::wstring const& path) {
-	static std::unordered_map<std::wstring, std::wstring> cache;
-
-	if (path[0] != L'@')
-		return path;
-
-	if (auto it = cache.find(path); it != cache.end())
-		return it->second;
-
-	auto comma = path.find(L',', 1);
-	if (comma == std::wstring::npos)
-		return path;
-
-	auto dllname = path.substr(1, comma - 1);
-	auto hDll = ::LoadLibraryEx(dllname.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-	if (!hDll)
-		return path;
-
-	CString result;
-	auto id = _wtoi(path.substr(comma + 1).c_str());
-	if (id < 0)
-		id = -id;
-	result.LoadStringW(hDll, id);
-	::FreeLibrary(hDll);
-	if (!result.IsEmpty()) {
-		cache.insert({ path, (PCWSTR)result });
-		return (PCWSTR)result;
-	}
-	if (dllname.substr(dllname.rfind(L'.')) != L".mui")
-		return PoorParseMUIString(L"@c:\\Windows\\System32\\en-US\\" + dllname + L".mui" + path.substr(comma));
-	return path;
-}
-
 std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
 	if (input == nullptr)
 		return L"";
@@ -244,12 +206,10 @@ std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool include
 	return info;
 }
 
-std::optional<WFPCalloutInfo> WFPEngine::GetCalloutByKey(GUID const& key) const {
-	FWPM_CALLOUT* co;
+WFPObject<FWPM_CALLOUT> WFPEngine::GetCalloutByKey(GUID const& key) const {
+	FWPM_CALLOUT* co = nullptr;
 	FwpmCalloutGetByKey(m_hEngine, &key, &co);
-	auto info = InitCallout(co, true);
-	FwpmFreeMemory((void**)&co);
-	return info;
+	return WFPObject(co);
 }
 
 uint32_t WFPEngine::GetFilterCount(GUID const& layer) const {
@@ -260,7 +220,7 @@ uint32_t WFPEngine::GetFilterCount(GUID const& layer) const {
 	FWPM_FILTER** filters;
 	UINT32 count;
 	uint32_t total = 0;
-	m_LastError = FwpmFilterEnum(m_hEngine, hEnum, 4096, &filters, &count);
+	m_LastError = FwpmFilterEnum(m_hEngine, hEnum, 8192, &filters, &count);
 	if (m_LastError == ERROR_SUCCESS) {
 		for (UINT32 i = 0; i < count; i++) {
 			auto filter = filters[i];
@@ -281,7 +241,7 @@ uint32_t WFPEngine::GetCalloutCount(GUID const& layer) const {
 	FWPM_CALLOUT** callouts;
 	UINT32 count;
 	uint32_t total = 0;
-	m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
+	m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 1024, &callouts, &count);
 	if (m_LastError == ERROR_SUCCESS) {
 		for (UINT32 i = 0; i < count; i++) {
 			auto c = callouts[i];

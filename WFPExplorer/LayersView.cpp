@@ -4,6 +4,7 @@
 #include <SortHelper.h>
 #include "WFPHelper.h"
 #include "LayerGeneralPage.h"
+#include <Enumerators.h>
 
 CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -49,46 +50,48 @@ LRESULT CLayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 
 LRESULT CLayersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 	auto& layer = m_Layers[m_List.GetSelectedIndex()];
-	WFPHelper::ShowLayerProperties(m_Engine, layer);
+	WFPHelper::ShowLayerProperties(m_Engine, layer.Data);
 	return 0;
 }
 
 void CLayersView::Refresh() {
-	m_Layers = m_Engine.EnumLayers<LayerInfo>();
+	WFPLayerEnumerator enumerator(m_Engine.Handle());
+	m_Layers = enumerator.Next<LayerInfo>();
 	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Layers.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(4, std::format(L"{} Layers", m_Layers.size()).c_str());
 }
 
 CString CLayersView::GetColumnText(HWND, int row, int col) {
-	auto& info = m_Layers[row];
+	auto& layer = m_Layers[row];
+	auto info = layer.Data;
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
-		case ColumnType::Key: return StringHelper::GuidToString(info.LayerKey);
+		case ColumnType::Key: return StringHelper::GuidToString(info->layerKey);
 		case ColumnType::DefaultSubLayer:
-			if (info.DefaultSublayer.IsEmpty()) {
-				if (info.DefaultSubLayerKey != GUID_NULL) {
-					auto sl = m_Engine.GetSublayerByKey(info.DefaultSubLayerKey);
+			if (layer.DefaultSublayer.IsEmpty()) {
+				if (info->defaultSubLayerKey != GUID_NULL) {
+					auto sl = m_Engine.GetSublayerByKey(info->defaultSubLayerKey);
 					if (sl && !sl.value().Name.empty())
-						info.DefaultSublayer = sl.value().Name.c_str();
+						layer.DefaultSublayer = sl.value().Name.c_str();
 					else
-						info.DefaultSublayer = StringHelper::GuidToString(info.DefaultSubLayerKey);
+						layer.DefaultSublayer = StringHelper::GuidToString(info->defaultSubLayerKey);
 				}
 			}
-			return info.DefaultSublayer;
+			return layer.DefaultSublayer;
 
-		case ColumnType::Filters: return std::to_wstring(info.FilterCount).c_str();
-		case ColumnType::Callouts: return std::to_wstring(info.CalloutCount).c_str();
+		case ColumnType::Filters: return std::to_wstring(layer.FilterCount).c_str();
+		case ColumnType::Callouts: return std::to_wstring(layer.CalloutCount).c_str();
 
-		case ColumnType::Name: return info.Name.c_str();
-		case ColumnType::Desc: return info.Desc.c_str();
+		case ColumnType::Name: return layer.Name();
+		case ColumnType::Desc: return layer.Desc();
 		case ColumnType::Flags: 
-			if (info.Flags == WFPLayerFlags::None)
+			if (info->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", (UINT32)info.Flags, 
-				(PCWSTR)StringHelper::WFPLayerFlagsToString(info.Flags)).c_str();
+			return std::format(L"0x{:X} ({})", info->flags, 
+				(PCWSTR)StringHelper::WFPLayerFlagsToString(info->flags)).c_str();
 
-		case ColumnType::Fields: return std::to_wstring(info.NumFields).c_str();
-		case ColumnType::Id: return std::to_wstring(info.LayerId).c_str();
+		case ColumnType::Fields: return std::to_wstring(info->numFields).c_str();
+		case ColumnType::Id: return std::to_wstring(info->layerId).c_str();
 	}
 	return CString();
 }
@@ -99,15 +102,16 @@ void CLayersView::DoSort(SortInfo const* si) {
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
 
-	auto compare = [&](auto& l1, auto& l2) {
+	auto compare = [&](auto& layer1, auto& layer2) {
+		auto l1 = layer1.Data, l2 = layer2.Data;
 		switch (col) {
-			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(l1.LayerKey), StringHelper::GuidToString(l2.LayerKey), asc);
-			case ColumnType::Name: return SortHelper::Sort(l1.Name, l2.Name, asc);
-			case ColumnType::Desc: return SortHelper::Sort(l1.Desc, l2.Desc, asc);
-			case ColumnType::Flags: return SortHelper::Sort(l1.Flags, l2.Flags, asc);
-			case ColumnType::Fields: return SortHelper::Sort(l1.NumFields, l2.NumFields, asc);
-			case ColumnType::DefaultSubLayer: return SortHelper::Sort(l1.DefaultSublayer, l2.DefaultSublayer, asc);
-			case ColumnType::Id: return SortHelper::Sort(l1.LayerId, l2.LayerId, asc);
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(l1->layerKey), StringHelper::GuidToString(l2->layerKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(layer1.Name(), layer2.Name(), asc);
+			case ColumnType::Desc: return SortHelper::Sort(layer1.Desc(), layer2.Desc(), asc);
+			case ColumnType::Flags: return SortHelper::Sort(l1->flags, l2->flags, asc);
+			case ColumnType::Fields: return SortHelper::Sort(l1->numFields, l2->numFields, asc);
+			case ColumnType::DefaultSubLayer: return SortHelper::Sort(layer1.DefaultSublayer, layer2.DefaultSublayer, asc);
+			case ColumnType::Id: return SortHelper::Sort(l1->layerId, l2->layerId, asc);
 		}
 		return false;
 	};
@@ -129,13 +133,13 @@ void CLayersView::UpdateUI() {
 
 int CLayersView::GetFilterCount(LayerInfo& layer) const {
 	if (layer.FilterCount < 0)
-		layer.FilterCount = m_Engine.GetFilterCount(layer.LayerKey);
+		layer.FilterCount = m_Engine.GetFilterCount(layer.Data->layerKey);
 	return layer.FilterCount;
 }
 
 int CLayersView::GetCalloutCount(LayerInfo& layer) const {
 	if (layer.CalloutCount < 0)
-		layer.CalloutCount = m_Engine.GetCalloutCount(layer.LayerKey);
+		layer.CalloutCount = m_Engine.GetCalloutCount(layer.Data->layerKey);
 	return layer.CalloutCount;
 }
 
@@ -147,4 +151,16 @@ void CLayersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT new
 bool CLayersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
 	LRESULT result;
 	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
+}
+
+CString const& CLayersView::LayerInfo::Name() const {
+	if (m_Name.IsEmpty())
+		m_Name = StringHelper::ParseMUIString(Data->displayData.name);
+	return m_Name;
+}
+
+CString const& CLayersView::LayerInfo::Desc() const {
+	if (m_Desc.IsEmpty())
+		m_Desc = StringHelper::ParseMUIString(Data->displayData.description);
+	return m_Desc;
 }

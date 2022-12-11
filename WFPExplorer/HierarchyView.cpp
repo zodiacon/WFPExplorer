@@ -7,6 +7,7 @@
 #include "CalloutsView.h"
 #include "FiltersView.h"
 #include "AppSettings.h"
+#include <Enumerators.h>
 
 CHierarchyView::CHierarchyView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -69,7 +70,8 @@ void CHierarchyView::BuildTree() {
 
 	auto hLayers = InsertTreeItem(m_Tree, L"Layers", 1, TreeItemType::Layers, TVI_ROOT);
 	auto filters = m_Engine.EnumFilters();
-	auto callouts = m_Engine.EnumCallouts();
+	WFPCalloutEnumerator cenum(m_Engine.Handle());
+	auto callouts = cenum.Next(1024);
 	m_LayersMap.clear();
 	m_FiltersMap.clear();
 	m_CalloutsMap.clear();
@@ -95,16 +97,16 @@ void CHierarchyView::BuildTree() {
 			}
 		}
 		{
-			auto view = callouts | views::filter([&](auto& c) { return c.ApplicableLayer == layer.LayerKey; });
+			auto view = callouts | views::filter([&](auto& c) { return c->applicableLayer == layer.LayerKey; });
 			if (!view.empty()) {
 				auto hCallouts = InsertTreeItem(m_Tree, L"Callouts", 2, TreeItemType::Callouts, hLayer, TVI_LAST);
 				uint32_t count = 0;
 				for (auto& v : view) {
-					CString name = v.Name.c_str();
+					CString name = v->displayData.name;
 					if (name[0] != L'{')
-						name += L" " + StringHelper::GuidToString(v.CalloutKey);
+						name += L" " + StringHelper::GuidToString(v->calloutKey);
 					auto hCallout = InsertTreeItem(m_Tree, name, 2, TreeItemType::Callout, hCallouts, TVI_SORT);
-					m_CalloutsMap.insert({ hCallout, v.CalloutKey });
+					m_CalloutsMap.insert({ hCallout, v->calloutKey });
 					count++;
 				}
 				m_Tree.SetItemText(hCallouts, std::format(L"Callouts ({})", count).c_str());

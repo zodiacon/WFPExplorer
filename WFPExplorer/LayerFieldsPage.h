@@ -5,7 +5,6 @@
 #include <VirtualListView.h>
 
 class WFPEngine;
-struct WFPLayerInfo;
 struct WFPFieldInfo;
 
 class CLayerFieldsPage :
@@ -16,7 +15,7 @@ class CLayerFieldsPage :
 public:
 	enum { IDD = IDD_LAYERFIELDS };
 
-	CLayerFieldsPage(WFPEngine& engine, WFPLayerInfo const& layer);
+	CLayerFieldsPage(WFPEngine& engine, FWPM_LAYER* layer);
 
 	CString GetColumnText(HWND, int row, int col) const;
 	void DoSort(SortInfo const* si);
@@ -37,7 +36,7 @@ private:
 
 private:
 	WFPEngine& m_Engine;
-	WFPLayerInfo const& m_Layer;
-	std::vector<WFPFieldInfo> m_Fields;
+	FWPM_LAYER* m_Layer;
+	std::vector<FWPM_FIELD> m_Fields;
 	CListViewCtrl m_List;
 };

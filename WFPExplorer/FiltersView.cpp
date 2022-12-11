@@ -49,7 +49,7 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 					else {
 						auto callout = m_Engine.GetCalloutByKey(info.Action.CalloutKey);
 						if (callout)
-							info.FilterAction = callout->Name.c_str();
+							info.FilterAction = callout->displayData.name;
 					}
 				}
 			}
@@ -84,8 +84,8 @@ CString const& CFiltersView::GetProviderName(FilterInfo& info) const {
 CString const& CFiltersView::GetLayerName(FilterInfo& info) const {
 	if (info.Layer.IsEmpty() && info.LayerKey != GUID_NULL) {
 		auto layer = m_Engine.GetLayerByKey(info.LayerKey);
-		if (layer && !layer.value().Name.empty() && layer.value().Name[0] != L'@')
-			info.Layer = layer.value().Name.c_str();
+		if (layer && layer->displayData.name && layer->displayData.name[0] != L'@')
+			info.Layer = layer->displayData.name;
 		else
 			info.Layer = StringHelper::GuidToString(info.LayerKey);
 	}

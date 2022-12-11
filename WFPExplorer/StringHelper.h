@@ -12,13 +12,13 @@ enum class WFPProviderContextType;
 enum class WFPActionType;
 enum class WFPMatchType;
 enum class WFPDataType;
-enum class WFPFieldType;
 
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
+	static CString ParseMUIString(PCWSTR input);
 	static CString WFPValueToString(WFPValue const& value, bool hex = false, bool full = false);
 	static CString WFPFilterFlagsToString(WFPFilterFlags flags);
-	static CString WFPLayerFlagsToString(WFPLayerFlags flags);
+	static CString WFPLayerFlagsToString(DWORD flags);
 	static CString WFPSessionFlagsToString(WFPSessionFlags flags);
 	static CString WFPProviderFlagsToString(DWORD flags);
 	static CString WFPSubLayerFlagsToString(WFPSubLayerFlags flags);
@@ -31,7 +31,7 @@ struct StringHelper abstract final {
 	static CString WFPConditionFieldKeyToString(GUID const& key);
 	static CString FormatBinary(BYTE const* buffer, ULONG size, int lineSize = 16);
 	static CString FormatSID(PSID const sid);
-	static PCWSTR WFPFieldTypeToString(WFPFieldType type);
+	static PCWSTR WFPFieldTypeToString(DWORD type);
 
 	template<typename TFlags, typename TValue>
 	static CString FlagsToString(TValue value, TFlags const& data) {

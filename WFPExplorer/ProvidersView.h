@@ -38,6 +38,14 @@ private:
 	enum class ColumnType {
 		Key, Name, Desc, Flags, ServiceName, ProviderData,
 	};
+	struct ProviderInfo {
+		FWPM_PROVIDER* Data;
+		CString const& Name() const;
+		CString const& Desc() const;
+
+	private:
+		mutable CString m_Name, m_Desc;
+	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -45,6 +53,5 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<FWPM_PROVIDER*> m_Providers;
-	WFPProviderEnumerator m_Enum;
+	WFPObjectVector<FWPM_PROVIDER, ProviderInfo> m_Providers;
 };

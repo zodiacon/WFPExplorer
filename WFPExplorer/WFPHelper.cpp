@@ -6,6 +6,7 @@
 #include "LayerFieldsPage.h"
 #include "FilterGeneralPage.h"
 #include "FilterConditionsPage.h"
+#include "LayersView.h"
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	if (key != GUID_NULL) {
@@ -30,8 +31,8 @@ CString WFPHelper::GetFilterName(WFPEngine const& engine, GUID const& key) {
 CString WFPHelper::GetLayerName(WFPEngine const& engine, GUID const& key) {
 	if (key != GUID_NULL) {
 		auto layer = engine.GetLayerByKey(key);
-		if (layer && !layer->Name.empty() && layer->Name[0] != L'@')
-			return layer->Name.c_str();
+		if (layer && layer->displayData.name && layer->displayData.name[0] != L'@')
+			return layer->displayData.name;
 		return StringHelper::GuidToString(key);
 	}
 	return L"";
@@ -47,8 +48,8 @@ CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 	return L"";
 }
 
-int WFPHelper::ShowLayerProperties(WFPEngine& engine, WFPLayerInfo const& layer) {
-	auto name = L"Layer Properties (" + GetLayerName(engine, layer.LayerKey) + L")";
+int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
+	auto name = L"Layer Properties (" + GetLayerName(engine, layer->layerKey) + L")";
 	CPropertySheet sheet((PCWSTR)name);
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_LAYERS);
@@ -58,7 +59,7 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, WFPLayerInfo const& layer)
 	sheet.AddPage(general);
 
 	CLayerFieldsPage fields(engine, layer);
-	if (layer.NumFields > 0) {
+	if (layer->numFields > 0) {
 		fields.m_psp.dwFlags |= PSP_USEICONID;
 		fields.m_psp.pszIcon = MAKEINTRESOURCE(IDI_FIELD);
 		sheet.AddPage(fields);

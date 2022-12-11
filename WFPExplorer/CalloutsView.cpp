@@ -5,7 +5,7 @@
 #include "resource.h"
 #include <ranges>
 
-CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine), m_Enum(engine.Handle()) {
+CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
 
 LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -41,13 +41,12 @@ void CCalloutsView::SetLayer(GUID const& layer) {
 }
 
 void CCalloutsView::Refresh() {
-	m_Enum.Close();
+	WFPCalloutEnumerator cenum(m_Engine.Handle());
 	if (m_LayerKey != GUID_NULL) {
-		auto callouts = m_Enum.Next<CalloutInfo>(2048) | std::views::filter([&](auto& c) { return c.Data->applicableLayer == m_LayerKey; });
-		m_Callouts.assign(callouts.begin(), callouts.end());
+		m_Callouts = cenum.NextFiltered<CalloutInfo>([&](auto c) { return c->applicableLayer == m_LayerKey; }, 2048);
 	}
 	else {
-		m_Callouts = m_Enum.Next<CalloutInfo>(2048);
+		m_Callouts = cenum.Next<CalloutInfo>(2048);
 	}
 	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Callouts.size(), LVSICF_NOSCROLL);
@@ -61,8 +60,8 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Layer: 
 			if (info.Layer.IsEmpty()) {
 				auto layer = m_Engine.GetLayerByKey(info.Data->applicableLayer);
-				if (layer && !layer->Name.empty()) {
-					info.Layer = layer->Name.c_str();
+				if (layer && layer->displayData.name) {
+					info.Layer = layer->displayData.name;
 				}
 				else {
 					info.Layer = StringHelper::GuidToString(info.Data->applicableLayer);

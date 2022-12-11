@@ -49,6 +49,6 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<SessionInfo> m_Sessions;
+	WFPObjectVector<FWPM_SESSION, SessionInfo> m_Sessions;
 	WFPSessionEnumerator m_Enum;
 };

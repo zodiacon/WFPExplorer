@@ -618,40 +618,6 @@ public:
 	std::vector<WFPConnectionInfo> EnumConnections(bool includeData = false);
 	std::vector<WFPSystemPortByType> EnumSystemPorts();
 
-	template<typename TSession = WFPSessionInfo> requires std::is_base_of_v<WFPSessionInfo, TSession>
-	std::vector<TSession> EnumSessions() const {
-		HANDLE hEnum;
-		std::vector<TSession> info;
-		m_LastError = FwpmSessionCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-		if (m_LastError != ERROR_SUCCESS)
-			return info;
-
-		UINT32 count;
-		FWPM_SESSION** sessions;
-		if ((m_LastError = FwpmSessionEnum(m_hEngine, hEnum, 128, &sessions, &count)) == ERROR_SUCCESS) {
-			info.reserve(count);
-			for (UINT32 i = 0; i < count; i++) {
-				auto session = sessions[i];
-				TSession si;
-				si.Name = ParseMUIString(session->displayData.name);
-				si.Desc = ParseMUIString(session->displayData.description);
-				si.SessionKey = session->sessionKey;
-				si.ProcessId = session->processId;
-				si.UserName = session->username;
-				si.Flags = static_cast<WFPSessionFlags>(session->flags);
-				auto len = ::GetLengthSid(session->sid);
-				si.Sid.resize(len);
-				::CopySid(len, (PSID)si.Sid.data(), session->sid);
-				si.KernelMode = session->kernelMode;
-				info.emplace_back(std::move(si));
-			}
-			FwpmFreeMemory((void**)&sessions);
-			m_LastError = FwpmSessionDestroyEnumHandle(m_hEngine, hEnum);
-		}
-
-		return info;
-	}
-
 	template<typename TFilter = WFPFilterInfo> requires std::is_base_of_v<WFPFilterInfo, TFilter>
 	std::vector<TFilter> EnumFilters(GUID const& layer, bool full = false) const {
 		if (layer == GUID_NULL)
@@ -754,58 +720,6 @@ public:
 
 	std::vector<WFPProviderContextInfo> EnumProviderContexts(bool includeData = false) const;
 
-	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
-	std::vector<TCallout> EnumCallouts() const {
-		HANDLE hEnum;
-		std::vector<TCallout> info;
-		m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-		if (m_LastError)
-			return info;
-		FWPM_CALLOUT** callouts;
-		UINT32 count;
-		m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
-		if (m_LastError == ERROR_SUCCESS) {
-			info.reserve(count);
-			for (UINT32 i = 0; i < count; i++) {
-				auto c = callouts[i];
-				auto ci = InitCallout(c);
-				info.emplace_back(std::move(ci));
-			}
-			FwpmFreeMemory((void**)&callouts);
-		}
-		m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
-		return info;
-	}
-
-	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
-	std::vector<TCallout> EnumCallouts(GUID const& layer) const {
-		if (layer == GUID_NULL)
-			return EnumCallouts<TCallout>();
-
-		HANDLE hEnum;
-		std::vector<TCallout> info;
-		m_LastError = FwpmCalloutCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-		if (m_LastError)
-			return info;
-		FWPM_CALLOUT** callouts;
-		UINT32 count;
-		m_LastError = FwpmCalloutEnum(m_hEngine, hEnum, 256, &callouts, &count);
-		if (m_LastError == ERROR_SUCCESS) {
-			info.reserve(count);
-			for (UINT32 i = 0; i < count; i++) {
-				auto c = callouts[i];
-				if (c->applicableLayer == layer) {
-					auto ci = InitCallout(c);
-					info.emplace_back(std::move(ci));
-				}
-			}
-			FwpmFreeMemory((void**)&callouts);
-		}
-		m_LastError = FwpmCalloutDestroyEnumHandle(m_hEngine, hEnum);
-
-		return info;
-	}
-
 	//
 	// providers API
 	//
@@ -822,7 +736,7 @@ public:
 	//
 	// layer API
 	//
-	std::optional<WFPLayerInfo> GetLayerByKey(GUID const& key) const;
+	WFPObject<FWPM_LAYER> GetLayerByKey(GUID const& key) const;
 	std::optional<WFPLayerInfo> GetLayerById(UINT16 id) const;
 
 	//
@@ -832,7 +746,7 @@ public:
 	std::optional<WFPSubLayerInfo> GetSublayerById(UINT16 id) const;
 
 
-	std::optional<WFPCalloutInfo> GetCalloutByKey(GUID const& key) const;
+	WFPObject<FWPM_CALLOUT> GetCalloutByKey(GUID const& key) const;
 
 private:
 	//
@@ -916,25 +830,6 @@ private:
 			memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
 		}
 		return li;
-	}
-
-	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
-	static TCallout InitCallout(FWPM_CALLOUT* c, bool full = false) {
-		TCallout ci;
-		ci.Name = ParseMUIString(c->displayData.name);
-		ci.Desc = ParseMUIString(c->displayData.description);
-		ci.ProviderKey = c->providerKey ? *c->providerKey : GUID_NULL;
-		ci.Flags = static_cast<WFPCalloutFlags>(c->flags);
-		ci.CalloutKey = c->calloutKey;
-		ci.ApplicableLayer = c->applicableLayer;
-		ci.ProviderDataSize = c->providerData.size;
-		if (full && ci.ProviderDataSize) {
-			ci.ProviderData.resize(ci.ProviderDataSize);
-			memcpy(ci.ProviderData.data(), c->providerData.data, ci.ProviderDataSize);
-		}
-		ci.CalloutId = c->calloutId;
-		ci.ApplicableLayer = c->applicableLayer;
-		return ci;
 	}
 
 	static std::wstring PoorParseMUIString(std::wstring const& path);

@@ -54,3 +54,25 @@ struct WFPCalloutEnumerator : WFPEnumerator<
 		WFPEnumerator(hEngine, ::FwpmCalloutCreateEnumHandle, ::FwpmCalloutDestroyEnumHandle, ::FwpmCalloutEnum) {
 	}
 };
+
+struct WFPLayerEnumerator : WFPEnumerator<
+	decltype(&::FwpmLayerCreateEnumHandle),
+	decltype(&::FwpmLayerDestroyEnumHandle),
+	decltype(&::FwpmLayerEnum),
+	FWPM_LAYER> {
+
+	explicit WFPLayerEnumerator(HANDLE hEngine) :
+		WFPEnumerator(hEngine, ::FwpmLayerCreateEnumHandle, ::FwpmLayerDestroyEnumHandle, ::FwpmLayerEnum) {
+	}
+};
+
+struct WFPSubLayerEnumerator : WFPEnumerator<
+	decltype(&::FwpmSubLayerCreateEnumHandle),
+	decltype(&::FwpmSubLayerDestroyEnumHandle),
+	decltype(&::FwpmSubLayerEnum),
+	FWPM_SUBLAYER> {
+
+	explicit WFPSubLayerEnumerator(HANDLE hEngine) :
+		WFPEnumerator(hEngine, ::FwpmSubLayerCreateEnumHandle, ::FwpmSubLayerDestroyEnumHandle, ::FwpmSubLayerEnum) {
+	}
+};

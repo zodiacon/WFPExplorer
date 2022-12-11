@@ -5,6 +5,18 @@
 
 #pragma comment(lib, "ntdll")
 
+CString StringHelper::ParseMUIString(PCWSTR input) {
+	if (input == nullptr)
+		return L"";
+
+	if (*input && input[0] == L'@') {
+		WCHAR result[256];
+		if (::SHLoadIndirectString(input, result, _countof(result), nullptr) == S_OK)
+			return result;
+	}
+	return input;
+}
+
 CString StringHelper::GuidToString(GUID const& guid) {
 	WCHAR sguid[64];
 	return ::StringFromGUID2(guid, sguid, _countof(sguid)) ? sguid : L"";
@@ -88,15 +100,15 @@ CString StringHelper::WFPFilterFlagsToString(WFPFilterFlags flags) {
 	return result;
 }
 
-CString StringHelper::WFPLayerFlagsToString(WFPLayerFlags flags) {
+CString StringHelper::WFPLayerFlagsToString(DWORD flags) {
 	static const struct {
-		WFPLayerFlags flag;
+		DWORD flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPLayerFlags::Kernel, L"Kernel" },
-		{ WFPLayerFlags::BuiltIn, L"Builtin" },
-		{ WFPLayerFlags::ClassifyMostly, L"Class Modify" },
-		{ WFPLayerFlags::Buffered, L"Buffered" },
+		{ FWPM_LAYER_FLAG_KERNEL,			L"Kernel" },
+		{ FWPM_LAYER_FLAG_BUILTIN,			L"Builtin" },
+		{ FWPM_LAYER_FLAG_CLASSIFY_MOSTLY,	L"Class Mostly" },
+		{ FWPM_LAYER_FLAG_BUFFERED,			L"Buffered" },
 	};
 	return FlagsToString(flags, data);
 }
@@ -390,11 +402,11 @@ CString StringHelper::FormatSID(PSID const sid) {
 	return L"";
 }
 
-PCWSTR StringHelper::WFPFieldTypeToString(WFPFieldType type) {
+PCWSTR StringHelper::WFPFieldTypeToString(DWORD type) {
 	switch (type) {
-		case WFPFieldType::RawData: return L"Raw Data";
-		case WFPFieldType::IpAddress: return L"IP Address";
-		case WFPFieldType::Flags: return L"Flags";
+		case FWPM_FIELD_RAW_DATA: return L"Raw Data";
+		case FWPM_FIELD_IP_ADDRESS: return L"IP Address";
+		case FWPM_FIELD_FLAGS: return L"Flags";
 	}
 	ATLASSERT(false);
 	return L"";

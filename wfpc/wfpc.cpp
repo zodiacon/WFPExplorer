@@ -13,7 +13,9 @@ std::wstring GuidToString(GUID const& guid) {
 	return ::StringFromGUID2(guid, sguid, _countof(sguid)) ? sguid : L"";
 }
 
-void DisplaySessions(std::vector<WFPSessionInfo> const& sessions) {
+void DisplaySessions(WFPEngine& engine) {
+	WFPSessionEnumerator enumerator(engine.Handle());
+	auto sessions = enumerator.Next(256);
 	printf("Total sessions: %u\n", (UINT32)sessions.size());
 	int n = printf("%-39s %-6s %-28s %6s %-28s %s\n",
 		"Key", "PID", "User name", "Flags", "Name", "Description");
@@ -21,12 +23,12 @@ void DisplaySessions(std::vector<WFPSessionInfo> const& sessions) {
 
 	for (auto& session : sessions) {
 		printf("%ws %6u %-28ws %6X %-28ws %ws\n",
-			GuidToString(session.SessionKey).c_str(),
-			session.ProcessId,
-			session.UserName.c_str(),
-			session.Flags,
-			session.Name.c_str(),
-			session.Desc.c_str());
+			GuidToString(session->sessionKey).c_str(),
+			session->processId,
+			session->username,
+			session->flags,
+			session->displayData.name,
+			session->displayData.description);
 	}
 }
 
@@ -110,11 +112,11 @@ int main(int argc, const char* argv[]) {
 
 	switch (argv[1][0]) {
 		case 's': case 'S':
-			DisplaySessions(engine.EnumSessions());
+			DisplaySessions(engine);
 			break;
 
 		case 'p': case 'P':
-//			DisplayProviders(engine.EnumProviders());
+			//DisplayProviders(engine);
 			break;
 
 		case 'l': case 'L':
@@ -126,7 +128,7 @@ int main(int argc, const char* argv[]) {
 			break;
 
 		case 'c': case 'C':
-			DisplayCallouts(engine.EnumCallouts());
+			//DisplayCallouts(engine.EnumCallouts());
 			break;
 
 		default:
