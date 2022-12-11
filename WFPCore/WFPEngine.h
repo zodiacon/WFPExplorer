@@ -6,36 +6,12 @@
 #include <type_traits>
 #include <optional>
 
-enum class WFPSessionFlags {
-	None,
-	Dynamic = FWPM_SESSION_FLAG_DYNAMIC,
-	Reserved = FWPM_SESSION_FLAG_RESERVED,
-};
-DEFINE_ENUM_FLAG_OPERATORS(WFPSessionFlags);
-
-enum class WFPIPVersion {
-	V4 = 0,
-	V6,
-	NONE,
-};
-
 enum class WFPProviderContextFlags {
 	None,
 	Persistent = FWPM_PROVIDER_CONTEXT_FLAG_PERSISTENT,
 	DownLevel = FWPM_PROVIDER_CONTEXT_FLAG_DOWNLEVEL,
 };
 DEFINE_ENUM_FLAG_OPERATORS(WFPProviderContextFlags);
-
-struct WFPSubLayerInfo {
-	GUID SubLayerKey;
-	std::wstring Name;
-	std::wstring Desc;
-	UINT32 Flags;
-	GUID ProviderKey;
-	std::vector<BYTE> ProviderData;
-	uint32_t ProviderDataSize;
-	UINT16 Weight;
-};
 
 enum class WFPProviderContextType {
 	IPSecKeying						= FWPM_IPSEC_KEYING_CONTEXT,
@@ -105,31 +81,6 @@ public:
 	uint32_t GetFilterCount(GUID const& layer = GUID_NULL) const;
 	uint32_t GetCalloutCount(GUID const& layer = GUID_NULL) const;
 
-
-	template<typename T = WFPSubLayerInfo> requires std::is_base_of_v<WFPSubLayerInfo, T>
-	std::vector<T> EnumSubLayers() const {
-		HANDLE hEnum;
-		std::vector<T> info;
-		m_LastError = FwpmSubLayerCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-		if (m_LastError)
-			return info;
-		FWPM_SUBLAYER** layers;
-		UINT32 count;
-		m_LastError = FwpmSubLayerEnum(m_hEngine, hEnum, 256, &layers, &count);
-		if (m_LastError == ERROR_SUCCESS) {
-			info.reserve(count);
-			for (UINT32 i = 0; i < count; i++) {
-				auto layer = layers[i];
-				auto li = InitSubLayer(layer);
-				info.emplace_back(std::move(li));
-			}
-			FwpmFreeMemory((void**)&layers);
-		}
-		m_LastError = FwpmSubLayerDestroyEnumHandle(m_hEngine, hEnum);
-		return info;
-
-	}
-
 	std::vector<WFPProviderContextInfo> EnumProviderContexts(bool includeData = false) const;
 
 	//
@@ -154,8 +105,8 @@ public:
 	//
 	// sublayer API
 	//
-	std::optional<WFPSubLayerInfo> GetSublayerByKey(GUID const& key) const;
-	std::optional<WFPSubLayerInfo> GetSublayerById(UINT16 id) const;
+	WFPObject<FWPM_SUBLAYER> GetSublayerByKey(GUID const& key) const;
+	WFPObject<FWPM_SUBLAYER> GetSublayerById(UINT16 id) const;
 
 
 	WFPObject<FWPM_CALLOUT> GetCalloutByKey(GUID const& key) const;
@@ -166,26 +117,6 @@ private:
 	//
 	static std::wstring ParseMUIString(PCWSTR input);
 	static WFPProviderContextInfo InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool full = false);
-
-
-	template<typename TLayer = WFPSubLayerInfo> requires std::is_base_of_v<WFPSubLayerInfo, TLayer>
-	static TLayer InitSubLayer(FWPM_SUBLAYER* layer, bool full = false) {
-		TLayer li;
-		li.Name = ParseMUIString(layer->displayData.name);
-		li.Desc = ParseMUIString(layer->displayData.description);
-		li.SubLayerKey = layer->subLayerKey;
-		li.Flags = layer->flags;
-		li.Weight = layer->weight;
-		li.ProviderKey = layer->providerKey ? *layer->providerKey : GUID_NULL;
-		li.ProviderDataSize = layer->providerData.size;
-		if (full && li.ProviderDataSize) {
-			li.ProviderData.resize(li.ProviderDataSize);
-			memcpy(li.ProviderData.data(), layer->providerData.data, layer->providerData.size);
-		}
-		return li;
-	}
-
-	static std::wstring PoorParseMUIString(std::wstring const& path);
 
 	HANDLE m_hEngine{ nullptr };
 	mutable DWORD m_LastError{ 0 };

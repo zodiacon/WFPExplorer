@@ -123,12 +123,12 @@ CString StringHelper::WFPLayerFlagsToString(UINT32 flags) {
 	return FlagsToString(flags, data);
 }
 
-CString StringHelper::WFPSessionFlagsToString(WFPSessionFlags flags) {
+CString StringHelper::WFPSessionFlagsToString(UINT32 flags) {
 	static const struct {
-		WFPSessionFlags flag;
+		UINT32 flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPSessionFlags::Dynamic, L"Dynamic" },
+		{ FWPM_SESSION_FLAG_DYNAMIC, L"Dynamic" },
 	};
 
 	return FlagsToString(flags, data);

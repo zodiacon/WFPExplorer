@@ -1,8 +1,5 @@
 #pragma once
 
-enum class WFPSessionFlags;
-enum class WFPProviderFlags;
-enum class WFPSubLayerFlags;
 enum class WFPProviderContextFlags;
 enum class WFPProviderContextType;
 
@@ -13,7 +10,7 @@ struct StringHelper abstract final {
 	static CString WFPConditionValueToString(FWP_CONDITION_VALUE const& value, bool hex = false, bool full = false);
 	static CString WFPFilterFlagsToString(UINT32 flags);
 	static CString WFPLayerFlagsToString(UINT32 flags);
-	static CString WFPSessionFlagsToString(WFPSessionFlags flags);
+	static CString WFPSessionFlagsToString(UINT32 flags);
 	static CString WFPProviderFlagsToString(DWORD flags);
 	static CString WFPSubLayerFlagsToString(UINT32 flags);
 	static CString WFPCalloutFlagsToString(DWORD flags);

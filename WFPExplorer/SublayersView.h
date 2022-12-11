@@ -4,6 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include <WFPEnumerator.h>
 
 class WFPEngine;
 
@@ -38,8 +39,14 @@ private:
 		Key, Name, Desc, Flags, Weight, Provider, ProviderData,
 	};
 
-	struct SubLayerInfo : WFPSubLayerInfo {
+	struct SubLayerInfo {
+		FWPM_SUBLAYER* Data;
 		CString ProviderName;
+		CString const& Name() const;
+		CString const& Desc() const;
+
+	private:
+		mutable CString m_Name, m_Desc;
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -48,5 +55,5 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<SubLayerInfo> m_Layers;
+	WFPObjectVector<FWPM_SUBLAYER, SubLayerInfo> m_Layers;
 };

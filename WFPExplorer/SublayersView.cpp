@@ -3,6 +3,7 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
+#include <Enumerators.h>
 
 CSublayersView::CSublayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -37,36 +38,37 @@ LRESULT CSublayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 void CSublayersView::Refresh() {
-	m_Layers = m_Engine.EnumSubLayers<SubLayerInfo>();
+	m_Layers = WFPSubLayerEnumerator(m_Engine.Handle()).Next<SubLayerInfo>(512);
 	m_List.SetItemCountEx((int)m_Layers.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(6, std::format(L"{} Sublayers", m_Layers.size()).c_str());
 }
 
 CString CSublayersView::GetColumnText(HWND, int row, int col) {
-	auto& info = m_Layers[row];
+	auto& sl = m_Layers[row];
+	auto info = sl.Data;
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
-		case ColumnType::Key: return StringHelper::GuidToString(info.SubLayerKey);
-		case ColumnType::Name: return info.Name.c_str();
-		case ColumnType::Desc: return info.Desc.c_str();
-		case ColumnType::ProviderData: return info.ProviderDataSize == 0 ? L"" : std::format(L"{} Bytes", info.ProviderDataSize).c_str();
+		case ColumnType::Key: return StringHelper::GuidToString(info->subLayerKey);
+		case ColumnType::Name: return sl.Name();
+		case ColumnType::Desc: return sl.Desc();
+		case ColumnType::ProviderData: return info->providerData.size == 0 ? L"" : std::format(L"{} Bytes", info->providerData.size).c_str();
 		case ColumnType::Flags:
-			if (info.Flags == 0)
+			if (info->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", info.Flags,
-				(PCWSTR)StringHelper::WFPSubLayerFlagsToString(info.Flags)).c_str();
+			return std::format(L"0x{:X} ({})", info->flags,
+				(PCWSTR)StringHelper::WFPSubLayerFlagsToString(info->flags)).c_str();
 
-		case ColumnType::Weight: return std::to_wstring(info.Weight).c_str();
+		case ColumnType::Weight: return std::to_wstring(info->weight).c_str();
 		case ColumnType::Provider:
-			if (info.ProviderName.IsEmpty()) {
-				if (info.ProviderKey != GUID_NULL) {
-					auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
-					if (provider && provider->displayData.name && provider->displayData.name[0] != L'@')
-						info.ProviderName = provider->displayData.name;
+			if (sl.ProviderName.IsEmpty()) {
+				if (info->providerKey) {
+					auto provider = m_Engine.GetProviderByKey(*info->providerKey);
+					if (provider)
+						sl.ProviderName = StringHelper::ParseMUIString(provider->displayData.name);
 					else
-						info.ProviderName = StringHelper::GuidToString(info.ProviderKey);
+						sl.ProviderName = StringHelper::GuidToString(*info->providerKey);
 				}
 			}
-			return info.ProviderName;
+			return sl.ProviderName;
 
 	}
 	return CString();
@@ -76,15 +78,16 @@ void CSublayersView::DoSort(SortInfo const* si) {
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
 
-	auto compare = [&](auto& l1, auto& l2) {
+	auto compare = [&](auto& sl1, auto& sl2) {
+		auto l1 = sl1.Data, l2 = sl2.Data;
 		switch (col) {
-			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(l1.SubLayerKey), StringHelper::GuidToString(l2.SubLayerKey), asc);
-			case ColumnType::Name: return SortHelper::Sort(l1.Name, l2.Name, asc);
-			case ColumnType::Desc: return SortHelper::Sort(l1.Desc, l2.Desc, asc);
-			case ColumnType::Flags: return SortHelper::Sort(l1.Flags, l2.Flags, asc);
-			case ColumnType::Provider: return SortHelper::Sort(l1.ProviderName, l2.ProviderName, asc);
-			case ColumnType::Weight: return SortHelper::Sort(l1.Weight, l2.Weight, asc);
-			case ColumnType::ProviderData: return SortHelper::Sort(l1.ProviderDataSize, l2.ProviderDataSize, asc);
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(l1->subLayerKey), StringHelper::GuidToString(l2->subLayerKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(sl1.Name(), sl2.Name(), asc);
+			case ColumnType::Desc: return SortHelper::Sort(sl1.Desc(), sl2.Desc(), asc);
+			case ColumnType::Flags: return SortHelper::Sort(l1->flags, l2->flags, asc);
+			case ColumnType::Provider: return SortHelper::Sort(sl1.ProviderName, sl2.ProviderName, asc);
+			case ColumnType::Weight: return SortHelper::Sort(l1->weight, l2->weight, asc);
+			case ColumnType::ProviderData: return SortHelper::Sort(l1->providerData.size, l2->providerData.size, asc);
 		}
 		return false;
 	};
@@ -97,4 +100,16 @@ int CSublayersView::GetSaveColumnRange(HWND, int&) const {
 
 int CSublayersView::GetRowImage(HWND, int row, int col) const {
 	return 0;
+}
+
+CString const& CSublayersView::SubLayerInfo::Name() const {
+	if (m_Name.IsEmpty())
+		m_Name = StringHelper::ParseMUIString(Data->displayData.name);
+	return m_Name;
+}
+
+CString const& CSublayersView::SubLayerInfo::Desc() const {
+	if (m_Desc.IsEmpty())
+		m_Desc = StringHelper::ParseMUIString(Data->displayData.description);
+	return m_Desc;
 }

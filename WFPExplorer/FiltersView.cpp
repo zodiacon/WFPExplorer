@@ -101,8 +101,8 @@ CString const& CFiltersView::GetLayerName(FilterInfo& info) const {
 CString const& CFiltersView::GetSublayerName(FilterInfo& info) const {
 	if (info.SubLayer.IsEmpty()) {
 		auto layer = m_Engine.GetSublayerByKey(info.Data->subLayerKey);
-		if (layer && !layer.value().Name.empty() && layer.value().Name[0] != L'@')
-			info.SubLayer = layer.value().Name.c_str();
+		if (layer)
+			info.SubLayer = StringHelper::ParseMUIString(layer->displayData.name);
 		else
 			info.SubLayer = StringHelper::GuidToString(info.Data->layerKey);
 	}

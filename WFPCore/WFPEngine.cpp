@@ -62,18 +62,16 @@ WFPObject<FWPM_LAYER> WFPEngine::GetLayerByKey(GUID const& key) const {
 	return WFPObject(layer);
 }
 
-WFPObject<FWPM_LAYER>  WFPEngine::GetLayerById(UINT16 id) const {
+WFPObject<FWPM_LAYER> WFPEngine::GetLayerById(UINT16 id) const {
 	FWPM_LAYER* layer;
 	m_LastError = FwpmLayerGetById(m_hEngine, id, &layer);
 	return WFPObject(layer);
 }
 
-std::optional<WFPSubLayerInfo> WFPEngine::GetSublayerByKey(GUID const& key) const {
-	FWPM_SUBLAYER* sublayer;
-	FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
-	auto info = InitSubLayer(sublayer);
-	FwpmFreeMemory((void**)&sublayer);
-	return info;
+WFPObject<FWPM_SUBLAYER> WFPEngine::GetSublayerByKey(GUID const& key) const {
+	FWPM_SUBLAYER* sublayer = nullptr;
+	m_LastError = FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
+	return WFPObject(sublayer);
 }
 
 WFPProviderContextInfo WFPEngine::InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool includeData) {

@@ -41,8 +41,8 @@ CString WFPHelper::GetLayerName(WFPEngine const& engine, GUID const& key) {
 CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 	if (key != GUID_NULL) {
 		auto layer = engine.GetSublayerByKey(key);
-		if (layer && !layer->Name.empty() && layer->Name[0] != L'@')
-			return layer->Name.c_str();
+		if (layer)
+			return StringHelper::ParseMUIString(layer->displayData.name);
 		return StringHelper::GuidToString(key);
 	}
 	return L"";
