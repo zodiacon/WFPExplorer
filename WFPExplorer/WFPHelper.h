@@ -14,6 +14,6 @@ struct WFPHelper abstract final {
 	static int ShowLayerProperties(WFPEngine& engine, WFPLayerInfo const& layer);
 	static int ShowFilterProperties(WFPEngine& engine, WFPFilterInfo const& filter);
 	static int ShowSublayerProperties(WFPEngine& engine, WFPSubLayerInfo& sublayer);
-	static int ShowProviderProperties(WFPEngine& engine, WFPProviderInfo& provider);
+	static int ShowProviderProperties(WFPEngine& engine, FWPM_PROVIDER* provider);
 };
 

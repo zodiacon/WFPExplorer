@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "..\WFPCore\WFPEngine.h"
+#include "..\WFPCore\Enumerators.h"
 
 #pragma comment(lib, "Fwpuclnt.lib")
 #pragma comment(lib, "Shlwapi.lib")
@@ -26,17 +27,6 @@ void DisplaySessions(std::vector<WFPSessionInfo> const& sessions) {
 			session.Flags,
 			session.Name.c_str(),
 			session.Desc.c_str());
-	}
-}
-
-void DisplayProviders(std::vector<WFPProviderInfo> const& providers) {
-	printf("Total providers: %u\n", (UINT32)providers.size());
-	for (auto& p : providers) {
-		printf("%-39ws %-20ws %-20ws %-20ws\n",
-			GuidToString(p.ProviderKey).c_str(),
-			p.ServiceName.c_str(),
-			p.Name.c_str(),
-			p.Desc.c_str());
 	}
 }
 
@@ -110,7 +100,13 @@ int main(int argc, const char* argv[]) {
 	auto ports = engine.EnumSystemPorts();
 	auto conns = engine.EnumConnections();
 	auto contexts = engine.EnumProviderContexts();
-	auto events = engine.EnumNetEvents<WFPNetEventHeader3>();
+	
+	//WFPNetEventEnumerator events(engine.Handle());
+	//for (auto& event : events.Next()) {
+	//}
+
+	WFPSessionEnumerator sessionsEnum(engine.Handle());
+	auto sessins = sessionsEnum.Next();
 
 	switch (argv[1][0]) {
 		case 's': case 'S':
@@ -118,7 +114,7 @@ int main(int argc, const char* argv[]) {
 			break;
 
 		case 'p': case 'P':
-			DisplayProviders(engine.EnumProviders());
+//			DisplayProviders(engine.EnumProviders());
 			break;
 
 		case 'l': case 'L':

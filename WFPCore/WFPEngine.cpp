@@ -49,28 +49,6 @@ std::vector<WFPConnectionInfo> WFPEngine::EnumConnections(bool includeData) {
 	return info;
 }
 
-std::vector<WFPProviderInfo> WFPEngine::EnumProviders(bool includeData) const {
-	HANDLE hEnum;
-	std::vector<WFPProviderInfo> info;
-	m_LastError = FwpmProviderCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_PROVIDER** providers;
-	UINT32 count;
-	m_LastError = FwpmProviderEnum(m_hEngine, hEnum, 128, &providers, &count);
-	if (m_LastError == ERROR_SUCCESS) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto p = providers[i];
-			info.emplace_back(std::move(InitProvider(p, includeData)));
-		}
-		FwpmFreeMemory((void**)&providers);
-		m_LastError = FwpmProviderDestroyEnumHandle(m_hEngine, hEnum);
-	}
-
-	return info;
-}
-
 std::vector<WFPSystemPortByType> WFPEngine::EnumSystemPorts() {
 	FWPM_SYSTEM_PORTS* ports;
 	m_LastError = ::FwpmSystemPortsGet(m_hEngine, &ports);
@@ -93,15 +71,10 @@ std::vector<WFPSystemPortByType> WFPEngine::EnumSystemPorts() {
 	return sports;
 }
 
-std::optional<WFPProviderInfo> WFPEngine::GetProviderByKey(GUID const& guid) const {
-	FWPM_PROVIDER* provider;
+WFPObject<FWPM_PROVIDER> WFPEngine::GetProviderByKey(GUID const& guid) const {
+	FWPM_PROVIDER* provider = nullptr;
 	m_LastError = FwpmProviderGetByKey(m_hEngine, &guid, &provider);
-	if (ERROR_SUCCESS != m_LastError)
-		return {};
-
-	auto p = InitProvider(provider);
-	FwpmFreeMemory((void**)&provider);
-	return p;
+	return WFPObject(provider);
 }
 
 std::optional<WFPFilterInfo> WFPEngine::GetFilterByKey(GUID const& key, bool full) const {
@@ -164,21 +137,6 @@ std::optional<WFPSubLayerInfo> WFPEngine::GetSublayerByKey(GUID const& key) cons
 	auto info = InitSubLayer(sublayer);
 	FwpmFreeMemory((void**)&sublayer);
 	return info;
-}
-
-WFPProviderInfo WFPEngine::InitProvider(FWPM_PROVIDER* p, bool includeData) {
-	WFPProviderInfo pi;
-	pi.Name = ParseMUIString(p->displayData.name);
-	pi.Desc = ParseMUIString(p->displayData.description);
-	pi.ProviderKey = p->providerKey;
-	pi.Flags = static_cast<WFPProviderFlags>(p->flags);
-	pi.ServiceName = p->serviceName ? p->serviceName : L"";
-	pi.ProviderDataSize = p->providerData.size;
-	if (includeData) {
-		pi.ProviderData = std::make_unique<BYTE[]>(p->providerData.size);
-		memcpy(pi.ProviderData.get(), p->providerData.data, p->providerData.size);
-	}
-	return pi;
 }
 
 WFPProviderContextInfo WFPEngine::InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool includeData) {

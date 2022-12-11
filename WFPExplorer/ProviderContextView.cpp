@@ -52,8 +52,8 @@ CString CProviderContextView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Provider:
 			if (info.ProviderKey != GUID_NULL) {
 				auto provider = m_Engine.GetProviderByKey(info.ProviderKey);
-				if (provider && !provider->Name.empty() && provider->Name[0] != L'@')
-					return provider->Name.c_str();
+				if (provider && provider->displayData.name && provider->displayData.name[0] != L'@')
+					return provider->displayData.name;
 				return StringHelper::GuidToString(info.ProviderKey);
 			}
 			break;

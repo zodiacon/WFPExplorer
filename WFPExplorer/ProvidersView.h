@@ -4,6 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include <Enumerators.h>
 
 class WFPEngine;
 
@@ -44,5 +45,6 @@ private:
 	WFPEngine& m_Engine;
 
 	CListViewCtrl m_List;
-	std::vector<WFPProviderInfo> m_Providers;
+	std::vector<FWPM_PROVIDER*> m_Providers;
+	WFPProviderEnumerator m_Enum;
 };

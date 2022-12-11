@@ -112,13 +112,13 @@ CString StringHelper::WFPSessionFlagsToString(WFPSessionFlags flags) {
 	return FlagsToString(flags, data);
 }
 
-CString StringHelper::WFPProviderFlagsToString(WFPProviderFlags flags) {
+CString StringHelper::WFPProviderFlagsToString(DWORD flags) {
 	static const struct {
-		WFPProviderFlags flag;
+		DWORD flag;
 		PCWSTR text;
 	} data[] = {
-		{ WFPProviderFlags::Persistent, L"Persistent" },
-		{ WFPProviderFlags::Disabled, L"Disabled" },
+		{ FWPM_PROVIDER_FLAG_PERSISTENT, L"Persistent" },
+		{ FWPM_PROVIDER_FLAG_DISABLED, L"Disabled" },
 	};
 
 	return FlagsToString(flags, data);

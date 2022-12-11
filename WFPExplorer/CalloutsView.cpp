@@ -66,8 +66,8 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 			if (info.Provider.IsEmpty()) {
 				if (info.ProviderKey != GUID_NULL) {
 					auto sl = m_Engine.GetProviderByKey(info.ProviderKey);
-					if (sl && !sl.value().Name.empty() && sl.value().Name[0] != L'@')
-						info.Provider = sl.value().Name.c_str();
+					if (sl && sl->displayData.name && sl->displayData.name[0] != L'@')
+						info.Provider = sl->displayData.name;
 					else
 						info.Provider = StringHelper::GuidToString(info.ProviderKey);
 				}

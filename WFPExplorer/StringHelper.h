@@ -20,7 +20,7 @@ struct StringHelper abstract final {
 	static CString WFPFilterFlagsToString(WFPFilterFlags flags);
 	static CString WFPLayerFlagsToString(WFPLayerFlags flags);
 	static CString WFPSessionFlagsToString(WFPSessionFlags flags);
-	static CString WFPProviderFlagsToString(WFPProviderFlags flags);
+	static CString WFPProviderFlagsToString(DWORD flags);
 	static CString WFPSubLayerFlagsToString(WFPSubLayerFlags flags);
 	static CString WFPCalloutFlagsToString(WFPCalloutFlags flags);
 	static CString WFPProviderContextFlagsToString(WFPProviderContextFlags flags);

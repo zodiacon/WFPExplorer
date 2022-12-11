@@ -4,6 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
+#include <Enumerators.h>
 
 class WFPEngine;
 
@@ -37,7 +38,8 @@ private:
 	enum class ColumnType {
 		Key, Name, Desc, Flags, ProcessId, ProcessName, UserName, SID, KernelMode,
 	};
-	struct SessionInfo : WFPSessionInfo {
+	struct SessionInfo {
+		FWPM_SESSION* Data;
 		CString ProcessName;
 	};
 
@@ -48,4 +50,5 @@ private:
 
 	CListViewCtrl m_List;
 	std::vector<SessionInfo> m_Sessions;
+	WFPSessionEnumerator m_Enum;
 };

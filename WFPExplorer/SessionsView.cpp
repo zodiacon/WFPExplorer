@@ -10,7 +10,7 @@
 #include "ProcessHelper.h"
 #include <SortHelper.h>
 
-CSessionsView::CSessionsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CSessionsView::CSessionsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine), m_Enum(engine.Handle()) {
 }
 
 BOOL CSessionsView::PreTranslateMessage(MSG* pMsg) {
@@ -19,28 +19,29 @@ BOOL CSessionsView::PreTranslateMessage(MSG* pMsg) {
 }
 
 void CSessionsView::Refresh() {
-	m_Sessions = m_Engine.EnumSessions<SessionInfo>();
+	m_Sessions = m_Enum.Next<SessionInfo>();
 	m_List.SetItemCountEx((int)m_Sessions.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(1, std::format(L"{} Sessions", m_Sessions.size()).c_str());
 }
 
 CString CSessionsView::GetColumnText(HWND, int row, int col) {
 	auto& session = m_Sessions[row];
+	auto data = session.Data;
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
-		case ColumnType::Key: return StringHelper::GuidToString(session.SessionKey);
-		case ColumnType::Name: return session.Name.c_str();
-		case ColumnType::Desc: return session.Desc.c_str();
-		case ColumnType::SID: return StringHelper::FormatSID((PSID const)session.Sid.data());
-		case ColumnType::KernelMode: return session.KernelMode ? L"Yes" : L"";
-		case ColumnType::UserName: return session.UserName.c_str();
-		case ColumnType::ProcessId: return std::to_wstring(session.ProcessId).c_str();
+		case ColumnType::Key: return StringHelper::GuidToString(data->sessionKey);
+		case ColumnType::Name: return data->displayData.name;
+		case ColumnType::Desc: return data->displayData.description;
+		case ColumnType::SID: return StringHelper::FormatSID(data->sid);
+		case ColumnType::KernelMode: return data->kernelMode ? L"Yes" : L"";
+		case ColumnType::UserName: return data->username;
+		case ColumnType::ProcessId: return std::to_wstring(data->processId).c_str();
 		case ColumnType::Flags: 
-			if (session.Flags == WFPSessionFlags::None)
+			if (data->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", (UINT32)session.Flags, StringHelper::WFPSessionFlagsToString(session.Flags)).c_str();
+			return std::format(L"0x{:X} ({})", data->flags, StringHelper::WFPSessionFlagsToString((WFPSessionFlags)data->flags)).c_str();
 		case ColumnType::ProcessName:
 			if (session.ProcessName.IsEmpty())
-				session.ProcessName = ProcessHelper::GetProcessName(session.ProcessId);
+				session.ProcessName = ProcessHelper::GetProcessName(data->processId);
 			return session.ProcessName;
 	}
 	return CString();
@@ -51,15 +52,16 @@ void CSessionsView::DoSort(SortInfo const* si) {
 	auto asc = si->SortAscending;
 
 	auto compare = [&](auto& s1, auto& s2) {
+		auto d1 = s1.Data, d2 = s2.Data;
 		switch (col) {
-			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(s1.SessionKey), StringHelper::GuidToString(s2.SessionKey), asc);
-			case ColumnType::Name: return SortHelper::Sort(s1.Name, s2.Name, asc);
-			case ColumnType::Desc: return SortHelper::Sort(s1.Desc, s2.Desc, asc);
-			case ColumnType::Flags: return SortHelper::Sort(s1.Flags, s2.Flags, asc);
-			case ColumnType::ProcessId: return SortHelper::Sort(s1.ProcessId, s2.ProcessId, asc);
+			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(d1->sessionKey), StringHelper::GuidToString(d2->sessionKey), asc);
+			case ColumnType::Name: return SortHelper::Sort(d1->displayData.name, d2->displayData.name, asc);
+			case ColumnType::Desc: return SortHelper::Sort(d1->displayData.description, d2->displayData.description, asc);
+			case ColumnType::Flags: return SortHelper::Sort(d1->flags, d2->flags, asc);
+			case ColumnType::ProcessId: return SortHelper::Sort(d1->processId, d2->processId, asc);
 			case ColumnType::ProcessName: return SortHelper::Sort(s1.ProcessName, s2.ProcessName, asc);
-			case ColumnType::UserName: return SortHelper::Sort(s1.UserName, s2.UserName, asc);
-			case ColumnType::KernelMode: return SortHelper::Sort(s1.KernelMode, s2.KernelMode, asc);
+			case ColumnType::UserName: return SortHelper::Sort(d1->username, d2->username, asc);
+			case ColumnType::KernelMode: return SortHelper::Sort(d1->kernelMode, d2->kernelMode, asc);
 		}
 		return false;
 	};
@@ -67,7 +69,7 @@ void CSessionsView::DoSort(SortInfo const* si) {
 }
 
 int CSessionsView::GetRowImage(HWND, int row, int col) const {
-	return (m_Sessions[row].Flags & WFPSessionFlags::Dynamic) == WFPSessionFlags::Dynamic ? 1 : 0;
+	return m_Sessions[row].Data->flags & FWPM_SESSION_FLAG_DYNAMIC ? 1 : 0;
 }
 
 LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {

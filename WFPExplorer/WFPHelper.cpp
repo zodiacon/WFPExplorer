@@ -10,8 +10,8 @@
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	if (key != GUID_NULL) {
 		auto provider = engine.GetProviderByKey(key);
-		if (provider && !provider->Name.empty() && provider->Name[0] != L'@')
-			return provider->Name.c_str();
+		if (provider && provider->displayData.name && provider->displayData.name[0] != L'@')
+			return provider->displayData.name;
 		return StringHelper::GuidToString(key);
 	}
 	return L"";
@@ -88,6 +88,6 @@ int WFPHelper::ShowSublayerProperties(WFPEngine& engine, WFPSubLayerInfo& layer)
 	return 0;
 }
 
-int WFPHelper::ShowProviderProperties(WFPEngine& engine, WFPProviderInfo& layer) {
+int WFPHelper::ShowProviderProperties(WFPEngine& engine, FWPM_PROVIDER* provider) {
 	return 0;
 }

@@ -31,29 +31,12 @@ struct WFPSessionInfo {
 	bool KernelMode;
 };
 
-enum class WFPProviderFlags {
-	None,
-	Persistent = FWPM_PROVIDER_FLAG_PERSISTENT,
-	Disabled = FWPM_PROVIDER_FLAG_DISABLED,
-};
-DEFINE_ENUM_FLAG_OPERATORS(WFPProviderFlags);
-
 enum class WFPProviderContextFlags {
 	None,
 	Persistent = FWPM_PROVIDER_CONTEXT_FLAG_PERSISTENT,
 	DownLevel = FWPM_PROVIDER_CONTEXT_FLAG_DOWNLEVEL,
 };
 DEFINE_ENUM_FLAG_OPERATORS(WFPProviderContextFlags);
-
-struct WFPProviderInfo {
-	GUID ProviderKey;
-	std::wstring Name;
-	std::wstring Desc;
-	std::wstring ServiceName;
-	WFPProviderFlags Flags;
-	ULONG ProviderDataSize;
-	std::unique_ptr<BYTE[]> ProviderData;
-};
 
 enum class WFPFieldType {
 	RawData,
@@ -447,41 +430,6 @@ enum class WFPAddressFamily {
 	None = (FWP_AF_ETHER + 1)
 };
 
-#if (NTDDI_VERSION >= NTDDI_WIN8)
-struct WFPNetEventHeader2 : WFPNetEventHeader0 {
-	WFPAddressFamily AddressFamily;
-	std::vector<uint8_t> PackageSid;
-};
-
-#endif //(NTDDI_VERSION >= NTDDI_WIN8)
-
-#if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
-struct WFPNetEventHeader3 : WFPNetEventHeader2 {
-	std::wstring EnterpriseId;
-	uint64_t PolicyFlags;
-	std::vector<uint8_t> EffectiveName;
-};
-#endif
-
-template<typename T> requires std::is_base_of_v<WFPNetEventHeader0, T>
-struct WFPNetEventInfo {
-	T Header;
-	WFPNetEventType Type;
-	union {
-		FWPM_NET_EVENT_IKEEXT_MM_FAILURE2* ikeMmFailure;
-		FWPM_NET_EVENT_IKEEXT_QM_FAILURE1* ikeQmFailure;
-		FWPM_NET_EVENT_IKEEXT_EM_FAILURE1* ikeEmFailure;
-		FWPM_NET_EVENT_CLASSIFY_DROP2* classifyDrop2;
-		FWPM_NET_EVENT_CLASSIFY_DROP1* classifyDrop1;
-		FWPM_NET_EVENT_IPSEC_KERNEL_DROP0* ipsecDrop;
-		FWPM_NET_EVENT_IPSEC_DOSP_DROP0* idpDrop;
-		FWPM_NET_EVENT_CLASSIFY_ALLOW0* classifyAllow;
-		FWPM_NET_EVENT_CAPABILITY_DROP0* capabilityDrop;
-		FWPM_NET_EVENT_CAPABILITY_ALLOW0* capabilityAllow;
-		FWPM_NET_EVENT_CLASSIFY_DROP_MAC0* classifyDropMac;
-	};
-};
-
 enum class WFPIPSecTrafficType {
 	Transport = 0,
 	Tunnel,
@@ -628,6 +576,30 @@ struct WFPAleEndpointProperties {
 	std::vector<BYTE> AppId;
 };
 
+template<typename T>
+struct WFPObject {
+	WFPObject(T* p) : Data(p) {}
+	~WFPObject() {
+		if(Data)
+			::FwpmFreeMemory((void**)&Data);
+	}
+
+	T* operator->() const {
+		return Data;
+	}
+
+	T* operator*() {
+		return Data;
+	}
+
+	operator bool() const {
+		return Data != nullptr;
+	}
+
+private:
+	T* Data;
+};
+
 class WFPEngine {
 public:
 	bool Open(DWORD auth = RPC_C_AUTHN_WINNT);
@@ -642,56 +614,6 @@ public:
 
 	uint32_t GetFilterCount(GUID const& layer = GUID_NULL) const;
 	uint32_t GetCalloutCount(GUID const& layer = GUID_NULL) const;
-
-	template<typename T> requires std::is_base_of_v<WFPNetEventHeader0, T>
-	std::vector<WFPNetEventInfo<T>> EnumNetEvents() {
-		std::vector<WFPNetEventInfo<T>> events;
-
-		HANDLE hEnum;
-		m_LastError = FwpmNetEventCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-		if (m_LastError != ERROR_SUCCESS)
-			return events;
-
-		FWPM_NET_EVENT** pEvents;
-		UINT32 count;
-		m_LastError = FwpmNetEventEnum(m_hEngine, hEnum, 1024, &pEvents, &count);
-		if (ERROR_SUCCESS == m_LastError) {
-			for (UINT32 i = 0; i < count; i++) {
-				auto& e = pEvents[i];
-				WFPNetEventInfo<T> ei;
-
-				//
-				// copy header
-				//
-				auto& header = ei.Header;
-				auto const& eh = e->header;
-				header.TimeStamp = eh.timeStamp;
-				header.IpProtocol = eh.ipProtocol;
-				header.IpVersion = static_cast<WFPIPVersion>(eh.ipVersion);
-				header.Flags = eh.flags;
-				memcpy(header.LocalAddrV6, &eh.localAddrV6, sizeof(eh.localAddrV6));
-				memcpy(header.RemoteAddrV6, &eh.remoteAddrV6, sizeof(eh.remoteAddrV6));
-				header.LocalPort = eh.localPort;
-				header.RemotePort = eh.remotePort;
-				header.ScopeId = eh.scopeId;
-
-				if constexpr (std::is_base_of_v<WFPNetEventHeader2, T>) {
-					header.AddressFamily = static_cast<WFPAddressFamily>(eh.addressFamily);
-				}
-				if constexpr (std::is_base_of_v<WFPNetEventHeader3, T>) {
-					if (eh.enterpriseId)
-						header.EnterpriseId = eh.enterpriseId;
-				}
-				ei.Type = static_cast<WFPNetEventType>(e->type);
-
-				events.push_back(std::move(ei));
-			}
-			::FwpmFreeMemory((void**)&pEvents);
-			m_LastError = FwpmNetEventDestroyEnumHandle(m_hEngine, hEnum);
-		}
-
-		return events;
-	}
 
 	std::vector<WFPConnectionInfo> EnumConnections(bool includeData = false);
 	std::vector<WFPSystemPortByType> EnumSystemPorts();
@@ -830,7 +752,6 @@ public:
 
 	}
 
-	std::vector<WFPProviderInfo> EnumProviders(bool includeData = false) const;
 	std::vector<WFPProviderContextInfo> EnumProviderContexts(bool includeData = false) const;
 
 	template<typename TCallout = WFPCalloutInfo> requires std::is_base_of_v<WFPCalloutInfo, TCallout>
@@ -888,7 +809,7 @@ public:
 	//
 	// providers API
 	//
-	std::optional<WFPProviderInfo> GetProviderByKey(GUID const& key) const;
+	WFPObject<FWPM_PROVIDER> GetProviderByKey(GUID const& key) const;
 
 	//
 	// Filters API
@@ -918,7 +839,6 @@ private:
 	// helpers
 	//
 	static std::wstring ParseMUIString(PCWSTR input);
-	static WFPProviderInfo InitProvider(FWPM_PROVIDER* p, bool full = false);
 	static WFPConnectionInfo InitConnection(FWPM_CONNECTION* p, bool full = false);
 	static WFPProviderContextInfo InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool full = false);
 
