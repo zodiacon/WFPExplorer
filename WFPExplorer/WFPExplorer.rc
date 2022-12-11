@@ -78,6 +78,7 @@ BEGIN
         MENUITEM "Subla&yers",                  ID_VIEW_SUBLAYERS
         MENUITEM "&Callouts",                   ID_VIEW_CALLOUTS
         MENUITEM "Provider Conte&xts",          ID_VIEW_PROVIDERCONTEXTS
+        MENUITEM "&Network Events",             ID_VIEW_NETWORKEVENTS
         MENUITEM SEPARATOR
         MENUITEM "&Refresh",                    ID_VIEW_REFRESH
         MENUITEM SEPARATOR
@@ -85,6 +86,9 @@ BEGIN
     END
     POPUP "&Options"
     BEGIN
+        MENUITEM "&Append Network Events",      ID_OPTIONS_APPENDNETWORKEVENTS
+        MENUITEM "&Resolve Network Addresses",  ID_OPTIONS_RESOLVENETWORKADDRESSES
+        MENUITEM SEPARATOR
         MENUITEM "&Always On Top",              ID_OPTIONS_ALWAYSONTOP
         MENUITEM "&Dark Mode",                  ID_OPTIONS_DARKMODE
         MENUITEM "&Font...",                    ID_OPTIONS_FONT
@@ -167,6 +171,8 @@ IDI_CUBE                ICON                    "res\\Object.ico"
 IDI_FIELD               ICON                    "res\\field.ico"
 
 IDI_TREE                ICON                    "res\\tree.ico"
+
+IDI_EVENT               ICON                    "res\\event.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

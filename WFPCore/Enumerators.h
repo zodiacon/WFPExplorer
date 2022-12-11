@@ -87,3 +87,4 @@ struct WFPProviderContextEnumerator : WFPEnumerator<
 		WFPEnumerator(hEngine, ::FwpmProviderContextCreateEnumHandle, ::FwpmProviderContextDestroyEnumHandle, ::FwpmProviderContextEnum) {
 	}
 };
+

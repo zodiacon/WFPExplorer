@@ -85,7 +85,7 @@ int WFPHelper::ShowFilterProperties(WFPEngine& engine, FWPM_FILTER* filter) {
 	return (int)sheet.DoModal();
 }
 
-int WFPHelper::ShowSublayerProperties(WFPEngine& engine, WFPSubLayerInfo& layer) {
+int WFPHelper::ShowSublayerProperties(WFPEngine& engine, FWPM_SUBLAYER* sublayer) {
 	return 0;
 }
 

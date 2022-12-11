@@ -4,6 +4,7 @@
 #include <ip2string.h>
 
 #pragma comment(lib, "ntdll")
+#pragma comment(lib, "ws2_32")
 
 CString StringHelper::ParseMUIString(PCWSTR input) {
 	if (input == nullptr)
@@ -180,6 +181,24 @@ CString StringHelper::WFPProviderContextFlagsToString(UINT32 flags) {
 	};
 
 	return FlagsToString(flags, data);
+}
+
+PCWSTR StringHelper::NetEventTypeToString(FWPM_NET_EVENT_TYPE type) {
+	static PCWSTR types[] = {
+		L"IKExt Main Mode Failure",
+		L"IKExt Quick Mode Failure",
+		L"IKExt Extended Mode Failure",
+		L"Classify Drop",
+		L"IPSec Kernel Drop",
+		L"IPSec DoS Protection Drop",
+		L"Classify Allow",
+		L"Capability Drop",
+		L"Capability Allow",
+		L"Classify Drop MAC",
+		L"LPM Packet Arrival",
+	};
+	ATLASSERT(type < _countof(types));
+	return types[type];
 }
 
 PCWSTR StringHelper::WFPProviderContextTypeToString(FWPM_PROVIDER_CONTEXT_TYPE type) {
@@ -420,6 +439,63 @@ PCWSTR StringHelper::WFPFieldTypeToString(FWPM_FIELD_TYPE type) {
 	}
 	ATLASSERT(false);
 	return L"";
+}
+
+CString StringHelper::FormatIpv4Address(UINT32 address) {
+	WCHAR buf[32];
+	auto haddr = ntohl(address);
+	::RtlIpv4AddressToString((in_addr const*)&haddr, buf);
+	return buf;
+}
+
+CString StringHelper::FormatIpv6Address(BYTE const* address) {
+	WCHAR buf[64];
+	::RtlIpv6AddressToString((in6_addr const*)address, buf);
+	return buf;
+}
+
+PCWSTR StringHelper::IpProtocolToString(UINT8 protocol) {
+	switch (protocol) {
+		case IPPROTO_HOPOPTS: return L"IPv6 HopxHop Opts";
+		case IPPROTO_ICMP: return L"ICMP";
+		case IPPROTO_IGMP: return L"IGMP";
+		case IPPROTO_GGP: return L"GGP";
+		case IPPROTO_IPV4: return L"IPv4";
+		case IPPROTO_ST: return L"ST";
+		case IPPROTO_TCP: return L"TCP";
+		case IPPROTO_CBT: return L"CBT";
+		case IPPROTO_EGP: return L"EGP";
+		case IPPROTO_IGP: return L"IGP";
+		case IPPROTO_PUP: return L"PUP";
+		case IPPROTO_UDP: return L"UDP";
+		case IPPROTO_IDP: return L"IDP";
+		case IPPROTO_RDP: return L"RDP";
+		case IPPROTO_IPV6: return L"IPv6";
+		case IPPROTO_ROUTING: return L"Routing";
+		case IPPROTO_FRAGMENT: return L"Fragment";
+		case IPPROTO_ESP: return L"ESP";
+		case IPPROTO_AH: return L"AH";
+		case IPPROTO_ICMPV6: L"ICMPv6";
+		case IPPROTO_NONE: return L"IPv6 NNH";
+		case IPPROTO_DSTOPTS: return L"IPv6 Dst Opts";
+		case IPPROTO_ND: return L"ND";
+		case IPPROTO_ICLFXBM: return L"ICLFXBM";
+		case IPPROTO_PIM: return L"PIM";
+		case IPPROTO_PGM: return L"PGM";
+		case IPPROTO_L2TP: return L"L2TP";
+		case IPPROTO_SCTP: return L"SCTP";
+		case IPPROTO_RAW: return L"RAW";
+	};
+	return L"(Unknown)";
+}
+
+PCWSTR StringHelper::AddressFamilyToString(FWP_AF af) {
+	switch (af) {
+		case FWP_AF_INET: return L"INET";
+		case FWP_AF_INET6: return L"INET6";
+		case FWP_AF_ETHER: return L"ETHER";
+	}
+	return L"(Unknown)";
 }
 
 PCWSTR StringHelper::WFPFilterActionTypeToString(FWP_ACTION_TYPE type) {

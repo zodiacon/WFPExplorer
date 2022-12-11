@@ -238,6 +238,7 @@
     <ClCompile Include="LayerGeneralPage.cpp" />
     <ClCompile Include="LayersView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="NetEventsView.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -266,6 +267,7 @@
     <ClInclude Include="LayerGeneralPage.h" />
     <ClInclude Include="LayersView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="NetEventsView.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ProviderContextView.h" />
     <ClInclude Include="ProvidersView.h" />
@@ -287,6 +289,7 @@
     <Image Include="res\Cut.ico" />
     <Image Include="res\Delete.ico" />
     <Image Include="res\engine.ico" />
+    <Image Include="res\event.ico" />
     <Image Include="res\field.ico" />
     <Image Include="res\filter-disabled.ico" />
     <Image Include="res\Filter.ico" />

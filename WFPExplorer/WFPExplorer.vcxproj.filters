@@ -90,6 +90,9 @@
     <ClCompile Include="HierarchyView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="NetEventsView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -153,6 +156,9 @@
       <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="HierarchyView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="NetEventsView.h">
       <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
@@ -238,6 +244,9 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\tree.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\event.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

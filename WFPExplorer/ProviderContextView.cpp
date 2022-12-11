@@ -11,8 +11,7 @@ CProviderContextView::CProviderContextView(IMainFrame* frame, WFPEngine& engine)
 CString CProviderContextView::GetProviderName(GUID const* key) const {
 	CString name;
 	if (key) {
-		auto provider = m_Engine.GetProviderByKey(*key);
-		if (provider)
+		if (auto provider = m_Engine.GetProviderByKey(*key); provider)
 			name = StringHelper::ParseMUIString(provider->displayData.name);
 		if(name.IsEmpty() || name[0] == L'@')
 			name =StringHelper::GuidToString(*key);
@@ -28,11 +27,11 @@ LRESULT CProviderContextView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM 
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Context Key", 0, 260, ColumnType::Key);
 	cm->AddColumn(L"Type", 0, 150, ColumnType::Type);
+	cm->AddColumn(L"Name", 0, 220, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 100, ColumnType::Flags);
 	cm->AddColumn(L"Data Size", LVCFMT_RIGHT, 90, ColumnType::DataSize);
 	cm->AddColumn(L"Context ID", 0, 120, ColumnType::Id);
 	cm->AddColumn(L"Provider", 0, 240, ColumnType::Provider);
-	cm->AddColumn(L"Name", 0, 220, ColumnType::Name);
 	cm->AddColumn(L"Description", 0, 300, ColumnType::Desc);
 
 	CImageList images;

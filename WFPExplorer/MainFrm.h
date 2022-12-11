@@ -29,6 +29,7 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_PROVIDERCONTEXTS, OnViewProviderContexts)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_VIEW_HIERARCHY, OnViewHierarchy)
+		COMMAND_ID_HANDLER(ID_VIEW_NETWORKEVENTS, OnViewNetEvents)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
 		NOTIFY_CODE_HANDLER(TBVN_PAGEACTIVATED, OnPageActivated)
 		COMMAND_ID_HANDLER(ID_OPTIONS_ALWAYSONTOP, OnAlwaysOnTop)
@@ -72,6 +73,7 @@ private:
 	LRESULT OnViewProviders(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewProviderContexts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewLayers(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnViewNetEvents(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewHierarchy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewSublayers(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewCallouts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);

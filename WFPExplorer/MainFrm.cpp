@@ -16,6 +16,7 @@
 #include <ToolbarHelper.h>
 #include "AppSettings.h"
 #include "HierarchyView.h"
+#include "NetEventsView.h"
 
 const int WINDOW_MENU_POSITION = 4;
 
@@ -53,6 +54,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		{ ID_VIEW_PROVIDERS, IDI_PROVIDER },
 		{ ID_VIEW_FILTERS, IDI_FILTER },
 		{ ID_VIEW_LAYERS, IDI_LAYERS },
+		{ ID_VIEW_NETWORKEVENTS, IDI_EVENT },
 		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
 		{ ID_VIEW_CALLOUTS, IDI_CALLOUT },
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
@@ -69,7 +71,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
 	UINT icons[] = { 
 		IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_SUBLAYER, IDI_CALLOUT,
-		IDI_CONTEXT, IDI_TREE,
+		IDI_CONTEXT, IDI_TREE, IDI_EVENT,
 	};
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
@@ -134,6 +136,7 @@ void CMainFrame::InitMenu() {
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
 		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
 		{ ID_VIEW_HIERARCHY, IDI_TREE },
+		{ ID_VIEW_NETWORKEVENTS, IDI_EVENT },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)
@@ -240,6 +243,14 @@ LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CLayersView(this, m_Engine);
 	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	m_view.AddPage(view->m_hWnd, L"Layers", 3, view);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewNetEvents(WORD, WORD, HWND, BOOL&) {
+	auto view = new CNetEventsView(this, m_Engine);
+	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_view.AddPage(view->m_hWnd, L"Net Events", 8, view);
 
 	return 0;
 }

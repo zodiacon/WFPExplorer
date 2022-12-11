@@ -37,6 +37,7 @@
 #define IDI_TREE                        233
 #define IDR_MENU1                       234
 #define IDR_CONTEXT                     234
+#define IDI_EVENT                       235
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -74,13 +75,16 @@
 #define ID_VIEW_PROVIDERS               32784
 #define ID_VIEW_PROVIDERCONTEXTS        32785
 #define ID_EDIT_PROPERTIES              32786
+#define ID_VIEW_NETWORKEVENTS           32787
+#define ID_OPTIONS_APPENDNETWORKEVENTS  32788
+#define ID_OPTIONS_RESOLVENETWORKADDRESSES 32789
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        235
-#define _APS_NEXT_COMMAND_VALUE         32787
+#define _APS_NEXT_RESOURCE_VALUE        236
+#define _APS_NEXT_COMMAND_VALUE         32790
 #define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
