@@ -40,7 +40,7 @@ CString CSessionsView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Flags: 
 			if (data->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", data->flags, StringHelper::WFPSessionFlagsToString(data->flags)).c_str();
+			return std::format(L"0x{:X} ({})", data->flags, (PCWSTR)StringHelper::WFPSessionFlagsToString(data->flags)).c_str();
 		case ColumnType::ProcessName:
 			if (session.ProcessName.IsEmpty())
 				session.ProcessName = ProcessHelper::GetProcessName(data->processId);

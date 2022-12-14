@@ -13,14 +13,18 @@ public:
 		SETTING(DarkMode, 0, SettingType::Bool);
 		SETTING(SingleInstance, 0, SettingType::Bool);
 		SETTING(HideEmptyLayers, 1, SettingType::Bool);
+		SETTING(AppendNetworkEvents, 0, SettingType::Bool);
+		SETTING(ResolveNetworkAddresses, 0, SettingType::Bool);
 	END_SETTINGS
 
-	DEF_SETTING(DarkMode, int)
-	DEF_SETTING(AlwaysOnTop, int)
-	DEF_SETTING(ViewToolBar, int)
-	DEF_SETTING(ViewStatusBar, int)
-	DEF_SETTING(SingleInstance, int)
+	DEF_SETTING(DarkMode, bool)
+	DEF_SETTING(AlwaysOnTop, bool)
+	DEF_SETTING(ViewToolBar, bool)
+	DEF_SETTING(ViewStatusBar, bool)
+	DEF_SETTING(SingleInstance, bool)
 	DEF_SETTING(MainWindowPlacement, WINDOWPLACEMENT)
 	DEF_SETTING(HideEmptyLayers, bool)
+	DEF_SETTING(AppendNetworkEvents, bool)
+	DEF_SETTING(ResolveNetworkAddresses, bool)
 };
 

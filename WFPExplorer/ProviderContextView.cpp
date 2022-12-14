@@ -68,7 +68,7 @@ CString CProviderContextView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Flags:
 			if (info->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", info->flags, StringHelper::WFPProviderContextFlagsToString(info->flags)).c_str();
+			return std::format(L"0x{:X} ({})", info->flags, (PCWSTR)StringHelper::WFPProviderContextFlagsToString(info->flags)).c_str();
 	}
 	return CString();
 }

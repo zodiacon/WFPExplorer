@@ -55,7 +55,7 @@ CString CProvidersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Flags:
 			if (info->flags == 0)
 				return L"0";
-			return std::format(L"0x{:X} ({})", info->flags, StringHelper::WFPProviderFlagsToString(info->flags)).c_str();
+			return std::format(L"0x{:X} ({})", info->flags, (PCWSTR)StringHelper::WFPProviderFlagsToString(info->flags)).c_str();
 		case ColumnType::ServiceName: return info->serviceName;
 	}
 	return CString();

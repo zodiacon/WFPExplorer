@@ -78,13 +78,15 @@
 #define ID_VIEW_NETWORKEVENTS           32787
 #define ID_OPTIONS_APPENDNETWORKEVENTS  32788
 #define ID_OPTIONS_RESOLVENETWORKADDRESSES 32789
+#define ID_FILE_NEW32790                32790
+#define ID_NEW_FILTER                   32791
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        236
-#define _APS_NEXT_COMMAND_VALUE         32790
+#define _APS_NEXT_COMMAND_VALUE         32792
 #define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

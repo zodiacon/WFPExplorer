@@ -105,6 +105,9 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
+	WFPConnectionEnumerator enumerator(engine.Handle());
+	auto conns = enumerator.Next(256);
+
 	switch (argv[1][0]) {
 		case 's': case 'S':
 			DisplaySessions(engine);

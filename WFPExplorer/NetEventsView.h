@@ -40,17 +40,26 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
+	struct NetEventInfo {
+		FWPM_NET_EVENT* Data;
+		CString LocalAddress, RemoteAddress;
+		CString AppId, UserId, PackageId;
+	};
+
 	void UpdateUI();
+	CString const& GetLocalAddress(NetEventInfo& info);
+	CString const& GetRemoteAddress(NetEventInfo& info);
+	UINT16 GetLocalPort(NetEventInfo& info) const;
+	UINT16 GetRemotePort(NetEventInfo& info) const;
+	CString const& GetAppId(NetEventInfo& info);
+	CString const& GetUserId(NetEventInfo& info);
+	CString const& GetPackageId(NetEventInfo& info);
 
 	enum class ColumnType {
 		Time, Type, LocalPort, RemotePort, LocalAddress, RemoteAddress, Flags, EnterpriseId,
 		IPVersion, Protocol, ScopeId, AppId, UserId, PackageId, PolicyFlags, EffectiveName,
 		AddressFamily
 		
-	};
-
-	struct NetEventInfo {
-		FWPM_NET_EVENT* Data;
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

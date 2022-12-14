@@ -88,3 +88,14 @@ struct WFPProviderContextEnumerator : WFPEnumerator<
 	}
 };
 
+struct WFPConnectionEnumerator : WFPEnumerator<
+	decltype(&::FwpmConnectionCreateEnumHandle),
+	decltype(&::FwpmConnectionDestroyEnumHandle),
+	decltype(&::FwpmConnectionEnum),
+	FWPM_CONNECTION> {
+
+	explicit WFPConnectionEnumerator(HANDLE hEngine) :
+		WFPEnumerator(hEngine, ::FwpmConnectionCreateEnumHandle, ::FwpmConnectionDestroyEnumHandle, ::FwpmConnectionEnum) {
+	}
+};
+

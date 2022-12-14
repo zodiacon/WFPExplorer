@@ -97,8 +97,6 @@ CString CLayersView::GetColumnText(HWND, int row, int col) {
 }
 
 void CLayersView::DoSort(SortInfo const* si) {
-	if (si == nullptr)
-		return;
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
 

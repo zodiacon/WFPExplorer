@@ -53,6 +53,11 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "&File"
     BEGIN
+        POPUP "&New"
+        BEGIN
+            MENUITEM "&Filter...",                  ID_NEW_FILTER
+        END
+        MENUITEM SEPARATOR
         MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
         MENUITEM "&Save...\tCtrl+S",            ID_FILE_SAVE
         MENUITEM SEPARATOR
@@ -369,8 +374,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,3,0,0
- PRODUCTVERSION 0,3,0,0
+ FILEVERSION 0,4,0,0
+ PRODUCTVERSION 0,4,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -387,12 +392,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.3"
+            VALUE "FileVersion", "0.4.0.0"
             VALUE "InternalName", "WFPExplorer"
             VALUE "LegalCopyright", "©2022 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.3"
+            VALUE "ProductVersion", "0.4.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -551,6 +556,8 @@ STRINGTABLE
 BEGIN
     ID_VIEW_PROVIDERS       "\nProviders"
     ID_VIEW_PROVIDERCONTEXTS "\nProvider Contexts"
+    ID_VIEW_NETWORKEVENTS   "\nNetwork Events"
+    ID_NEW_FILTER           "\nNew Filter"
 END
 
 #endif    // English (United States) resources
