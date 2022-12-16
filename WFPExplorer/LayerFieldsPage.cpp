@@ -35,9 +35,8 @@ LRESULT CLayerFieldsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	m_List.Attach(GetDlgItem(IDC_LIST));
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
 
-	auto layer = m_Engine.GetLayerByKey(m_Layer->layerKey);
-	m_Fields.resize(layer->numFields);
-	memcpy(m_Fields.data(), layer->field, sizeof(FWPM_FIELD) * layer->numFields);
+	m_Fields.resize(m_Layer->numFields);
+	memcpy(m_Fields.data(), m_Layer->field, sizeof(FWPM_FIELD) * m_Layer->numFields);
 	m_List.SetItemCount(m_Layer->numFields);
 
 	auto cm = GetColumnManager(m_List);
