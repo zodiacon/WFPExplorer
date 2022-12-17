@@ -7,11 +7,11 @@
 #include <WFPEngine.h>
 #include <CustomSplitterWindow.h>
 #include "resource.h"
+#include "FiltersView.h"
+#include "LayersView.h"
+#include "CalloutsView.h"
 
 class WFPEngine;
-class CLayersView;
-class CFiltersView;
-class CCalloutsView;
 
 class CHierarchyView :
 	public CFrameView<CHierarchyView, IMainFrame>,
@@ -31,6 +31,15 @@ public:
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		if (uMsg == WM_COMMAND) {
+			if (m_Splitter.GetSplitterPane(1) == m_FiltersView->m_hWnd)
+				return m_FiltersView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
+			if (m_Splitter.GetSplitterPane(1) == m_CalloutsView->m_hWnd)
+				return m_CalloutsView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
+			if (m_Splitter.GetSplitterPane(1) == m_LayersView->m_hWnd)
+				return m_LayersView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
+		}
+			
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):

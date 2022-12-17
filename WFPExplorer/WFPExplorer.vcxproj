@@ -298,12 +298,14 @@
     <Image Include="res\FilteringRightArrow.ico" />
     <Image Include="res\layers.ico" />
     <Image Include="res\Object.ico" />
+    <Image Include="res\Open.ico" />
     <Image Include="res\Paste.ico" />
     <Image Include="res\pin.ico" />
     <Image Include="res\properties.ico" />
     <Image Include="res\provider-persistent.ico" />
     <Image Include="res\provider.ico" />
     <Image Include="res\Refresh.ico" />
+    <Image Include="res\Save.ico" />
     <Image Include="res\Session-synamic.ico" />
     <Image Include="res\Session.ico" />
     <Image Include="res\sublayers.ico" />

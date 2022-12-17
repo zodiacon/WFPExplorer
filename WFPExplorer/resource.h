@@ -38,6 +38,10 @@
 #define IDR_MENU1                       234
 #define IDR_CONTEXT                     234
 #define IDI_EVENT                       235
+#define IDD_NEWFILTER                   236
+#define IDI_SAVE                        238
+#define IDI_ICON2                       239
+#define IDI_OPEN                        239
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -61,6 +65,7 @@
 #define IDC_VALUE                       1016
 #define IDC_FLAGS                       1017
 #define IDC_TABS                        1018
+#define IDC_GENERATE                    1019
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -80,14 +85,16 @@
 #define ID_OPTIONS_RESOLVENETWORKADDRESSES 32789
 #define ID_FILE_NEW32790                32790
 #define ID_NEW_FILTER                   32791
+#define ID_NEW_SIMPLEFILTER             32795
+#define ID_NEW_PROVIDER                 32796
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        236
-#define _APS_NEXT_COMMAND_VALUE         32792
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_RESOURCE_VALUE        240
+#define _APS_NEXT_COMMAND_VALUE         32797
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

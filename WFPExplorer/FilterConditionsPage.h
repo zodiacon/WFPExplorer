@@ -20,6 +20,7 @@ public:
 
 	CString GetColumnText(HWND, int row, int col) const;
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
+	int GetRowImage(HWND, int row, int) const;
 
 	BEGIN_MSG_MAP(CFilterConditionsPage)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)

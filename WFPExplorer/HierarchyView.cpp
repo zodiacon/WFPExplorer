@@ -3,9 +3,6 @@
 #include "WFPHelper.h"
 #include "StringHelper.h"
 #include <ranges>
-#include "LayersView.h"
-#include "CalloutsView.h"
-#include "FiltersView.h"
 #include "AppSettings.h"
 #include <Enumerators.h>
 
@@ -16,8 +13,8 @@ void CHierarchyView::Refresh() {
 	BuildTree();
 }
 
-void CHierarchyView::OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew) {
-	auto type = GetItemData<TreeItemType>(m_Tree, hNew);
+void CHierarchyView::OnTreeSelChanged(HWND tree, HTREEITEM /* hOld */, HTREEITEM hNew) {
+	auto type = GetItemData<TreeItemType>(tree, hNew);
 	HWND hNewView = nullptr;
 	auto hOldView = m_Splitter.GetSplitterPane(SPLIT_PANE_RIGHT);
 	switch (type) {
@@ -195,7 +192,11 @@ LRESULT CHierarchyView::OnSetFocus(UINT, WPARAM, LPARAM, BOOL&) {
 	return 0;
 }
 
-LRESULT CHierarchyView::OnProperties(WORD, WORD, HWND, BOOL&) {
-	ShowProperties(m_Tree.GetSelectedItem());
+LRESULT CHierarchyView::OnProperties(WORD, WORD, HWND, BOOL& handled) {
+	auto hWnd = ::GetFocus();
+	if (hWnd == m_Tree)
+		ShowProperties(m_Tree.GetSelectedItem());
+	else
+		handled = FALSE;
 	return 0;
 }

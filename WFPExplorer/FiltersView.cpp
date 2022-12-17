@@ -10,6 +10,9 @@
 #include <ResizablePropertySheet.h>
 #include "AppSettings.h"
 #include <Enumerators.h>
+#include <ClipboardHelper.h>
+#include <fstream>
+#include <ThemeHelper.h>
 
 CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -79,6 +82,7 @@ void CFiltersView::UpdateUI() {
 	auto selected = m_List.GetSelectedCount();
 	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
 	ui.UIEnable(ID_EDIT_DELETE, selected > 0);
+	ui.UIEnable(ID_EDIT_COPY, selected > 0);
 }
 
 CString const& CFiltersView::GetProviderName(FilterInfo& info) const {
@@ -111,7 +115,7 @@ CString const& CFiltersView::GetSublayerName(FilterInfo& info) const {
 
 LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT);
+		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	auto cm = GetColumnManager(m_List);
@@ -178,6 +182,28 @@ LRESULT CFiltersView::OnDeleteFilter(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CFiltersView::OnCopy(WORD, WORD, HWND, BOOL&) {
+	auto text = ListViewHelper::GetSelectedRowsAsString(m_List, L",");
+	ClipboardHelper::CopyText(m_hWnd, text);
+
+	return 0;
+}
+
+LRESULT CFiltersView::OnSave(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(FALSE, L"csv", L"filters.csv", OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
+		L"CSV Files (*.csv)\0*.csv\0Text Files (*.txt)\0*.txt\0All Files\0*.*\0", m_hWnd);
+	ThemeHelper::Suspend();
+
+	auto ok = IDOK == dlg.DoModal();
+	ThemeHelper::Resume();
+	if(ok) {
+		if(!ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
+			AtlMessageBox(m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
+		}
+	}
+	return 0;
+}
+
 void CFiltersView::DoSort(SortInfo const* si) {
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
@@ -226,6 +252,16 @@ void CFiltersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT ne
 bool CFiltersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
 	LRESULT result;
 	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
+}
+
+bool CFiltersView::OnRightClickList(HWND, int row, int col, POINT const& pt) {
+	if (row < 0)
+		return false;
+
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT);
+
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
 }
 
 DWORD CFiltersView::OnPrePaint(int, LPNMCUSTOMDRAW cd) {

@@ -30,6 +30,10 @@ void CLayerFieldsPage::DoSort(SortInfo const* si) {
 	std::ranges::sort(m_Fields, compare);
 }
 
+int CLayerFieldsPage::GetRowImage(HWND, int row, int) const {
+	return 0;
+}
+
 LRESULT CLayerFieldsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	InitDynamicLayout(false);
 	m_List.Attach(GetDlgItem(IDC_LIST));
@@ -43,6 +47,11 @@ LRESULT CLayerFieldsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	cm->AddColumn(L"Field", 0, 230);
 	cm->AddColumn(L"Type", 0, 80);
 	cm->AddColumn(L"Data Type", 0, 150);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
+	images.AddIcon(AtlLoadIconImage(IDI_FIELD, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	return 0;
 }

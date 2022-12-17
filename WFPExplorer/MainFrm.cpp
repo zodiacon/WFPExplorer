@@ -116,6 +116,10 @@ HFONT CMainFrame::GetMonoFont() const {
 	return m_MonoFont.m_hFont;
 }
 
+bool CMainFrame::TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWnd) {
+	return ShowContextMenu(hMenu, flags, x, y, hWnd);
+}
+
 void CMainFrame::InitMenu() {
 	struct {
 		UINT id, icon;
@@ -137,6 +141,8 @@ void CMainFrame::InitMenu() {
 		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
 		{ ID_VIEW_HIERARCHY, IDI_TREE },
 		{ ID_VIEW_NETWORKEVENTS, IDI_EVENT },
+		{ ID_FILE_OPEN, IDI_OPEN },
+		{ ID_FILE_SAVE, IDI_SAVE },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)

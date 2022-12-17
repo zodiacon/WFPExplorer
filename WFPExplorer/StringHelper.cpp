@@ -2,6 +2,7 @@
 #include "StringHelper.h"
 #include <WFPEngine.h>
 #include <ip2string.h>
+#include <sddl.h>
 
 #pragma comment(lib, "ntdll")
 #pragma comment(lib, "ws2_32")

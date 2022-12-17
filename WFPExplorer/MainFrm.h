@@ -57,6 +57,7 @@ private:
 	void SetStatusText(int index, PCWSTR text) override;
 	CUpdateUIBase& UI() override;
 	HFONT GetMonoFont() const override;
+	bool TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWnd = nullptr) override;
 
 	void InitMenu();
 	void UpdateUI();

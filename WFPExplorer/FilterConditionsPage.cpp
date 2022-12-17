@@ -22,6 +22,10 @@ void CFilterConditionsPage::OnStateChanged(HWND, int from, int to, UINT oldState
         SetDlgItemText(IDC_VALUE, StringHelper::WFPConditionValueToString(m_Conditions[from].conditionValue, true, true));
 }
 
+int CFilterConditionsPage::GetRowImage(HWND, int row, int) const {
+    return 0;
+}
+
 LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     InitDynamicLayout(false);
     m_List.Attach(GetDlgItem(IDC_LIST));
@@ -37,6 +41,11 @@ LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     m_Conditions.resize(m_Filter->numFilterConditions);
     memcpy(m_Conditions.data(), m_Filter->filterCondition, sizeof(FWPM_FILTER_CONDITION) * m_Filter->numFilterConditions);
     m_List.SetItemCount(m_Filter->numFilterConditions);
+
+    CImageList images;
+    images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
+    images.AddIcon(AtlLoadIconImage(IDI_FIELD, 0, 16, 16));
+    m_List.SetImageList(images, LVSIL_SMALL);
 
     CWindow edit(GetDlgItem(IDC_VALUE));
     CFontHandle hfont(edit.GetFont());

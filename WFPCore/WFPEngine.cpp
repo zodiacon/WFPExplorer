@@ -56,6 +56,12 @@ bool WFPEngine::DeleteFilter(UINT64 id) {
 	return m_LastError == ERROR_SUCCESS;
 }
 
+UINT64 WFPEngine::AddFilter(FWPM_FILTER const* filter, PSECURITY_DESCRIPTOR sd) {
+	UINT64 id;
+	m_LastError = ::FwpmFilterAdd(m_hEngine, filter, sd, &id);
+	return m_LastError ? 0 : id;
+}
+
 WFPObject<FWPM_LAYER> WFPEngine::GetLayerByKey(GUID const& key) const {
 	FWPM_LAYER* layer = nullptr;
 	m_LastError = FwpmLayerGetByKey(m_hEngine, &key, &layer);
@@ -64,13 +70,13 @@ WFPObject<FWPM_LAYER> WFPEngine::GetLayerByKey(GUID const& key) const {
 
 WFPObject<FWPM_LAYER> WFPEngine::GetLayerById(UINT16 id) const {
 	FWPM_LAYER* layer;
-	m_LastError = FwpmLayerGetById(m_hEngine, id, &layer);
+	m_LastError = ::FwpmLayerGetById(m_hEngine, id, &layer);
 	return WFPObject(layer);
 }
 
 WFPObject<FWPM_SUBLAYER> WFPEngine::GetSublayerByKey(GUID const& key) const {
 	FWPM_SUBLAYER* sublayer = nullptr;
-	m_LastError = FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
+	m_LastError = ::FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);
 	return WFPObject(sublayer);
 }
 
@@ -128,6 +134,12 @@ std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool include
 WFPObject<FWPM_CALLOUT> WFPEngine::GetCalloutByKey(GUID const& key) const {
 	FWPM_CALLOUT* co = nullptr;
 	FwpmCalloutGetByKey(m_hEngine, &key, &co);
+	return WFPObject(co);
+}
+
+WFPObject<FWPM_CALLOUT> WFPEngine::GetCalloutById(UINT32 id) const {
+	FWPM_CALLOUT* co = nullptr;
+	FwpmCalloutGetById(m_hEngine, id, &co);
 	return WFPObject(co);
 }
 

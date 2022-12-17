@@ -249,6 +249,12 @@
     <Image Include="res\event.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\Open.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Save.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

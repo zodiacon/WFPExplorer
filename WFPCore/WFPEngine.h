@@ -1,10 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <atlsecurity.h>
-#include <memory>
-#include <type_traits>
-#include <optional>
 
 enum class WFPProviderContextFlags {
 	None,
@@ -74,10 +70,6 @@ public:
 	DWORD LastError() const;
 	HANDLE Handle() const;
 
-	//
-	// enumerations
-	//
-
 	uint32_t GetFilterCount(GUID const& layer = GUID_NULL) const;
 	uint32_t GetCalloutCount(GUID const& layer = GUID_NULL) const;
 
@@ -95,6 +87,7 @@ public:
 	WFPObject<FWPM_FILTER> GetFilterById(UINT64 id, bool full = true) const;
 	bool DeleteFilter(GUID const& key);
 	bool DeleteFilter(UINT64 id);
+	UINT64 AddFilter(FWPM_FILTER const* filter, PSECURITY_DESCRIPTOR sd = nullptr);
 
 	//
 	// layer API
@@ -106,10 +99,9 @@ public:
 	// sublayer API
 	//
 	WFPObject<FWPM_SUBLAYER> GetSublayerByKey(GUID const& key) const;
-	WFPObject<FWPM_SUBLAYER> GetSublayerById(UINT16 id) const;
-
 
 	WFPObject<FWPM_CALLOUT> GetCalloutByKey(GUID const& key) const;
+	WFPObject<FWPM_CALLOUT> GetCalloutById(UINT32 id) const;
 
 private:
 	//
