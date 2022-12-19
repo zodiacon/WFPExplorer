@@ -73,8 +73,6 @@ public:
 	uint32_t GetFilterCount(GUID const& layer = GUID_NULL) const;
 	uint32_t GetCalloutCount(GUID const& layer = GUID_NULL) const;
 
-	std::vector<WFPProviderContextInfo> EnumProviderContexts(bool includeData = false) const;
-
 	//
 	// providers API
 	//
@@ -104,10 +102,6 @@ public:
 	WFPObject<FWPM_CALLOUT> GetCalloutById(UINT32 id) const;
 
 private:
-	//
-	// helpers
-	//
-	static std::wstring ParseMUIString(PCWSTR input);
 	static WFPProviderContextInfo InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool full = false);
 
 	HANDLE m_hEngine{ nullptr };

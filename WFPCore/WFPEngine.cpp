@@ -80,57 +80,6 @@ WFPObject<FWPM_SUBLAYER> WFPEngine::GetSublayerByKey(GUID const& key) const {
 	return WFPObject(sublayer);
 }
 
-WFPProviderContextInfo WFPEngine::InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool includeData) {
-	WFPProviderContextInfo pi;
-	pi.Name = ParseMUIString(p->displayData.name);
-	pi.Desc = ParseMUIString(p->displayData.description);
-	pi.ProviderContextKey = p->providerContextKey;
-	pi.ProviderContextId = p->providerContextId;
-	pi.Flags = static_cast<WFPProviderContextFlags>(p->flags);
-	pi.ProviderDataSize = p->providerData.size;
-	pi.ProviderKey = p->providerKey ? *p->providerKey : GUID_NULL;
-	pi.Type = static_cast<WFPProviderContextType>(p->type);
-	if (includeData) {
-		pi.ProviderData.resize(p->providerData.size);
-		memcpy(pi.ProviderData.data(), p->providerData.data, p->providerData.size);
-	}
-	return pi;
-}
-
-std::wstring WFPEngine::ParseMUIString(PCWSTR input) {
-	if (input == nullptr)
-		return L"";
-
-	if (*input && input[0] == L'@') {
-		WCHAR result[256];
-		if (::SHLoadIndirectString(input, result, _countof(result), nullptr) == S_OK)
-			return result;
-	}
-	return input;
-}
-
-std::vector<WFPProviderContextInfo> WFPEngine::EnumProviderContexts(bool includeData) const {
-	HANDLE hEnum;
-	std::vector<WFPProviderContextInfo> info;
-	m_LastError = FwpmProviderContextCreateEnumHandle(m_hEngine, nullptr, &hEnum);
-	if (m_LastError)
-		return info;
-	FWPM_PROVIDER_CONTEXT** contexts;
-	UINT32 count;
-	m_LastError = FwpmProviderContextEnum(m_hEngine, hEnum, 128, &contexts, &count);
-	if (m_LastError == ERROR_SUCCESS && count > 0) {
-		info.reserve(count);
-		for (UINT32 i = 0; i < count; i++) {
-			auto p = contexts[i];
-			info.emplace_back(std::move(InitProviderContext(p, includeData)));
-		}
-		FwpmFreeMemory((void**)&contexts);
-	}
-	m_LastError = FwpmProviderContextDestroyEnumHandle(m_hEngine, hEnum);
-
-	return info;
-}
-
 WFPObject<FWPM_CALLOUT> WFPEngine::GetCalloutByKey(GUID const& key) const {
 	FWPM_CALLOUT* co = nullptr;
 	FwpmCalloutGetByKey(m_hEngine, &key, &co);

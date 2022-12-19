@@ -120,6 +120,12 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
     END
+    POPUP "layer"
+    BEGIN
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
+    END
 END
 
 

@@ -5,6 +5,8 @@
 #include "WFPHelper.h"
 #include "LayerGeneralPage.h"
 #include <Enumerators.h>
+#include <ClipboardHelper.h>
+#include <ThemeHelper.h>
 
 CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -146,8 +148,8 @@ void CLayersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT new
 		UpdateUI();
 }
 
-bool CLayersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
-	LRESULT result;
+bool CLayersView::OnDoubleClickList(HWND, int, int, POINT const&) {
+	LRESULT result = 0;
 	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
 }
 
@@ -157,8 +159,27 @@ CString const& CLayersView::LayerInfo::Name() const {
 	return m_Name;
 }
 
-CString const& CLayersView::LayerInfo::Desc() const {
+CString const& CLayersView::LayerInfo::Desc() const {  
 	if (m_Desc.IsEmpty())
 		m_Desc = StringHelper::ParseMUIString(Data->displayData.description);
 	return m_Desc;
+}
+
+LRESULT CLayersView::OnSave(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(FALSE, L"csv", L"layers.csv", OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
+		L"CSV Files (*.csv)\0*.csv\0Text Files (*.txt)\0*.txt\0All Files\0*.*\0", m_hWnd);
+	ThemeHelper::Suspend();
+	auto ok = IDOK == dlg.DoModal();
+	ThemeHelper::Resume();
+	if (ok && !ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
+		AtlMessageBox(m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
+	}
+	return 0;
+}
+
+LRESULT CLayersView::OnCopy(WORD, WORD, HWND, BOOL&) {
+	auto text = ListViewHelper::GetSelectedRowsAsString(m_List, L",");
+	ClipboardHelper::CopyText(m_hWnd, text);
+
+	return 0;
 }
