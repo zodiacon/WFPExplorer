@@ -93,6 +93,9 @@
     <ClCompile Include="NetEventsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ProviderDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="NetEventsView.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ProviderDlg.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

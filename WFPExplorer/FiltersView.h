@@ -54,7 +54,7 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
-	void UpdateUI();
+	void UpdateUI() const;
 
 	enum class ColumnType {
 		Key, Name, Desc, Flags, ProviderGUID, ProviderName, LayerKey, SubLayerKey,

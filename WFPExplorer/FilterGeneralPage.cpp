@@ -33,6 +33,10 @@ LRESULT CFilterGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     AddIconToButton(IDC_LAYER_PROP, IDI_LAYERS);
     AddIconToButton(IDC_SUBLAYER_PROP, IDI_SUBLAYER);
 
+    if (m_Filter->providerKey == nullptr) {
+        GetDlgItem(IDC_PROVIDER_PROP).EnableWindow(FALSE);
+    }
+
     return 0;
 }
 

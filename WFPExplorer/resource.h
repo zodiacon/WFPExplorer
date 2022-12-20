@@ -43,15 +43,18 @@
 #define IDI_OPEN                        239
 #define IDI_FIND                        240
 #define IDI_FIND_NEXT                   241
-#define IDI_ICON3                       242
 #define IDI_FIND_PREV                   242
+#define IDD_PROVIDER                    243
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
 #define IDC_NAME                        1002
 #define IDC_DESC                        1003
 #define IDC_PROVIDER                    1004
+#define IDC_KEY2                        1004
+#define IDC_SERVICENAME                 1004
 #define IDC_PROVIDER_PROP               1005
+#define IDC_PROVIDERDATA                1005
 #define IDC_LAYER                       1006
 #define IDC_LAYER_PROP                  1007
 #define IDC_ACTIONTYPE                  1008
@@ -70,6 +73,9 @@
 #define IDC_TABS                        1018
 #define IDC_GENERATE                    1019
 #define IDC_COPYFROM                    1021
+#define IDC_PERSISTENT                  1022
+#define IDC_DISABLED                    1023
+#define IDC_DATASIZE                    1024
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -98,9 +104,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        243
+#define _APS_NEXT_RESOURCE_VALUE        245
 #define _APS_NEXT_COMMAND_VALUE         32801
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

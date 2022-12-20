@@ -7,6 +7,7 @@
 #include "FilterGeneralPage.h"
 #include "FilterConditionsPage.h"
 #include "LayersView.h"
+#include "ProviderDlg.h"
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	if (key != GUID_NULL) {
@@ -68,7 +69,7 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
 }
 
 int WFPHelper::ShowFilterProperties(WFPEngine& engine, FWPM_FILTER* filter) {
-	auto name = L"Filter Properties (" + GetFilterName(engine, filter->filterKey) + L")";
+	auto name = L"Filter: " + GetFilterName(engine, filter->filterKey);
 	CPropertySheet sheet((PCWSTR)name);
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
@@ -90,5 +91,8 @@ int WFPHelper::ShowSublayerProperties(WFPEngine& engine, FWPM_SUBLAYER* sublayer
 }
 
 int WFPHelper::ShowProviderProperties(WFPEngine& engine, FWPM_PROVIDER* provider) {
+	CProviderDlg dlg(provider);
+	dlg.DoModal();
+
 	return 0;
 }

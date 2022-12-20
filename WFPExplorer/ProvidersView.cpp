@@ -3,8 +3,14 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
+#include "ProviderDlg.h"
 
 CProvidersView::CProvidersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+}
+
+void CProvidersView::UpdateUI() const {
+	auto& ui = Frame()->UI();
+	ui.UIEnable(ID_EDIT_PROPERTIES, m_List.GetSelectedCount() == 1);
 }
 
 LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -31,8 +37,34 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	return 0;
 }
 
+LRESULT CProvidersView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) {
+	if (active)
+		UpdateUI();
+	return 0;
+}
+
+void CProvidersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
+	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+		UpdateUI();
+}
+
+bool CProvidersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
+	LRESULT result;
+	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
+}
+
 LRESULT CProvidersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	Refresh();
+	return 0;
+}
+
+LRESULT CProvidersView::OnProperties(WORD, WORD, HWND, BOOL&) {
+	auto count = m_List.GetSelectedCount();
+	ATLASSERT(count == 1);
+	auto& provider = m_Providers[m_List.GetNextItem(-1, LVIS_SELECTED)];
+	CProviderDlg dlg(provider.Data);
+	dlg.DoModal();
+
 	return 0;
 }
 

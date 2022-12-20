@@ -77,6 +77,7 @@ public:
 	// providers API
 	//
 	WFPObject<FWPM_PROVIDER> GetProviderByKey(GUID const& key) const;
+	bool AddProvider(FWPM_PROVIDER const* provider, PSECURITY_DESCRIPTOR sd = nullptr);
 
 	//
 	// Filters API

@@ -77,7 +77,7 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 	return CString();
 }
 
-void CFiltersView::UpdateUI() {
+void CFiltersView::UpdateUI() const {
 	auto& ui = Frame()->UI();
 	auto selected = m_List.GetSelectedCount();
 	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);

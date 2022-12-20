@@ -34,6 +34,11 @@ WFPObject<FWPM_PROVIDER> WFPEngine::GetProviderByKey(GUID const& guid) const {
 	return WFPObject(provider);
 }
 
+bool WFPEngine::AddProvider(FWPM_PROVIDER const* provider, PSECURITY_DESCRIPTOR sd) {
+	m_LastError = ::FwpmProviderAdd(m_hEngine, provider, sd);
+	return m_LastError == ERROR_SUCCESS;
+}
+
 WFPObject<FWPM_FILTER> WFPEngine::GetFilterByKey(GUID const& key) const {
 	FWPM_FILTER* filter = nullptr;
 	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);
