@@ -4,7 +4,7 @@
 #include "StringHelper.h"
 #include <ranges>
 #include "AppSettings.h"
-#include <Enumerators.h>
+#include <WFPEnumerators.h>
 
 CHierarchyView::CHierarchyView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }

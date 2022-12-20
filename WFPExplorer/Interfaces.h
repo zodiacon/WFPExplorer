@@ -5,5 +5,6 @@ struct IMainFrame abstract {
 	virtual CUpdateUIBase& UI() = 0;
 	virtual HFONT GetMonoFont() const = 0;
 	virtual bool TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWnd = nullptr) = 0;
+	virtual CFindReplaceDialog* GetFindDialog() const = 0;
 };
 

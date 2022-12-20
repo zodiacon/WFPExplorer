@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "..\WFPCore\WFPEngine.h"
-#include "..\WFPCore\Enumerators.h"
+#include "..\WFPCore\WFPEnumerators.h"
 
 #pragma comment(lib, "Fwpuclnt.lib")
 #pragma comment(lib, "Shlwapi.lib")

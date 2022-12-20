@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "NetEventsView.h"
-#include <Enumerators.h>
+#include <WFPEnumerators.h>
 #include <atltime.h>
 #include "StringHelper.h"
 #include <SortHelper.h>
@@ -80,7 +80,7 @@ int CNetEventsView::GetRowImage(HWND, int row, int col) const {
 void CNetEventsView::UpdateUI() {
 }
 
-CString const& CNetEventsView::GetLocalAddress(NetEventInfo& info) {
+CString const& CNetEventsView::GetLocalAddress(NetEventInfo& info) const {
 	if (info.LocalAddress.IsEmpty()) {
 		auto const& header = info.Data->header;
 		auto flags = header.flags;
@@ -92,7 +92,7 @@ CString const& CNetEventsView::GetLocalAddress(NetEventInfo& info) {
 	return info.LocalAddress;
 }
 
-CString const& CNetEventsView::GetRemoteAddress(NetEventInfo& info) {
+CString const& CNetEventsView::GetRemoteAddress(NetEventInfo& info) const {
 	if (info.RemoteAddress.IsEmpty()) {
 		auto const& header = info.Data->header;
 		auto flags = header.flags;
@@ -109,7 +109,7 @@ UINT16 CNetEventsView::GetLocalPort(NetEventInfo& info) const {
 }
 
 UINT16 CNetEventsView::GetRemotePort(NetEventInfo& info) const {
-	return (info.Data->header.flags & FWPM_NET_EVENT_FLAG_REMOTE_PORT_SET) ? info.Data->header.localPort : 0;
+	return (info.Data->header.flags & FWPM_NET_EVENT_FLAG_REMOTE_PORT_SET) ? info.Data->header.remotePort : 0;
 }
 
 CString const& CNetEventsView::GetAppId(NetEventInfo& info) {

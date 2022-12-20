@@ -4,7 +4,7 @@
 #include <SortHelper.h>
 #include "WFPHelper.h"
 #include "LayerGeneralPage.h"
-#include <Enumerators.h>
+#include <WFPEnumerators.h>
 #include <ClipboardHelper.h>
 #include <ThemeHelper.h>
 

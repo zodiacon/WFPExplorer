@@ -296,6 +296,9 @@
     <Image Include="res\FilteringRefresh.ico" />
     <Image Include="res\Filteringrestricted.ico" />
     <Image Include="res\FilteringRightArrow.ico" />
+    <Image Include="res\Find-next.ico" />
+    <Image Include="res\Find-prev.ico" />
+    <Image Include="res\Find.ico" />
     <Image Include="res\layers.ico" />
     <Image Include="res\Object.ico" />
     <Image Include="res\Open.ico" />

@@ -147,7 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Enumerators.h" />
+    <ClInclude Include="WFPEnumerators.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="WFPEngine.h" />
     <ClInclude Include="WFPEnumerator.h" />

@@ -4,7 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include <WFPEngine.h>
-#include <Enumerators.h>
+#include <WFPEnumerators.h>
 
 class WFPEngine;
 

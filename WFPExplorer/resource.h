@@ -40,8 +40,11 @@
 #define IDI_EVENT                       235
 #define IDD_NEWFILTER                   236
 #define IDI_SAVE                        238
-#define IDI_ICON2                       239
 #define IDI_OPEN                        239
+#define IDI_FIND                        240
+#define IDI_FIND_NEXT                   241
+#define IDI_ICON3                       242
+#define IDI_FIND_PREV                   242
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -66,6 +69,7 @@
 #define IDC_FLAGS                       1017
 #define IDC_TABS                        1018
 #define IDC_GENERATE                    1019
+#define IDC_COPYFROM                    1021
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -87,14 +91,16 @@
 #define ID_NEW_FILTER                   32791
 #define ID_NEW_SIMPLEFILTER             32795
 #define ID_NEW_PROVIDER                 32796
+#define ID_EDIT_FIND32797               32797
+#define ID_EDIT_FINDNEXT                32798
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        240
-#define _APS_NEXT_COMMAND_VALUE         32797
-#define _APS_NEXT_CONTROL_VALUE         1021
+#define _APS_NEXT_RESOURCE_VALUE        243
+#define _APS_NEXT_COMMAND_VALUE         32801
+#define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

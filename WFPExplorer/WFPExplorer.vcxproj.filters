@@ -255,6 +255,15 @@
     <Image Include="res\Save.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\Find.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Find-next.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Find-prev.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

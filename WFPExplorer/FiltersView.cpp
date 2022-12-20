@@ -9,7 +9,7 @@
 #include "WFPHelper.h"
 #include <ResizablePropertySheet.h>
 #include "AppSettings.h"
-#include <Enumerators.h>
+#include <WFPEnumerators.h>
 #include <ClipboardHelper.h>
 #include <fstream>
 #include <ThemeHelper.h>
@@ -163,7 +163,8 @@ LRESULT CFiltersView::OnActivate(UINT, WPARAM activate, LPARAM, BOOL&) {
 }
 
 LRESULT CFiltersView::OnDeleteFilter(WORD, WORD, HWND, BOOL&) {
-	ATLASSERT(m_List.GetSelectedCount() > 0);
+	int selected = m_List.GetSelectedCount();
+	ATLASSERT(selected > 0);
 	if (AtlMessageBox(m_hWnd, L"Delete selected filter(s)?", IDS_TITLE, MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2) == IDNO)
 		return 0;
 
@@ -177,7 +178,8 @@ LRESULT CFiltersView::OnDeleteFilter(WORD, WORD, HWND, BOOL&) {
 		m_List.SelectAllItems(false);
 		Refresh();
 	}
-	AtlMessageBox(m_hWnd, std::format(L"Deleted {} filters", deleted).c_str(), IDS_TITLE, MB_ICONINFORMATION);
+	if(deleted < selected)
+		AtlMessageBox(m_hWnd, std::format(L"Deleted {}/{} filters", deleted, selected).c_str(), IDS_TITLE, MB_ICONINFORMATION);
 
 	return 0;
 }
@@ -202,6 +204,52 @@ LRESULT CFiltersView::OnSave(WORD, WORD, HWND, BOOL&) {
 		}
 	}
 	return 0;
+}
+
+LRESULT CFiltersView::OnFind(UINT, WPARAM, LPARAM, BOOL&) {
+	auto findDlg = Frame()->GetFindDialog();
+	auto searchDown = findDlg->SearchDown();
+	int start = m_List.GetNextItem(-1, LVIS_SELECTED);
+	CString find(findDlg->GetFindString());
+	auto ignoreCase = !findDlg->MatchCase();
+	if (ignoreCase)
+		find.MakeLower();
+
+	auto columns = m_List.GetHeader().GetItemCount();
+	auto count = m_List.GetItemCount();
+	int from = searchDown ? start + 1 : start - 1 + count;
+	int to = searchDown ? count + start : start + 1;
+	int step = searchDown ? 1 : -1;
+
+	int findIndex = -1;
+	CString text;
+	for (int i = from; i != to; i += step) {
+		int index = i % count;
+		for (int c = 0; c < columns; c++) {
+			m_List.GetItemText(index, c, text);
+			if (ignoreCase)
+				text.MakeLower();
+			if (text.Find(find) >= 0) {
+				findIndex = index;
+				break;
+			}
+		}
+		if (findIndex >= 0)
+			break;
+	}
+
+	if (findIndex >= 0) {
+		m_List.SelectItem(findIndex);
+		m_List.SetFocus();
+	}
+	else {
+		AtlMessageBox(m_hWnd, L"Finsihed searching list.", IDS_TITLE, MB_ICONINFORMATION);
+	}
+	return 0;
+}
+
+LRESULT CFiltersView::OnFindNext(WORD, WORD, HWND, BOOL&) {
+	return SendMessage(CFindReplaceDialog::GetFindReplaceMsg());
 }
 
 void CFiltersView::DoSort(SortInfo const* si) {

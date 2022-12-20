@@ -3,7 +3,7 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
-#include <Enumerators.h>
+#include <WFPEnumerators.h>
 
 CSublayersView::CSublayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }

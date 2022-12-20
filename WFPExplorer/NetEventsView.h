@@ -47,8 +47,8 @@ private:
 	};
 
 	void UpdateUI();
-	CString const& GetLocalAddress(NetEventInfo& info);
-	CString const& GetRemoteAddress(NetEventInfo& info);
+	CString const& GetLocalAddress(NetEventInfo& info) const;
+	CString const& GetRemoteAddress(NetEventInfo& info) const;
 	UINT16 GetLocalPort(NetEventInfo& info) const;
 	UINT16 GetRemotePort(NetEventInfo& info) const;
 	CString const& GetAppId(NetEventInfo& info);

@@ -21,6 +21,9 @@
 const int WINDOW_MENU_POSITION = 4;
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
+	if (m_pFindDlg && m_pFindDlg->IsDialogMessageW(pMsg))
+		return TRUE;
+
 	if (CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg))
 		return TRUE;
 
@@ -58,6 +61,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
 		{ ID_VIEW_CALLOUTS, IDI_CALLOUT },
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
+		{ 0 },
+		{ ID_EDIT_FIND, IDI_FIND },
+		{ ID_EDIT_FINDNEXT, IDI_FIND_NEXT },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
 	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
@@ -120,6 +126,10 @@ bool CMainFrame::TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWn
 	return ShowContextMenu(hMenu, flags, x, y, hWnd);
 }
 
+CFindReplaceDialog* CMainFrame::GetFindDialog() const {
+	return m_pFindDlg;
+}
+
 void CMainFrame::InitMenu() {
 	struct {
 		UINT id, icon;
@@ -143,6 +153,8 @@ void CMainFrame::InitMenu() {
 		{ ID_VIEW_NETWORKEVENTS, IDI_EVENT },
 		{ ID_FILE_OPEN, IDI_OPEN },
 		{ ID_FILE_SAVE, IDI_SAVE },
+		{ ID_EDIT_FIND, IDI_FIND },
+		{ ID_EDIT_FINDNEXT, IDI_FIND_NEXT },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)
@@ -161,6 +173,7 @@ void CMainFrame::UpdateUI() {
 	UIEnable(ID_EDIT_DELETE, false);
 	UIEnable(ID_VIEW_REFRESH, anyPage);
 	UIEnable(ID_EDIT_PROPERTIES, false);
+	UIEnable(ID_EDIT_FIND, anyPage);
 }
 
 void CMainFrame::SetAlwaysOnTop(bool onTop) {
@@ -339,5 +352,31 @@ LRESULT CMainFrame::OnAlwaysOnTop(WORD, WORD, HWND, BOOL&) {
 	auto& settings = AppSettings::Get();
 	settings.AlwaysOnTop(!settings.AlwaysOnTop());
 	SetAlwaysOnTop(settings.AlwaysOnTop());
+	return 0;
+}
+
+LRESULT CMainFrame::OnEditFind(WORD, WORD, HWND, BOOL&) {
+	ATLASSERT(m_view.GetPageCount() > 0);
+
+	if (m_pFindDlg == nullptr) {
+		m_pFindDlg = new CFindReplaceDialog;
+		m_pFindDlg->Create(TRUE, m_SearchText, nullptr, FR_DOWN | FR_HIDEWHOLEWORD, m_hWnd);
+		m_pFindDlg->ShowWindow(SW_SHOW);
+	}
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnFind(UINT msg, WPARAM wp, LPARAM lp, BOOL&) {
+	if (m_pFindDlg->IsTerminating()) {
+		m_pFindDlg = nullptr;
+		return 0;
+	}
+	m_pFindDlg->SetFocus();
+	
+	if (auto page = m_view.GetActivePage(); page >= 0) {
+		m_SearchText = m_pFindDlg->GetFindString();
+		::SendMessage(m_view.GetPageHWND(page), msg, wp, lp);
+	}
 	return 0;
 }

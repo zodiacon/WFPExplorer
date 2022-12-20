@@ -73,6 +73,9 @@ BEGIN
         MENUITEM "&Delete\tDel",                ID_EDIT_DELETE
         MENUITEM SEPARATOR
         MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "&Find...\tCtrl+F",            ID_EDIT_FIND
+        MENUITEM "Find &Next\tF3",              ID_EDIT_FINDNEXT
     END
     POPUP "&View"
     BEGIN
@@ -194,6 +197,12 @@ IDI_SAVE                ICON                    "res\\Save.ico"
 
 IDI_OPEN                ICON                    "res\\Open.ico"
 
+IDI_FIND                ICON                    "res\\Find.ico"
+
+IDI_FIND_NEXT           ICON                    "res\\Find-next.ico"
+
+IDI_FIND_PREV           ICON                    "res\\Find-prev.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -305,17 +314,16 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,164,246,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,230,246,50,14
-    LTEXT           "Key:",IDC_STATIC,7,15,16,8
-    EDITTEXT        IDC_KEY,51,13,234,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
-    LTEXT           "Name:",IDC_STATIC,7,36,22,8
-    EDITTEXT        IDC_NAME,51,34,359,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
-    LTEXT           "Description:",IDC_STATIC,7,57,39,8
-    EDITTEXT        IDC_DESC,51,55,359,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
-    LTEXT           "ID:",IDC_STATIC,347,16,12,8
-    EDITTEXT        IDC_ID,365,14,70,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
-    PUSHBUTTON      "Generate",IDC_GENERATE,290,12,50,14
-    LTEXT           "Provider:",IDC_STATIC,7,81,30,8
-    COMBOBOX        IDC_PROVIDER,51,78,279,75,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Key:",IDC_STATIC,7,10,16,8
+    EDITTEXT        IDC_KEY,51,8,234,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
+    LTEXT           "Name:",IDC_STATIC,7,31,22,8
+    EDITTEXT        IDC_NAME,51,29,359,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
+    LTEXT           "Description:",IDC_STATIC,7,52,39,8
+    EDITTEXT        IDC_DESC,51,50,359,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
+    PUSHBUTTON      "Generate",IDC_GENERATE,290,7,50,14
+    LTEXT           "Provider:",IDC_STATIC,7,76,30,8
+    COMBOBOX        IDC_PROVIDER,51,73,279,75,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Copy From...",IDC_COPYFROM,353,7,64,14
 END
 
 
@@ -397,6 +405,7 @@ BEGIN
     VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
     "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_DELETE,         VIRTKEY, NOINVERT
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
     VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
     VK_RETURN,      ID_EDIT_PROPERTIES,     VIRTKEY, ALT, NOINVERT
@@ -408,8 +417,9 @@ BEGIN
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
-    VK_DELETE,      ID_EDIT_DELETE,         VIRTKEY, NOINVERT
     VK_F5,          ID_VIEW_REFRESH,        VIRTKEY, NOINVERT
+    "F",            ID_EDIT_FIND,           VIRTKEY, CONTROL, NOINVERT
+    VK_F3,          ID_EDIT_FINDNEXT,       VIRTKEY, NOINVERT
 END
 
 
@@ -608,6 +618,7 @@ BEGIN
     ID_VIEW_PROVIDERCONTEXTS "\nProvider Contexts"
     ID_VIEW_NETWORKEVENTS   "\nNetwork Events"
     ID_NEW_FILTER           "\nNew Filter"
+    ID_EDIT_FINDNEXT        "\nFind Next"
 END
 
 #endif    // English (United States) resources

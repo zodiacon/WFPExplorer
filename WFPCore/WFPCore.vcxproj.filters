@@ -21,7 +21,7 @@
     <ClInclude Include="WFPEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enumerators.h">
+    <ClInclude Include="WFPEnumerators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WFPEnumerator.h">
