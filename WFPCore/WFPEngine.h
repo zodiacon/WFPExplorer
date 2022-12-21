@@ -2,42 +2,6 @@
 
 #include <vector>
 
-enum class WFPProviderContextFlags {
-	None,
-	Persistent = FWPM_PROVIDER_CONTEXT_FLAG_PERSISTENT,
-	DownLevel = FWPM_PROVIDER_CONTEXT_FLAG_DOWNLEVEL,
-};
-DEFINE_ENUM_FLAG_OPERATORS(WFPProviderContextFlags);
-
-enum class WFPProviderContextType {
-	IPSecKeying						= FWPM_IPSEC_KEYING_CONTEXT,
-	IPSecIkeQuickModeTransport		= FWPM_IPSEC_IKE_QM_TRANSPORT_CONTEXT,
-	IPSecIkeQuickModeTunnel			= FWPM_IPSEC_IKE_QM_TUNNEL_CONTEXT,
-	IPSecAuthIPQuickModeTransport	= FWPM_IPSEC_AUTHIP_QM_TRANSPORT_CONTEXT,
-	IPSecAuthIPQuickModeTunnel		= FWPM_IPSEC_AUTHIP_QM_TUNNEL_CONTEXT,
-	IPSecIkeMainMode				= FWPM_IPSEC_IKE_MM_CONTEXT,
-	IPSecAuthIPMainMode				= FWPM_IPSEC_AUTHIP_MM_CONTEXT,
-	ClassifyOptions					= FWPM_CLASSIFY_OPTIONS_CONTEXT,
-	General							= FWPM_GENERAL_CONTEXT,
-	IPSecIkeV2QuickModeTunnel		= FWPM_IPSEC_IKEV2_QM_TUNNEL_CONTEXT,
-	IPSecIKeV2MainMode				= FWPM_IPSEC_IKEV2_MM_CONTEXT,
-	IPSecDosProtection				= FWPM_IPSEC_DOSP_CONTEXT,
-	IPSecIkeV2QuickModeTransport	= FWPM_IPSEC_IKEV2_QM_TRANSPORT_CONTEXT,
-	_Max							= FWPM_PROVIDER_CONTEXT_TYPE_MAX
-};
-
-struct WFPProviderContextInfo {
-	GUID ProviderContextKey;
-	std::wstring Name;
-	std::wstring Desc;
-	WFPProviderContextFlags Flags;
-	GUID ProviderKey;
-	uint32_t ProviderDataSize;
-	std::vector<BYTE> ProviderData;
-	UINT64 ProviderContextId;
-	WFPProviderContextType Type;
-};
-
 template<typename T>
 struct WFPObject {
 	explicit WFPObject(T* p) : Data(p) {}
@@ -78,6 +42,7 @@ public:
 	//
 	WFPObject<FWPM_PROVIDER> GetProviderByKey(GUID const& key) const;
 	bool AddProvider(FWPM_PROVIDER const* provider, PSECURITY_DESCRIPTOR sd = nullptr);
+	bool DeleteProvider(GUID const& key);
 
 	//
 	// Filters API
@@ -103,8 +68,6 @@ public:
 	WFPObject<FWPM_CALLOUT> GetCalloutById(UINT32 id) const;
 
 private:
-	static WFPProviderContextInfo InitProviderContext(FWPM_PROVIDER_CONTEXT* p, bool full = false);
-
 	HANDLE m_hEngine{ nullptr };
 	mutable DWORD m_LastError{ 0 };
 };

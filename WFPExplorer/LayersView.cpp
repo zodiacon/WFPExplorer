@@ -13,7 +13,7 @@ CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(fram
 
 LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL);
+		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
@@ -128,7 +128,9 @@ int CLayersView::GetRowImage(HWND, int row, int col) const {
 
 void CLayersView::UpdateUI() {
 	auto& ui = Frame()->UI();
-	ui.UIEnable(ID_EDIT_PROPERTIES, m_List.GetSelectedCount() == 1);
+	int selected = m_List.GetSelectedCount();
+	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
+	ui.UIEnable(ID_EDIT_COPY, selected > 0);
 }
 
 int CLayersView::GetFilterCount(LayerInfo& layer) const {
@@ -182,4 +184,14 @@ LRESULT CLayersView::OnCopy(WORD, WORD, HWND, BOOL&) {
 	ClipboardHelper::CopyText(m_hWnd, text);
 
 	return 0;
+}
+
+bool CLayersView::OnRightClickList(HWND, int row, int col, POINT const& pt) {
+	if (row < 0)
+		return false;
+
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT);
+
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(1), 0, pt.x, pt.y);
 }

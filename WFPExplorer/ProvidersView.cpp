@@ -3,14 +3,18 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
-#include "ProviderDlg.h"
+#include "WFPHelper.h"
+#include "ClipboardHelper.h"
 
 CProvidersView::CProvidersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
 
 void CProvidersView::UpdateUI() const {
 	auto& ui = Frame()->UI();
-	ui.UIEnable(ID_EDIT_PROPERTIES, m_List.GetSelectedCount() == 1);
+	auto selected = m_List.GetSelectedCount();
+	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
+	ui.UIEnable(ID_EDIT_COPY, selected > 0);
+	ui.UIEnable(ID_EDIT_DELETE, selected == 1);
 }
 
 LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -20,11 +24,11 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Provider Key", 0, 280, ColumnType::Key);
-	cm->AddColumn(L"Provider Name", 0, 220, ColumnType::Name);
-	cm->AddColumn(L"Service Name", 0, 180, ColumnType::ServiceName);
+	cm->AddColumn(L"Provider Name", 0, 330, ColumnType::Name);
+	cm->AddColumn(L"Service Name", 0, 120, ColumnType::ServiceName);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 90, ColumnType::ProviderData);
-	cm->AddColumn(L"Description", 0, 250, ColumnType::Desc);
+	cm->AddColumn(L"Description", 0, 450, ColumnType::Desc);
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
@@ -37,13 +41,13 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	return 0;
 }
 
-LRESULT CProvidersView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) {
+LRESULT CProvidersView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) const {
 	if (active)
 		UpdateUI();
 	return 0;
 }
 
-void CProvidersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
+void CProvidersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) const {
 	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
 		UpdateUI();
 }
@@ -62,8 +66,7 @@ LRESULT CProvidersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 	auto count = m_List.GetSelectedCount();
 	ATLASSERT(count == 1);
 	auto& provider = m_Providers[m_List.GetNextItem(-1, LVIS_SELECTED)];
-	CProviderDlg dlg(provider.Data);
-	dlg.DoModal();
+	WFPHelper::ShowProviderProperties(m_Engine, provider.Data);
 
 	return 0;
 }
@@ -130,4 +133,34 @@ CString const& CProvidersView::ProviderInfo::Desc() const {
 	if (m_Desc.IsEmpty())
 		m_Desc = StringHelper::ParseMUIString(Data->displayData.description);
 	return m_Desc;
+}
+
+LRESULT CProvidersView::OnCopy(WORD, WORD, HWND, BOOL&) {
+	auto text = ListViewHelper::GetSelectedRowsAsString(m_List, L",");
+	ClipboardHelper::CopyText(m_hWnd, text);
+
+	return 0;
+}
+
+bool CProvidersView::OnRightClickList(HWND, int row, int col, POINT const& pt) const {
+	if (row < 0)
+		return false;
+
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT);
+
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
+}
+
+LRESULT CProvidersView::OnDelete(WORD, WORD, HWND, BOOL&) {
+	auto count = m_List.GetSelectedCount();
+	ATLASSERT(count == 1);
+	auto& provider = m_Providers[m_List.GetNextItem(-1, LVIS_SELECTED)];
+	if (!m_Engine.DeleteProvider(provider.Data->providerKey)) {
+		AtlMessageBox(m_hWnd, L"Failed to delete provider", IDS_TITLE, MB_ICONERROR);
+	}
+	else {
+		Refresh();
+	}
+	return 0;
 }

@@ -151,6 +151,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="WFPEngine.h" />
     <ClInclude Include="WFPEnumerator.h" />
+    <ClInclude Include="WFPValue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -161,6 +162,7 @@
     </ClCompile>
     <ClCompile Include="WFPCore.cpp" />
     <ClCompile Include="WFPEngine.cpp" />
+    <ClCompile Include="WFPValue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

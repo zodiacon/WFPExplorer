@@ -27,6 +27,9 @@
     <ClInclude Include="WFPEnumerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WFPValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WFPCore.cpp">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WFPEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WFPValue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

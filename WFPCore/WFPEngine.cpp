@@ -39,6 +39,11 @@ bool WFPEngine::AddProvider(FWPM_PROVIDER const* provider, PSECURITY_DESCRIPTOR 
 	return m_LastError == ERROR_SUCCESS;
 }
 
+bool WFPEngine::DeleteProvider(GUID const& key) {
+	m_LastError = ::FwpmProviderDeleteByKey(m_hEngine, &key);
+	return m_LastError == ERROR_SUCCESS;
+}
+
 WFPObject<FWPM_FILTER> WFPEngine::GetFilterByKey(GUID const& key) const {
 	FWPM_FILTER* filter = nullptr;
 	m_LastError = FwpmFilterGetByKey(m_hEngine, &key, &filter);

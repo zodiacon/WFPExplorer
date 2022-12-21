@@ -4,6 +4,7 @@
 #include <SortHelper.h>
 #include "resource.h"
 #include <ranges>
+#include <ClipboardHelper.h>
 
 CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
@@ -123,4 +124,38 @@ int CCalloutsView::GetSaveColumnRange(HWND, int&) const {
 
 int CCalloutsView::GetRowImage(HWND, int row, int col) const {
 	return 0;
+}
+
+LRESULT CCalloutsView::OnCopy(WORD, WORD, HWND, BOOL&) {
+	auto text = ListViewHelper::GetSelectedRowsAsString(m_List, L",");
+	ClipboardHelper::CopyText(m_hWnd, text);
+
+	return 0;
+}
+
+LRESULT CCalloutsView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) const {
+	if (active)
+		UpdateUI();
+	return 0;
+}
+
+void CCalloutsView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) const {
+	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+		UpdateUI();
+}
+
+void CCalloutsView::UpdateUI() const {
+	auto& ui = Frame()->UI();
+	auto selected = m_List.GetSelectedCount();
+	ui.UIEnable(ID_EDIT_COPY, selected > 0);
+}
+
+bool CCalloutsView::OnRightClickList(HWND, int row, int col, POINT const& pt) const {
+	if (row < 0)
+		return false;
+
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT);
+
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(1), 0, pt.x, pt.y);
 }

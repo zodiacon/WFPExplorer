@@ -23,6 +23,7 @@ public:
 	int GetRowImage(HWND, int row, int col) const;
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
 	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
+	bool OnRightClickList(HWND, int row, int col, POINT const& pt);
 
 	BEGIN_MSG_MAP(CLayersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)

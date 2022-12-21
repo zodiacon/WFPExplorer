@@ -21,8 +21,9 @@ public:
 	void DoSort(SortInfo const* si);
 	int GetSaveColumnRange(HWND, int&) const;
 	int GetRowImage(HWND, int row, int col) const;
-	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
+	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) const;
 	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
+	bool OnRightClickList(HWND, int row, int col, POINT const& pt) const;
 
 	BEGIN_MSG_MAP(CProvidersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
@@ -32,6 +33,8 @@ public:
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
+		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
+		COMMAND_ID_HANDLER(ID_EDIT_DELETE, OnDelete)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -55,9 +58,11 @@ private:
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnActivate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnActivate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) const;
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnDelete(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;
 
