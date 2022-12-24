@@ -67,7 +67,7 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Flags:
 			if (info->flags == 0)
 				return L"0";
-			return std::format(L"0x{:02X} ({})", info->flags, 
+			return std::format(L"0x{:02X} ({})", info->flags,
 				(PCWSTR)StringHelper::WFPFilterFlagsToString(info->flags)).c_str();
 		case ColumnType::EffectiveWeight: return StringHelper::WFPValueToString(info->effectiveWeight, true);
 		case ColumnType::ProviderName: return GetProviderName(fi);
@@ -83,6 +83,7 @@ void CFiltersView::UpdateUI() const {
 	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
 	ui.UIEnable(ID_EDIT_DELETE, selected > 0);
 	ui.UIEnable(ID_EDIT_COPY, selected > 0);
+	ui.UIEnable(ID_EDIT_FINDNEXT, Frame()->GetFindDialog() != nullptr);
 }
 
 CString const& CFiltersView::GetProviderName(FilterInfo& info) const {
@@ -136,7 +137,7 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
 	UINT icons[] = { IDI_FILTER, IDI_FILTER_PERMIT, IDI_FILTER_BLOCK, IDI_FILTER_REFRESH };
-	for(auto icon : icons)
+	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
@@ -157,7 +158,7 @@ LRESULT CFiltersView::OnProperties(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CFiltersView::OnActivate(UINT, WPARAM activate, LPARAM, BOOL&) {
-	if(activate)
+	if (activate)
 		UpdateUI();
 	return 0;
 }
@@ -178,7 +179,7 @@ LRESULT CFiltersView::OnDeleteFilter(WORD, WORD, HWND, BOOL&) {
 		m_List.SelectAllItems(false);
 		Refresh();
 	}
-	if(deleted < selected)
+	if (deleted < selected)
 		AtlMessageBox(m_hWnd, std::format(L"Deleted {}/{} filters", deleted, selected).c_str(), IDS_TITLE, MB_ICONINFORMATION);
 
 	return 0;
@@ -198,10 +199,8 @@ LRESULT CFiltersView::OnSave(WORD, WORD, HWND, BOOL&) {
 
 	auto ok = IDOK == dlg.DoModal();
 	ThemeHelper::Resume();
-	if(ok) {
-		if(!ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
-			AtlMessageBox(m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
-		}
+	if (ok && !ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
+		AtlMessageBox(m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
 	}
 	return 0;
 }
@@ -293,7 +292,7 @@ int CFiltersView::GetRowImage(HWND, int row, int) const {
 }
 
 void CFiltersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
-	if((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
 		UpdateUI();
 }
 

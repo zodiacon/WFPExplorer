@@ -33,15 +33,15 @@ CString StringHelper::WFPValueToString(FWP_VALUE const& value, bool hex, bool fu
 		case FWP_INT32: str.Format(hex ? L"0x%X" : L"%d", value.int32); break;
 		case FWP_UINT16: str.Format(hex ? L"0x%X" : L"%u", (uint32_t)value.uint16); break;
 		case FWP_UINT32: str.Format(hex ? L"0x%X" : L"%u", value.uint32); break;
-		case FWP_INT64: str.Format(hex ? L"0x%llX" : L"%lld", value.int64); break;
-		case FWP_UINT64: str.Format(hex ? L"0x%llX" : L"%llu", value.uint64); break;
+		case FWP_INT64: str.Format(hex ? L"0x%llX" : L"%lld", *value.int64); break;
+		case FWP_UINT64: str.Format(hex ? L"0x%llX" : L"%llu", *value.uint64); break;
 		case FWP_FLOAT: str.Format(L"%f", value.float32); break;
-		case FWP_DOUBLE: str.Format(L"%lf", value.double64); break;
+		case FWP_DOUBLE: str.Format(L"%lf", *value.double64); break;
 		case FWP_UNICODE_STRING_TYPE: return value.unicodeString;
 		case FWP_BYTE_ARRAY6_TYPE: return FormatBinary(value.byteArray6->byteArray6, 6);
 		case FWP_BYTE_ARRAY16_TYPE: return FormatBinary(value.byteArray16->byteArray16, 16);
 		case FWP_BYTE_BLOB_TYPE: return std::format(L"({} bytes) \r\n", value.byteBlob->size).c_str() +
-			FormatBinary(value.byteBlob->data, full ? value.byteBlob->size : min(16, value.byteBlob->size));
+			FormatBinary(value.byteBlob->data, full ? value.byteBlob->size : min(16, value.byteBlob->size), 16, full);
 		case FWP_SID: return FormatSID(value.sid);
 		case FWP_SECURITY_DESCRIPTOR_TYPE:
 			PWSTR sddl;
@@ -407,13 +407,23 @@ CString StringHelper::WFPConditionFieldKeyToString(GUID const& key) {
 	return GuidToString(key);
 }
 
-CString StringHelper::FormatBinary(BYTE const* buffer, ULONG size, int lineSize) {
+CString StringHelper::FormatBinary(BYTE const* buffer, ULONG size, int lineSize, bool ascii) {
 	CString text;
+	CString asciiText;
 	for (ULONG i = 0; i < size; i++) {
 		text += std::format(L"{:02X} ", buffer[i]).c_str();
-		if (i % lineSize == lineSize - 1)
+		if (ascii)
+			asciiText += isprint(buffer[i]) ? (WCHAR)buffer[i] : L'.';
+		if (i % lineSize == lineSize - 1) {
+			if (ascii) {
+				text += L"  " + asciiText;
+				asciiText.Empty();
+			}
 			text += L"\r\n";
+		}
 	}
+	if(ascii && !asciiText.IsEmpty())
+		text += std::wstring(3 * (lineSize - size % lineSize) + 2, L' ').c_str() + asciiText;
 	return text;
 }
 

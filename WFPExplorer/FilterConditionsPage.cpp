@@ -12,7 +12,7 @@ CString CFilterConditionsPage::GetColumnText(HWND, int row, int col) const {
         case 0: return StringHelper::WFPConditionFieldKeyToString(cond.fieldKey);
         case 1: return StringHelper::WFPConditionMatchToString(cond.matchType);
         case 2: return StringHelper::WFPDataTypeToString(cond.conditionValue.type);
-        case 3: return StringHelper::WFPConditionValueToString(cond.conditionValue, true);
+        case 3: return StringHelper::WFPConditionValueToString(cond.conditionValue, true, true);
     }
     return CString();
 }

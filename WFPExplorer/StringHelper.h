@@ -18,7 +18,7 @@ struct StringHelper abstract final {
 	static PCWSTR WFPConditionMatchToString(FWP_MATCH_TYPE type);
 	static PCWSTR WFPDataTypeToString(FWP_DATA_TYPE type);
 	static CString WFPConditionFieldKeyToString(GUID const& key);
-	static CString FormatBinary(BYTE const* buffer, ULONG size, int lineSize = 16);
+	static CString FormatBinary(BYTE const* buffer, ULONG size, int lineSize = 16, bool ascii = false);
 	static CString FormatSID(PSID const sid);
 	static PCWSTR WFPFieldTypeToString(FWPM_FIELD_TYPE type);
 	static CString FormatIpv4Address(UINT32 address);
