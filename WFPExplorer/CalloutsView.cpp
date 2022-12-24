@@ -6,7 +6,7 @@
 #include <ranges>
 #include <ClipboardHelper.h>
 
-CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -15,8 +15,8 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Callout Key", 0, 250, ColumnType::Key);
-	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 90, ColumnType::Id);
+	cm->AddColumn(L"Callout Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 90, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider", 0, 250, ColumnType::Provider);

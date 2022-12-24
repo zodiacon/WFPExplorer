@@ -10,23 +10,16 @@
 #include "ProviderDlg.h"
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
-	if (key != GUID_NULL) {
-		auto provider = engine.GetProviderByKey(key);
-		if (provider && provider->displayData.name && provider->displayData.name[0] != L'@')
-			return provider->displayData.name;
-		return StringHelper::GuidToString(key);
-	}
-	return L"";
+	auto provider = engine.GetProviderByKey(key);
+	if (auto name = StringHelper::ParseMUIString(provider->displayData.name); !name.IsEmpty())
+		return name;
+	return StringHelper::GuidToString(key);
 }
 
 CString WFPHelper::GetFilterName(WFPEngine const& engine, GUID const& key) {
-	if (key != GUID_NULL) {
-		auto filter = engine.GetFilterByKey(key);
-		if (filter)
-			return StringHelper::ParseMUIString(filter->displayData.name);
-		return StringHelper::GuidToString(key);
-	}
-	return L"";
+	if (auto filter = engine.GetFilterByKey(key); filter)
+		return StringHelper::ParseMUIString(filter->displayData.name);
+	return StringHelper::GuidToString(key);
 }
 
 CString WFPHelper::GetLayerName(WFPEngine const& engine, GUID const& key) {

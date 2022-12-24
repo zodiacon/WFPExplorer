@@ -262,6 +262,7 @@
     <ClInclude Include="FilterConditionsPage.h" />
     <ClInclude Include="FilterGeneralPage.h" />
     <ClInclude Include="FiltersView.h" />
+    <ClInclude Include="GenericListViewBase.h" />
     <ClInclude Include="HierarchyView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="LayerFieldsPage.h" />

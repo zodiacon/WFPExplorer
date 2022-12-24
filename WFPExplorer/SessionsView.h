@@ -1,16 +1,13 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include <WFPEnumerators.h>
 
 class WFPEngine;
 
 class CSessionsView : 
-	public CFrameView<CSessionsView, IMainFrame>,
-	public CVirtualListView<CSessionsView> {
+	public CGenericListViewBase<CSessionsView> {
 public:
 	CSessionsView(IMainFrame* frame, WFPEngine& engine);
 
@@ -23,10 +20,10 @@ public:
 
 	BEGIN_MSG_MAP(CSessionsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CSessionsView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CSessionsView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CSessionsView>, 1)
 	END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
@@ -48,7 +45,5 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_SESSION, SessionInfo> m_Sessions;
-	WFPSessionEnumerator m_Enum;
 };

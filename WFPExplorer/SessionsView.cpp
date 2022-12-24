@@ -10,7 +10,7 @@
 #include "ProcessHelper.h"
 #include <SortHelper.h>
 
-CSessionsView::CSessionsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine), m_Enum(engine.Handle()) {
+CSessionsView::CSessionsView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 BOOL CSessionsView::PreTranslateMessage(MSG* pMsg) {
@@ -19,8 +19,8 @@ BOOL CSessionsView::PreTranslateMessage(MSG* pMsg) {
 }
 
 void CSessionsView::Refresh() {
-	m_Enum.Close();
-	m_Sessions = m_Enum.Next<SessionInfo>();
+	WFPSessionEnumerator enumerator(m_Engine.Handle());
+	m_Sessions = enumerator.Next<SessionInfo>();
 	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Sessions.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(1, std::format(L"{} Sessions", m_Sessions.size()).c_str());
@@ -80,8 +80,8 @@ LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Session Key", 0, 250, ColumnType::Key);
-	cm->AddColumn(L"PID", LVCFMT_RIGHT, 90, ColumnType::ProcessId);
+	cm->AddColumn(L"Session Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"PID", LVCFMT_RIGHT, 90, ColumnType::ProcessId, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Process Name", LVCFMT_LEFT, 180, ColumnType::ProcessName);
 	cm->AddColumn(L"User Name", LVCFMT_LEFT, 220, ColumnType::UserName);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 120, ColumnType::Flags);

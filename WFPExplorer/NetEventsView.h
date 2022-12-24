@@ -1,8 +1,6 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include "resource.h"
 #include <WFPEnumerator.h>
@@ -10,8 +8,7 @@
 class WFPEngine;
 
 class CNetEventsView :
-	public CFrameView<CNetEventsView, IMainFrame>,
-	public CVirtualListView<CNetEventsView> {
+	public CGenericListViewBase<CNetEventsView> {
 public:
 	CNetEventsView(IMainFrame* frame, WFPEngine& engine);
 
@@ -21,17 +18,17 @@ public:
 	void DoSort(SortInfo const* si);
 	//int GetSaveColumnRange(HWND, int&) const;
 	int GetRowImage(HWND, int row, int col) const;
-	//void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
+	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
 	//bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
 
 	BEGIN_MSG_MAP(CNetEventsView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CNetEventsView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CNetEventsView>)
 	ALT_MSG_MAP(1)
 		//COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CNetEventsView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -46,7 +43,7 @@ private:
 		CString AppId, UserId, PackageId;
 	};
 
-	void UpdateUI();
+	void UpdateUI() const;
 	CString const& GetLocalAddress(NetEventInfo& info) const;
 	CString const& GetRemoteAddress(NetEventInfo& info) const;
 	UINT16 GetLocalPort(NetEventInfo& info) const;
@@ -69,6 +66,5 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_NET_EVENT, NetEventInfo> m_Events;
 };

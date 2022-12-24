@@ -1,8 +1,6 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include "resource.h"
 #include <WFPEnumerator.h>
@@ -10,8 +8,7 @@
 class WFPEngine;
 
 class CLayersView :
-	public CFrameView<CLayersView, IMainFrame>,
-	public CVirtualListView<CLayersView> {
+	public CGenericListViewBase<CLayersView> {
 public:
 	CLayersView(IMainFrame* frame, WFPEngine& engine);
 
@@ -28,13 +25,13 @@ public:
 	BEGIN_MSG_MAP(CLayersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CLayersView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CLayersView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnSave)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CLayersView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -72,6 +69,5 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_LAYER, LayerInfo> m_Layers;
 };

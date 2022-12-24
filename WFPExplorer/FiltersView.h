@@ -1,8 +1,6 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include "resource.h"
 #include <WFPEnumerator.h>
@@ -10,9 +8,7 @@
 class WFPEngine;
 
 class CFiltersView :
-	public CFrameView<CFiltersView, IMainFrame>,
-	public CCustomDraw<CFiltersView>,
-	public CVirtualListView<CFiltersView> {
+	public CGenericListViewBase<CFiltersView> {
 public:
 	CFiltersView(IMainFrame* frame, WFPEngine& engine);
 
@@ -28,24 +24,17 @@ public:
 	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
 	bool OnRightClickList(HWND, int row, int col, POINT const& pt);
 
-	DWORD OnPrePaint(int, LPNMCUSTOMDRAW cd);
-	DWORD OnItemPrePaint(int, LPNMCUSTOMDRAW cd);
-	DWORD OnSubItemPrePaint(int, LPNMCUSTOMDRAW cd);
-
 	BEGIN_MSG_MAP(CFiltersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
-		MESSAGE_HANDLER(CFindReplaceDialog::GetFindReplaceMsg(), OnFind)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CFiltersView>)
-		CHAIN_MSG_MAP(CCustomDraw<CFiltersView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CFiltersView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_EDIT_DELETE, OnDeleteFilter)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
-		COMMAND_ID_HANDLER(ID_EDIT_FINDNEXT, OnFindNext)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnSave)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CFiltersView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -84,12 +73,9 @@ private:
 	LRESULT OnDeleteFilter(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnFind(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnFindNext(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_FILTER, FilterInfo> m_Filters;
 	GUID m_Layer{ GUID_NULL };
 };

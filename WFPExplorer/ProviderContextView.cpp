@@ -5,7 +5,7 @@
 #include "resource.h"
 #include <WFPEnumerators.h>
 
-CProviderContextView::CProviderContextView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CProviderContextView::CProviderContextView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 CString CProviderContextView::GetProviderName(GUID const* key) const {
@@ -25,12 +25,12 @@ LRESULT CProviderContextView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM 
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Context Key", 0, 260, ColumnType::Key);
+	cm->AddColumn(L"Context Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Type", 0, 150, ColumnType::Type);
 	cm->AddColumn(L"Name", 0, 220, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 100, ColumnType::Flags);
 	cm->AddColumn(L"Data Size", LVCFMT_RIGHT, 90, ColumnType::DataSize);
-	cm->AddColumn(L"Context ID", 0, 120, ColumnType::Id);
+	cm->AddColumn(L"Context ID", 0, 150, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Provider", 0, 240, ColumnType::Provider);
 	cm->AddColumn(L"Description", 0, 300, ColumnType::Desc);
 
@@ -64,7 +64,7 @@ CString CProviderContextView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Provider: return GetProviderName(info->providerKey);
 		case ColumnType::Desc: return StringHelper::ParseMUIString(info->displayData.description);
 		case ColumnType::Id: return std::format(L"0x{:X}", info->providerContextId).c_str();
-		case ColumnType::DataSize: return std::format(L"{}", info->providerData.size).c_str();
+		case ColumnType::DataSize: return info->providerData.size ? std::format(L"{} bytes", info->providerData.size).c_str() : L"";
 		case ColumnType::Flags:
 			if (info->flags == 0)
 				return L"0";

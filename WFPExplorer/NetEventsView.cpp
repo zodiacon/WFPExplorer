@@ -5,7 +5,7 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 
-CNetEventsView::CNetEventsView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CNetEventsView::CNetEventsView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 void CNetEventsView::Refresh() {
@@ -77,7 +77,17 @@ int CNetEventsView::GetRowImage(HWND, int row, int col) const {
 	return 0;
 }
 
-void CNetEventsView::UpdateUI() {
+void CNetEventsView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
+	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+		UpdateUI();
+}
+
+void CNetEventsView::UpdateUI() const {
+	auto& ui = Frame()->UI();
+	auto selected = m_List.GetSelectedCount();
+	ui.UIEnable(ID_EDIT_COPY, selected > 0);
+	ui.UIEnable(ID_EDIT_DELETE, selected > 0);
+	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
 }
 
 CString const& CNetEventsView::GetLocalAddress(NetEventInfo& info) const {
@@ -145,16 +155,16 @@ LRESULT CNetEventsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Type", 0, 150, ColumnType::Type);
-	cm->AddColumn(L"Time", 0, 130, ColumnType::Time);
+	cm->AddColumn(L"Time", 0, 160, ColumnType::Time, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Protocol", 0, 90, ColumnType::Protocol);
 	cm->AddColumn(L"Address Family", 0, 70, ColumnType::AddressFamily);
-	cm->AddColumn(L"Local Address", LVCFMT_RIGHT, 220, ColumnType::LocalAddress);
-	cm->AddColumn(L"Local Port", LVCFMT_RIGHT, 80, ColumnType::LocalPort);
-	cm->AddColumn(L"Remote Address", LVCFMT_RIGHT, 220, ColumnType::RemoteAddress);
-	cm->AddColumn(L"Remote Port", LVCFMT_RIGHT, 80, ColumnType::RemotePort);
-	cm->AddColumn(L"Scope ID", LVCFMT_RIGHT, 80, ColumnType::ScopeId);
+	cm->AddColumn(L"Local Address", LVCFMT_RIGHT, 300, ColumnType::LocalAddress, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Local Port", LVCFMT_RIGHT, 70, ColumnType::LocalPort, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Remote Address", LVCFMT_RIGHT, 300, ColumnType::RemoteAddress, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Remote Port", LVCFMT_RIGHT, 70, ColumnType::RemotePort, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Scope ID", LVCFMT_RIGHT, 80, ColumnType::ScopeId, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"User ID", 0, 180, ColumnType::UserId);
-	cm->AddColumn(L"App ID", 0, 180, ColumnType::AppId);
+	cm->AddColumn(L"App ID", 0, 180, ColumnType::AppId, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Package ID", 0, 180, ColumnType::PackageId);
 
 	Refresh();
@@ -167,7 +177,8 @@ LRESULT CNetEventsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
-LRESULT CNetEventsView::OnActivate(UINT, WPARAM, LPARAM, BOOL&) {
-	UpdateUI();
+LRESULT CNetEventsView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) {
+	if(active)
+		UpdateUI();
 	return 0;
 }

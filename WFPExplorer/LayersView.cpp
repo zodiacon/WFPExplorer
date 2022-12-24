@@ -8,7 +8,7 @@
 #include <ClipboardHelper.h>
 #include <ThemeHelper.h>
 
-CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -17,11 +17,11 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Layer Key", 0, 280, ColumnType::Key);
-	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 70, ColumnType::Id);
+	cm->AddColumn(L"Layer Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 70, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 250, ColumnType::Flags);
-	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 60, ColumnType::Fields);
+	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 60, ColumnType::Fields, ColumnFlags::Visible | ColumnFlags::Numeric);
 	//cm->AddColumn(L"Filters", LVCFMT_RIGHT, 60, ColumnType::Filters);
 	//cm->AddColumn(L"Callouts", LVCFMT_RIGHT, 60, ColumnType::Callouts);
 	cm->AddColumn(L"Default Sublayer", 0, 250, ColumnType::DefaultSubLayer);

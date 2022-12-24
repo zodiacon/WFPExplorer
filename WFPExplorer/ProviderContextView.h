@@ -1,16 +1,13 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include <WFPEnumerator.h>
 
 class WFPEngine;
 
 class CProviderContextView :
-	public CFrameView<CProviderContextView, IMainFrame>,
-	public CVirtualListView<CProviderContextView> {
+	public CGenericListViewBase<CProviderContextView> {
 public:
 	CProviderContextView(IMainFrame* frame, WFPEngine& engine);
 
@@ -23,10 +20,10 @@ public:
 
 	BEGIN_MSG_MAP(CProviderContextView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CProviderContextView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CProviderContextView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CProviderContextView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -46,6 +43,5 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_PROVIDER_CONTEXT> m_Contexts;
 };

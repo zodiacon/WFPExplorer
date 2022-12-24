@@ -1,8 +1,6 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include <WFPEnumerators.h>
 #include "resource.h"
@@ -10,8 +8,7 @@
 class WFPEngine;
 
 class CProvidersView :
-	public CFrameView<CProvidersView, IMainFrame>,
-	public CVirtualListView<CProvidersView> {
+	public CGenericListViewBase<CProvidersView> {
 public:
 	CProvidersView(IMainFrame* frame, WFPEngine& engine);
 
@@ -28,13 +25,13 @@ public:
 	BEGIN_MSG_MAP(CProvidersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CProvidersView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CProvidersView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
 		COMMAND_ID_HANDLER(ID_EDIT_DELETE, OnDelete)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CProvidersView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -66,6 +63,5 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_PROVIDER, ProviderInfo> m_Providers;
 };

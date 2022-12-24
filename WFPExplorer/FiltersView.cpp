@@ -14,7 +14,7 @@
 #include <fstream>
 #include <ThemeHelper.h>
 
-CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CFiltersView::CFiltersView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 void CFiltersView::SetLayer(GUID const& layer) {
@@ -40,7 +40,7 @@ CString CFiltersView::GetColumnText(HWND, int row, int col) {
 		case ColumnType::Key: return StringHelper::GuidToString(info->filterKey);
 		case ColumnType::Name: return fi.Name();
 		case ColumnType::Desc: return fi.Desc();
-		case ColumnType::Id: return std::to_wstring(info->filterId).c_str();
+		case ColumnType::Id: return std::format(L"0x{:X}", info->filterId).c_str();
 		case ColumnType::ConditionCount: return std::to_wstring(info->numFilterConditions).c_str();
 		case ColumnType::LayerKey: return StringHelper::GuidToString(info->layerKey);
 		case ColumnType::SubLayerKey: return StringHelper::GuidToString(info->subLayerKey);
@@ -120,12 +120,13 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Filter Key", 0, 300, ColumnType::Key);
-	cm->AddColumn(L"Filter Name", 0, 180, ColumnType::Name);
-	cm->AddColumn(L"Layer", LVCFMT_LEFT, 250, ColumnType::Layer);
-	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 140, ColumnType::Weight);
-	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 140, ColumnType::EffectiveWeight);
-	cm->AddColumn(L"Conditions", LVCFMT_RIGHT, 70, ColumnType::ConditionCount);
+	cm->AddColumn(L"Filter Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Filter Name", 0, 170, ColumnType::Name);
+	cm->AddColumn(L"Layer", LVCFMT_LEFT, 200, ColumnType::Layer);
+	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 140, ColumnType::Weight, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 140, ColumnType::EffectiveWeight, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Filter Id", LVCFMT_RIGHT, 100, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Conditions", LVCFMT_RIGHT, 70, ColumnType::ConditionCount, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Action", LVCFMT_LEFT, 110, ColumnType::Action);
 	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
@@ -205,52 +206,6 @@ LRESULT CFiltersView::OnSave(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
-LRESULT CFiltersView::OnFind(UINT, WPARAM, LPARAM, BOOL&) {
-	auto findDlg = Frame()->GetFindDialog();
-	auto searchDown = findDlg->SearchDown();
-	int start = m_List.GetNextItem(-1, LVIS_SELECTED);
-	CString find(findDlg->GetFindString());
-	auto ignoreCase = !findDlg->MatchCase();
-	if (ignoreCase)
-		find.MakeLower();
-
-	auto columns = m_List.GetHeader().GetItemCount();
-	auto count = m_List.GetItemCount();
-	int from = searchDown ? start + 1 : start - 1 + count;
-	int to = searchDown ? count + start : start + 1;
-	int step = searchDown ? 1 : -1;
-
-	int findIndex = -1;
-	CString text;
-	for (int i = from; i != to; i += step) {
-		int index = i % count;
-		for (int c = 0; c < columns; c++) {
-			m_List.GetItemText(index, c, text);
-			if (ignoreCase)
-				text.MakeLower();
-			if (text.Find(find) >= 0) {
-				findIndex = index;
-				break;
-			}
-		}
-		if (findIndex >= 0)
-			break;
-	}
-
-	if (findIndex >= 0) {
-		m_List.SelectItem(findIndex);
-		m_List.SetFocus();
-	}
-	else {
-		AtlMessageBox(m_hWnd, L"Finsihed searching list.", IDS_TITLE, MB_ICONINFORMATION);
-	}
-	return 0;
-}
-
-LRESULT CFiltersView::OnFindNext(WORD, WORD, HWND, BOOL&) {
-	return SendMessage(CFindReplaceDialog::GetFindReplaceMsg());
-}
-
 void CFiltersView::DoSort(SortInfo const* si) {
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
@@ -261,6 +216,7 @@ void CFiltersView::DoSort(SortInfo const* si) {
 			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(f1->filterKey), StringHelper::GuidToString(f2->filterKey), asc);
 			case ColumnType::Name: return SortHelper::Sort(filter1.Name(), filter2.Name(), asc);
 			case ColumnType::Desc: return SortHelper::Sort(filter1.Desc(), filter2.Desc(), asc);
+			case ColumnType::Id: return SortHelper::Sort(f1->filterId, f2->filterId, asc);
 			case ColumnType::Action: return SortHelper::Sort(f1->action.type, f2->action.type, asc);
 			case ColumnType::ActionKey: return SortHelper::Sort(filter1.FilterAction, filter2.FilterAction, asc);
 			case ColumnType::Flags: return SortHelper::Sort(f1->flags, f2->flags, asc);
@@ -311,25 +267,25 @@ bool CFiltersView::OnRightClickList(HWND, int row, int col, POINT const& pt) {
 	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
 }
 
-DWORD CFiltersView::OnPrePaint(int, LPNMCUSTOMDRAW cd) {
-	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYITEMDRAW : 0;
-}
-
-DWORD CFiltersView::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) {
-	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYSUBITEMDRAW : 0;
-}
-
-DWORD CFiltersView::OnSubItemPrePaint(int, LPNMCUSTOMDRAW cd) {
-	auto lv = (LPNMLVCUSTOMDRAW)cd;
-	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(lv->iSubItem);
-	if (col == ColumnType::Key || col == ColumnType::Weight || col == ColumnType::EffectiveWeight) {
-		::SelectObject(cd->hdc, Frame()->GetMonoFont());
-	}
-	else {
-		::SelectObject(cd->hdc, m_List.GetFont());
-	}
-	return CDRF_NEWFONT;
-}
+//DWORD CFiltersView::OnPrePaint(int, LPNMCUSTOMDRAW cd) {
+//	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYITEMDRAW : 0;
+//}
+//
+//DWORD CFiltersView::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) {
+//	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYSUBITEMDRAW : 0;
+//}
+//
+//DWORD CFiltersView::OnSubItemPrePaint(int, LPNMCUSTOMDRAW cd) {
+//	auto lv = (LPNMLVCUSTOMDRAW)cd;
+//	auto const& col = GetColumnManager(m_List)->GetColumn(lv->iSubItem);
+//	if ((col.Flags & ColumnFlags::Numeric) == ColumnFlags::Numeric) {
+//		::SelectObject(cd->hdc, Frame()->GetMonoFont());
+//	}
+//	else {
+//		::SelectObject(cd->hdc, m_List.GetFont());
+//	}
+//	return CDRF_NEWFONT;
+//}
 
 CString const& CFiltersView::FilterInfo::Name() const {
 	if (m_Name.IsEmpty())

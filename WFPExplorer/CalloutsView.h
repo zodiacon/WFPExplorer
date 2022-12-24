@@ -1,16 +1,13 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include <WFPEnumerators.h>
 
 class WFPEngine;
 
 class CCalloutsView :
-	public CFrameView<CCalloutsView, IMainFrame>,
-	public CVirtualListView<CCalloutsView> {
+	public CGenericListViewBase<CCalloutsView> {
 public:
 	CCalloutsView(IMainFrame* frame, WFPEngine& engine);
 
@@ -27,11 +24,11 @@ public:
 	BEGIN_MSG_MAP(CCalloutsView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CCalloutsView>)
-		CHAIN_MSG_MAP(BaseFrame)
+		CHAIN_MSG_MAP(CGenericListViewBase<CCalloutsView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CCalloutsView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -59,7 +56,6 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_CALLOUT, CalloutInfo> m_Callouts;
 	GUID m_LayerKey{ GUID_NULL };
 };

@@ -167,6 +167,9 @@
     <ClInclude Include="ProviderDlg.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
+    <ClInclude Include="GenericListViewBase.h">
+      <Filter>Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WFPExplorer.rc">

@@ -1,16 +1,13 @@
 #pragma once
 
-#include <FrameView.h>
-#include <VirtualListView.h>
-#include "Interfaces.h"
+#include "GenericListViewBase.h"
 #include <WFPEngine.h>
 #include <WFPEnumerator.h>
 
 class WFPEngine;
 
 class CSublayersView :
-	public CFrameView<CSublayersView, IMainFrame>,
-	public CVirtualListView<CSublayersView> {
+	public CGenericListViewBase<CSublayersView> {
 public:
 	CSublayersView(IMainFrame* frame, WFPEngine& engine);
 
@@ -23,10 +20,10 @@ public:
 
 	BEGIN_MSG_MAP(CSublayersView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CSublayersView>)
-		CHAIN_MSG_MAP(BaseFrame)
-		ALT_MSG_MAP(1)
+		CHAIN_MSG_MAP(CGenericListViewBase<CSublayersView>)
+	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CSublayersView>, 1)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -54,6 +51,5 @@ private:
 
 	WFPEngine& m_Engine;
 
-	CListViewCtrl m_List;
 	WFPObjectVector<FWPM_SUBLAYER, SubLayerInfo> m_Layers;
 };

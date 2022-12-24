@@ -6,7 +6,7 @@
 #include "WFPHelper.h"
 #include "ClipboardHelper.h"
 
-CProvidersView::CProvidersView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
+CProvidersView::CProvidersView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
 
 void CProvidersView::UpdateUI() const {
@@ -23,7 +23,7 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Provider Key", 0, 280, ColumnType::Key);
+	cm->AddColumn(L"Provider Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Provider Name", 0, 330, ColumnType::Name);
 	cm->AddColumn(L"Service Name", 0, 120, ColumnType::ServiceName);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
