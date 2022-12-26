@@ -32,6 +32,13 @@ CString WFPHelper::GetLayerName(WFPEngine const& engine, GUID const& key) {
 	return L"";
 }
 
+CString WFPHelper::GetCalloutName(WFPEngine const& engine, GUID const& key) {
+	auto callout = engine.GetCalloutByKey(key);
+	if (auto name = StringHelper::ParseMUIString(callout->displayData.name); !name.IsEmpty())
+		return name;
+	return StringHelper::GuidToString(key);
+}
+
 CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 	if (key != GUID_NULL) {
 		auto layer = engine.GetSublayerByKey(key);

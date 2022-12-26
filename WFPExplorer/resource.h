@@ -51,7 +51,6 @@
 #define IDC_NAME                        1002
 #define IDC_DESC                        1003
 #define IDC_PROVIDER                    1004
-#define IDC_KEY2                        1004
 #define IDC_SERVICENAME                 1004
 #define IDC_PROVIDER_PROP               1005
 #define IDC_PROVIDERDATA                1005
@@ -68,6 +67,8 @@
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
 #define IDC_SUBLAYER_PROP               1014
+#define IDC_LAYER_PROP2                 1015
+#define IDC_CALLOUT_PROP                1015
 #define IDC_VALUE                       1016
 #define IDC_FLAGS                       1017
 #define IDC_TABS                        1018
@@ -76,6 +77,7 @@
 #define IDC_PERSISTENT                  1022
 #define IDC_DISABLED                    1023
 #define IDC_DATASIZE                    1024
+#define IDC_COFI                        1025
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -99,14 +101,15 @@
 #define ID_NEW_PROVIDER                 32796
 #define ID_EDIT_FIND32797               32797
 #define ID_EDIT_FINDNEXT                32798
+#define ID_VIEW_STATISTICS              32801
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        245
-#define _APS_NEXT_COMMAND_VALUE         32801
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_COMMAND_VALUE         32802
+#define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

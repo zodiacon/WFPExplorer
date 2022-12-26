@@ -137,7 +137,7 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
-	UINT icons[] = { IDI_FILTER, IDI_FILTER_PERMIT, IDI_FILTER_BLOCK, IDI_FILTER_REFRESH };
+	UINT icons[] = { IDI_FILTER, IDI_FILTER_PERMIT, IDI_FILTER_BLOCK, IDI_FILTER_REFRESH, IDI_CALLOUT };
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
@@ -244,7 +244,7 @@ int CFiltersView::GetRowImage(HWND, int row, int) const {
 		case FWP_ACTION_PERMIT: return 1;
 		case FWP_ACTION_CONTINUE: return 3;
 	}
-	return 0;
+	return 4;
 }
 
 void CFiltersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {

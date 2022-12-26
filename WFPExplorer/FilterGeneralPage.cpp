@@ -16,8 +16,14 @@ LRESULT CFilterGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
     SetDlgItemText(IDC_LAYER, WFPHelper::GetLayerName(m_Engine, m_Filter->layerKey));
     SetDlgItemText(IDC_SUBLAYER, WFPHelper::GetSublayerName(m_Engine, m_Filter->subLayerKey));
     SetDlgItemText(IDC_ACTIONTYPE, StringHelper::WFPFilterActionTypeToString(m_Filter->action.type));
-    if (m_Filter->action.filterType != GUID_NULL) {
-        SetDlgItemText(IDC_CALLOUT_OR_FILTER, StringHelper::GuidToString(m_Filter->action.filterType));
+    if (m_Filter->action.type & FWP_ACTION_FLAG_CALLOUT) {
+        SetDlgItemText(IDC_CALLOUT_OR_FILTER, WFPHelper::GetCalloutName(m_Engine, m_Filter->action.calloutKey));
+        AddIconToButton(IDC_CALLOUT_PROP, IDI_CALLOUT);
+    }
+    else {
+        GetDlgItem(IDC_COFI).ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CALLOUT_OR_FILTER).ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CALLOUT_PROP).ShowWindow(SW_HIDE);
     }
     SetDlgItemText(IDC_WEIGHT, StringHelper::WFPValueToString(m_Filter->weight, true));
     SetDlgItemText(IDC_EFFECTIVEWEIGHT, StringHelper::WFPValueToString(m_Filter->effectiveWeight, true));

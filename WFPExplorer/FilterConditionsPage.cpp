@@ -33,7 +33,7 @@ LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 
     auto cm = GetColumnManager(m_List);
     cm->AddColumn(L"Field", 0, 200);
-    cm->AddColumn(L"Match", 0, 70);
+    cm->AddColumn(L"Match", 0, 90);
     cm->AddColumn(L"Type", 0, 80);
     cm->AddColumn(L"Value", 0, 170);
     cm->UpdateColumns();
