@@ -5,8 +5,22 @@
 #include "resource.h"
 #include <ranges>
 #include <ClipboardHelper.h>
+#include "WFPHelper.h"
 
 CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
+}
+
+CString const& CCalloutsView::GetCalloutLayer(CalloutInfo& info) const {
+	if (info.Layer.IsEmpty()) {
+		auto layer = m_Engine.GetLayerByKey(info.Data->applicableLayer);
+		if (layer && layer->displayData.name) {
+			info.Layer = layer->displayData.name;
+		}
+		else {
+			info.Layer = StringHelper::GuidToString(info.Data->applicableLayer);
+		}
+	}
+	return info.Layer;
 }
 
 LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
@@ -58,32 +72,11 @@ CString CCalloutsView::GetColumnText(HWND, int row, int col) {
 	auto& info = m_Callouts[row];
 	switch (GetColumnManager(m_List)->GetColumnTag<ColumnType>(col)) {
 		case ColumnType::Key: return StringHelper::GuidToString(info.Data->calloutKey);
-		case ColumnType::Layer: 
-			if (info.Layer.IsEmpty()) {
-				auto layer = m_Engine.GetLayerByKey(info.Data->applicableLayer);
-				if (layer && layer->displayData.name) {
-					info.Layer = layer->displayData.name;
-				}
-				else {
-					info.Layer = StringHelper::GuidToString(info.Data->applicableLayer);
-				}
-			}
-			return info.Layer;
+		case ColumnType::Layer: return GetCalloutLayer(info);
+		case ColumnType::Provider: return GetCalloutProvider(info);
 
-		case ColumnType::Provider:
-			if (info.Provider.IsEmpty()) {
-				if (info.Data->providerKey) {
-					auto sl = m_Engine.GetProviderByKey(*info.Data->providerKey);
-					if (sl && sl->displayData.name && sl->displayData.name[0] != L'@')
-						info.Provider = sl->displayData.name;
-					else
-						info.Provider = StringHelper::GuidToString(*info.Data->providerKey);
-				}
-			}
-			return info.Provider;
-
-		case ColumnType::Name: return info.Data->displayData.name;
-		case ColumnType::Desc: return info.Data->displayData.description;
+		case ColumnType::Name: return GetCalloutName(info);
+		case ColumnType::Desc: return GetCalloutDesc(info);
 		case ColumnType::ProviderData:
 			return info.Data->providerData.size == 0 ? L"" : std::format(L"{} Bytes", info.Data->providerData.size).c_str();
 
@@ -106,11 +99,11 @@ void CCalloutsView::DoSort(SortInfo const* si) {
 		auto d1 = c1.Data, d2 = c2.Data;
 		switch (col) {
 			case ColumnType::Key: return SortHelper::Sort(StringHelper::GuidToString(d1->calloutKey), StringHelper::GuidToString(d2->calloutKey), asc);
-			case ColumnType::Layer: return SortHelper::Sort(c1.Layer, c2.Layer, asc);
-			case ColumnType::Name: return SortHelper::Sort(d1->displayData.name, d2->displayData.name, asc);
-			case ColumnType::Desc: return SortHelper::Sort(d1->displayData.description, d2->displayData.description, asc);
+			case ColumnType::Layer: return SortHelper::Sort(GetCalloutLayer(c1), GetCalloutLayer(c2), asc);
+			case ColumnType::Name: return SortHelper::Sort(GetCalloutName(c1), GetCalloutName(c2), asc);
+			case ColumnType::Desc: return SortHelper::Sort(GetCalloutDesc(c2), GetCalloutDesc(c2), asc);
 			case ColumnType::Flags: return SortHelper::Sort(d1->flags, d2->flags, asc);
-			case ColumnType::Provider: return SortHelper::Sort(c1.Provider, c2.Provider, asc);
+			case ColumnType::Provider: return SortHelper::Sort(GetCalloutProvider(c1), GetCalloutProvider(c2), asc);
 			case ColumnType::Id: return SortHelper::Sort(d1->calloutId, d2->calloutId, asc);
 		}
 		return false;
@@ -133,6 +126,26 @@ LRESULT CCalloutsView::OnCopy(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CCalloutsView::OnDelete(WORD, WORD, HWND, BOOL&) {
+	auto selected = m_List.GetSelectedCount();
+	ATLASSERT(selected == 1);
+	auto& co = m_Callouts[m_List.GetNextItem(-1, LVNI_SELECTED)];
+	if (!m_Engine.DeleteCallout(co.Data->calloutKey))
+		AtlMessageBox(m_hWnd, L"Failed to delete callout", IDS_TITLE, MB_ICONERROR);
+	else
+		Refresh();
+	return 0;
+}
+
+LRESULT CCalloutsView::OnProperties(WORD, WORD, HWND, BOOL&) {
+	auto selected = m_List.GetSelectedCount();
+	ATLASSERT(selected == 1);
+	auto& co = m_Callouts[m_List.GetNextItem(-1, LVNI_SELECTED)];
+	WFPHelper::ShowCalloutProperties(m_Engine, co.Data);
+
+	return 0;
+}
+
 LRESULT CCalloutsView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) const {
 	if (active)
 		UpdateUI();
@@ -148,6 +161,36 @@ void CCalloutsView::UpdateUI() const {
 	auto& ui = Frame()->UI();
 	auto selected = m_List.GetSelectedCount();
 	ui.UIEnable(ID_EDIT_COPY, selected > 0);
+	ui.UIEnable(ID_EDIT_DELETE, selected == 1);
+	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
+}
+
+bool CCalloutsView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
+	LRESULT result;
+	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
+}
+
+CString const& CCalloutsView::GetCalloutProvider(CalloutInfo& info) const {
+	if (info.Provider.IsEmpty() && info.Data->providerKey) {
+		auto sl = m_Engine.GetProviderByKey(*info.Data->providerKey);
+		if (sl)
+			info.Provider = StringHelper::ParseMUIString(sl->displayData.name);
+		else
+			info.Provider = StringHelper::GuidToString(*info.Data->providerKey);
+	}
+	return info.Provider;
+}
+
+CString const& CCalloutsView::GetCalloutName(CalloutInfo& info) const {
+	if (info.Name.IsEmpty())
+		info.Name = StringHelper::ParseMUIString(info.Data->displayData.name);
+	return info.Name;
+}
+
+CString const& CCalloutsView::GetCalloutDesc(CalloutInfo& info) const {
+	if (info.Desc.IsEmpty())
+		info.Desc = StringHelper::ParseMUIString(info.Data->displayData.description);
+	return info.Desc;
 }
 
 bool CCalloutsView::OnRightClickList(HWND, int row, int col, POINT const& pt) const {
@@ -157,5 +200,5 @@ bool CCalloutsView::OnRightClickList(HWND, int row, int col, POINT const& pt) co
 	CMenu menu;
 	menu.LoadMenu(IDR_CONTEXT);
 
-	return Frame()->TrackPopupMenu(menu.GetSubMenu(1), 0, pt.x, pt.y);
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
 }

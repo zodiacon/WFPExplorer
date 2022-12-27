@@ -17,6 +17,7 @@ public:
 	BEGIN_MSG_MAP(CFilterGeneralPage)
 		COMMAND_ID_HANDLER(IDC_LAYER_PROP, OnShowLayer)
 		COMMAND_ID_HANDLER(IDC_PROVIDER_PROP, OnShowProvider)
+		COMMAND_ID_HANDLER(IDC_CALLOUT_PROP, OnShowCallout)
 		COMMAND_ID_HANDLER(IDC_SUBLAYER_PROP, OnShowSublayer)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	END_MSG_MAP()
@@ -31,6 +32,7 @@ private:
 	LRESULT OnShowLayer(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnShowProvider(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnShowSublayer(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnShowCallout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 	WFPEngine& m_Engine;

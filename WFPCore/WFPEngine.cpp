@@ -84,6 +84,16 @@ WFPObject<FWPM_LAYER> WFPEngine::GetLayerById(UINT16 id) const {
 	return WFPObject(layer);
 }
 
+bool WFPEngine::DeleteCallout(GUID const& key) {
+	m_LastError = ::FwpmCalloutDeleteByKey(m_hEngine, &key);
+	return m_LastError == ERROR_SUCCESS;
+}
+
+bool WFPEngine::DeleteCallout(UINT32 id) {
+	m_LastError = ::FwpmCalloutDeleteById(m_hEngine, id);
+	return m_LastError == ERROR_SUCCESS;
+}
+
 WFPObject<FWPM_SUBLAYER> WFPEngine::GetSublayerByKey(GUID const& key) const {
 	FWPM_SUBLAYER* sublayer = nullptr;
 	m_LastError = ::FwpmSubLayerGetByKey(m_hEngine, &key, &sublayer);

@@ -60,10 +60,15 @@ public:
 	WFPObject<FWPM_LAYER> GetLayerById(UINT16 id) const;
 
 	//
+	// Callout API
+	//
+	bool DeleteCallout(GUID const& key);
+	bool DeleteCallout(UINT32 id);
+
+	//
 	// sublayer API
 	//
 	WFPObject<FWPM_SUBLAYER> GetSublayerByKey(GUID const& key) const;
-
 	WFPObject<FWPM_CALLOUT> GetCalloutByKey(GUID const& key) const;
 	WFPObject<FWPM_CALLOUT> GetCalloutById(UINT32 id) const;
 

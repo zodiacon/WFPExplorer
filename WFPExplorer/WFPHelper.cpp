@@ -8,6 +8,7 @@
 #include "FilterConditionsPage.h"
 #include "LayersView.h"
 #include "ProviderDlg.h"
+#include "CalloutDlg.h"
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	auto provider = engine.GetProviderByKey(key);
@@ -92,7 +93,10 @@ int WFPHelper::ShowSublayerProperties(WFPEngine& engine, FWPM_SUBLAYER* sublayer
 
 int WFPHelper::ShowProviderProperties(WFPEngine& engine, FWPM_PROVIDER* provider) {
 	CProviderDlg dlg(provider);
-	dlg.DoModal();
+	return (int)dlg.DoModal();
+}
 
-	return 0;
+int WFPHelper::ShowCalloutProperties(WFPEngine& engine, FWPM_CALLOUT* callout) {
+	CCalloutDlg dlg(engine, callout);
+	return (int)dlg.DoModal();
 }

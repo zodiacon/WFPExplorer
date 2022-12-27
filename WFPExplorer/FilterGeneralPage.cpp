@@ -69,3 +69,11 @@ LRESULT CFilterGeneralPage::OnShowProvider(WORD, WORD, HWND, BOOL&) {
 LRESULT CFilterGeneralPage::OnShowSublayer(WORD, WORD, HWND, BOOL&) {
     return LRESULT();
 }
+
+LRESULT CFilterGeneralPage::OnShowCallout(WORD, WORD, HWND, BOOL&) {
+    auto callout = m_Engine.GetCalloutByKey(m_Filter->action.calloutKey);
+    ATLASSERT(callout);
+    WFPHelper::ShowCalloutProperties(m_Engine, *callout);
+
+    return 0;
+}

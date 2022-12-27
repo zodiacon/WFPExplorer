@@ -45,6 +45,7 @@
 #define IDI_FIND_NEXT                   241
 #define IDI_FIND_PREV                   242
 #define IDD_PROVIDER                    243
+#define IDD_CALLOUT                     245
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -53,11 +54,12 @@
 #define IDC_PROVIDER                    1004
 #define IDC_SERVICENAME                 1004
 #define IDC_PROVIDER_PROP               1005
-#define IDC_PROVIDERDATA                1005
+#define IDC_PROVIDERDATA                1027
 #define IDC_LAYER                       1006
 #define IDC_LAYER_PROP                  1007
 #define IDC_ACTIONTYPE                  1008
 #define IDC_FIELDS                      1008
+#define IDC_PROVIDERDATA2               1008
 #define IDC_CALLOUT_OR_FILTER           1009
 #define IDC_LIST                        1009
 #define IDC_FILTERS                     1009
@@ -67,7 +69,6 @@
 #define IDC_EFFECTIVEWEIGHT             1012
 #define IDC_SUBLAYER                    1013
 #define IDC_SUBLAYER_PROP               1014
-#define IDC_LAYER_PROP2                 1015
 #define IDC_CALLOUT_PROP                1015
 #define IDC_VALUE                       1016
 #define IDC_FLAGS                       1017
@@ -76,8 +77,10 @@
 #define IDC_COPYFROM                    1021
 #define IDC_PERSISTENT                  1022
 #define IDC_DISABLED                    1023
+#define IDC_PROVIDER_CONTEXT            1023
 #define IDC_DATASIZE                    1024
-#define IDC_COFI                        1025
+#define IDC_REGISTERED                  1025
+#define IDC_COFI                        1026
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -99,17 +102,16 @@
 #define ID_NEW_FILTER                   32791
 #define ID_NEW_SIMPLEFILTER             32795
 #define ID_NEW_PROVIDER                 32796
-#define ID_EDIT_FIND32797               32797
-#define ID_EDIT_FINDNEXT                32798
-#define ID_VIEW_STATISTICS              32801
+#define ID_EDIT_FINDNEXT                32797
+#define ID_VIEW_STATISTICS              32798
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        245
-#define _APS_NEXT_COMMAND_VALUE         32802
-#define _APS_NEXT_CONTROL_VALUE         1026
+#define _APS_NEXT_RESOURCE_VALUE        247
+#define _APS_NEXT_COMMAND_VALUE         32799
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

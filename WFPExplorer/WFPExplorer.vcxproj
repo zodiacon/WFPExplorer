@@ -229,6 +229,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppSettings.cpp" />
+    <ClCompile Include="CalloutDlg.cpp" />
     <ClCompile Include="CalloutsView.cpp" />
     <ClCompile Include="FilterConditionsPage.cpp" />
     <ClCompile Include="FilterGeneralPage.cpp" />
@@ -258,6 +259,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppSettings.h" />
+    <ClInclude Include="CalloutDlg.h" />
     <ClInclude Include="CalloutsView.h" />
     <ClInclude Include="FilterConditionsPage.h" />
     <ClInclude Include="FilterGeneralPage.h" />

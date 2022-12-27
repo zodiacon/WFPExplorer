@@ -96,6 +96,9 @@
     <ClCompile Include="ProviderDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="CalloutDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="GenericListViewBase.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="CalloutDlg.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

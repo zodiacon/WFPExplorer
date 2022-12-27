@@ -20,6 +20,7 @@ public:
 	int GetRowImage(HWND, int row, int col) const;
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) const;
 	bool OnRightClickList(HWND, int row, int col, POINT const& pt) const;
+	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
 
 	BEGIN_MSG_MAP(CCalloutsView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
@@ -27,6 +28,8 @@ public:
 		CHAIN_MSG_MAP(CGenericListViewBase<CCalloutsView>)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		COMMAND_ID_HANDLER(ID_EDIT_DELETE, OnDelete)
+		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
 		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CCalloutsView>, 1)
 	END_MSG_MAP()
@@ -45,14 +48,22 @@ private:
 
 	struct CalloutInfo {
 		FWPM_CALLOUT* Data;
-		CString Provider;
-		CString Layer;
+		mutable CString Provider;
+		mutable CString Layer;
+		mutable CString Name, Desc;
 	};
+
+	CString const& GetCalloutProvider(CalloutInfo& info) const;
+	CString const& GetCalloutName(CalloutInfo& info) const;
+	CString const& GetCalloutDesc(CalloutInfo& info) const;
+	CString const& GetCalloutLayer(CalloutInfo& info) const;
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnActivate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) const;
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnDelete(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;
 
