@@ -221,8 +221,8 @@ void CFiltersView::DoSort(SortInfo const* si) {
 			case ColumnType::ActionKey: return SortHelper::Sort(filter1.FilterAction, filter2.FilterAction, asc);
 			case ColumnType::Flags: return SortHelper::Sort(f1->flags, f2->flags, asc);
 			case ColumnType::ProviderName: return SortHelper::Sort(GetProviderName(filter1), GetProviderName(filter2), asc);
-			case ColumnType::Weight: return SortHelper::Sort(f1->weight.uint64, f2->weight.uint64, asc);
-			case ColumnType::EffectiveWeight: return SortHelper::Sort(f1->effectiveWeight.uint64, f2->effectiveWeight.uint64, asc);
+			case ColumnType::Weight: return SortHelper::Sort(*f1->weight.uint64, *f2->weight.uint64, asc);
+			case ColumnType::EffectiveWeight: return SortHelper::Sort(*f1->effectiveWeight.uint64, *f2->effectiveWeight.uint64, asc);
 			case ColumnType::Layer: return SortHelper::Sort(GetLayerName(filter1), GetLayerName(filter2), asc);
 			case ColumnType::SubLayer: return SortHelper::Sort(GetSublayerName(filter1), GetSublayerName(filter2), asc);
 			case ColumnType::ConditionCount: return SortHelper::Sort(f1->numFilterConditions, f2->numFilterConditions, asc);

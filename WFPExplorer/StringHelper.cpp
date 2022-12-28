@@ -165,8 +165,8 @@ CString StringHelper::WFPCalloutFlagsToString(DWORD flags) {
 		PCWSTR text;
 	} data[] = {
 		{ FWPM_CALLOUT_FLAG_PERSISTENT,				L"Persistent" },
-		{ FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,	L"Provider Context" },
 		{ FWPM_CALLOUT_FLAG_REGISTERED,				L"Registered" },
+		{ FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,	L"Provider Context" },
 	};
 
 	return FlagsToString(flags, data);

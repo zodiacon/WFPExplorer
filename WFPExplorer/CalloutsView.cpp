@@ -30,7 +30,7 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Callout Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
-	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 90, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Callout ID", LVCFMT_RIGHT, 90, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider", 0, 250, ColumnType::Provider);
