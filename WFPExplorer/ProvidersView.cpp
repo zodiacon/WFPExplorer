@@ -52,6 +52,10 @@ void CProvidersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT 
 		UpdateUI();
 }
 
+CString CProvidersView::GetDefaultSaveFile() const {
+	return L"providers.csv";
+}
+
 bool CProvidersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
 	LRESULT result;
 	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);

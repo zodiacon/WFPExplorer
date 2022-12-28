@@ -74,6 +74,10 @@ int CSessionsView::GetRowImage(HWND, int row, int col) const {
 	return m_Sessions[row].Data->flags & FWPM_SESSION_FLAG_DYNAMIC ? 1 : 0;
 }
 
+CString CSessionsView::GetDefaultSaveFile() const {
+	return L"sessions.csv";
+}
+
 LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);

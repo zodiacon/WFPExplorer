@@ -102,6 +102,10 @@ int CSublayersView::GetRowImage(HWND, int row, int col) const {
 	return 0;
 }
 
+CString CSublayersView::GetDefaultSaveFile() const {
+	return L"sublayers.csv";
+}
+
 CString const& CSublayersView::SubLayerInfo::Name() const {
 	if (m_Name.IsEmpty())
 		m_Name = StringHelper::ParseMUIString(Data->displayData.name);

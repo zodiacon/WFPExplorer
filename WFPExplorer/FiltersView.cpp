@@ -193,19 +193,6 @@ LRESULT CFiltersView::OnCopy(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
-LRESULT CFiltersView::OnSave(WORD, WORD, HWND, BOOL&) {
-	CSimpleFileDialog dlg(FALSE, L"csv", L"filters.csv", OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
-		L"CSV Files (*.csv)\0*.csv\0Text Files (*.txt)\0*.txt\0All Files\0*.*\0", m_hWnd);
-	ThemeHelper::Suspend();
-
-	auto ok = IDOK == dlg.DoModal();
-	ThemeHelper::Resume();
-	if (ok && !ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
-		AtlMessageBox(m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
-	}
-	return 0;
-}
-
 void CFiltersView::DoSort(SortInfo const* si) {
 	auto col = GetColumnManager(m_List)->GetColumnTag<ColumnType>(si->SortColumn);
 	auto asc = si->SortAscending;
@@ -267,25 +254,9 @@ bool CFiltersView::OnRightClickList(HWND, int row, int col, POINT const& pt) {
 	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
 }
 
-//DWORD CFiltersView::OnPrePaint(int, LPNMCUSTOMDRAW cd) {
-//	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYITEMDRAW : 0;
-//}
-//
-//DWORD CFiltersView::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) {
-//	return cd->hdr.hwndFrom == m_List ? CDRF_NOTIFYSUBITEMDRAW : 0;
-//}
-//
-//DWORD CFiltersView::OnSubItemPrePaint(int, LPNMCUSTOMDRAW cd) {
-//	auto lv = (LPNMLVCUSTOMDRAW)cd;
-//	auto const& col = GetColumnManager(m_List)->GetColumn(lv->iSubItem);
-//	if ((col.Flags & ColumnFlags::Numeric) == ColumnFlags::Numeric) {
-//		::SelectObject(cd->hdc, Frame()->GetMonoFont());
-//	}
-//	else {
-//		::SelectObject(cd->hdc, m_List.GetFont());
-//	}
-//	return CDRF_NEWFONT;
-//}
+CString CFiltersView::GetDefaultSaveFile() const {
+	return L"Filters";
+}
 
 CString const& CFiltersView::FilterInfo::Name() const {
 	if (m_Name.IsEmpty())

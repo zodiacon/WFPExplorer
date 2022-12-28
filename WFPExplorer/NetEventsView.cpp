@@ -82,6 +82,10 @@ void CNetEventsView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT 
 		UpdateUI();
 }
 
+CString CNetEventsView::GetDefaultSaveFile() const {
+	return L"events.csv";
+}
+
 void CNetEventsView::UpdateUI() const {
 	auto& ui = Frame()->UI();
 	auto selected = m_List.GetSelectedCount();

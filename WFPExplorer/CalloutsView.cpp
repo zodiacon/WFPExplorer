@@ -6,6 +6,7 @@
 #include <ranges>
 #include <ClipboardHelper.h>
 #include "WFPHelper.h"
+#include <ThemeHelper.h>
 
 CCalloutsView::CCalloutsView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
@@ -170,6 +171,10 @@ bool CCalloutsView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
 	return ProcessWindowMessage(m_hWnd, WM_COMMAND, ID_EDIT_PROPERTIES, 0, result, 1);
 }
 
+CString CCalloutsView::GetDefaultSaveFile() const {
+	return L"callouts.csv";
+}
+
 CString const& CCalloutsView::GetCalloutProvider(CalloutInfo& info) const {
 	if (info.Provider.IsEmpty() && info.Data->providerKey) {
 		auto sl = m_Engine.GetProviderByKey(*info.Data->providerKey);
@@ -202,3 +207,4 @@ bool CCalloutsView::OnRightClickList(HWND, int row, int col, POINT const& pt) co
 
 	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
 }
+

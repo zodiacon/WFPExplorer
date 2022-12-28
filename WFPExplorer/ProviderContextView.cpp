@@ -100,3 +100,7 @@ int CProviderContextView::GetSaveColumnRange(HWND, int&) const {
 int CProviderContextView::GetRowImage(HWND, int row, int col) const {
 	return 0;
 }
+
+CString CProviderContextView::GetDefaultSaveFile() const {
+	return L"providercontexts.csv";
+}

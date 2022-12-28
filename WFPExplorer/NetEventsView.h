@@ -20,6 +20,7 @@ public:
 	int GetRowImage(HWND, int row, int col) const;
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
 	//bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
+	CString GetDefaultSaveFile() const;
 
 	BEGIN_MSG_MAP(CNetEventsView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)

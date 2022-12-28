@@ -21,6 +21,7 @@ public:
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) const;
 	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
 	bool OnRightClickList(HWND, int row, int col, POINT const& pt) const;
+	CString GetDefaultSaveFile() const;
 
 	BEGIN_MSG_MAP(CProvidersView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)

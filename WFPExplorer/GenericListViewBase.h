@@ -4,6 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include "resource.h"
+#include <ThemeHelper.h>
 
 template<typename T>
 class CGenericListViewBase abstract :
@@ -75,8 +76,26 @@ public:
 		return 0;
 	}
 
+	LRESULT OnSave(WORD, WORD, HWND, BOOL&) {
+		auto p = static_cast<T*>(this);
+		CSimpleFileDialog dlg(FALSE, L"csv", p->GetDefaultSaveFile(), OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
+			L"CSV Files (*.csv)\0*.csv\0Text Files (*.txt)\0*.txt\0All Files\0*.*\0", p->m_hWnd);
+		ThemeHelper::Suspend();
+
+		auto ok = IDOK == dlg.DoModal();
+		ThemeHelper::Resume();
+		if (ok && !ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
+			AtlMessageBox(p->m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
+		}
+		return 0;
+	}
+
 	LRESULT OnFindNext(WORD, WORD, HWND, BOOL&) {
 		return static_cast<T*>(this)->SendMessage(CFindReplaceDialog::GetFindReplaceMsg());
+	}
+
+	CString GetDefaultSaveFile() const {
+		return L"";
 	}
 
 protected:
@@ -90,6 +109,7 @@ protected:
 		CHAIN_MSG_MAP(BaseFrame)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_EDIT_FINDNEXT, OnFindNext)
+		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnSave)
 	END_MSG_MAP()
 
 	CListViewCtrl m_List;

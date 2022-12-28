@@ -21,6 +21,7 @@ public:
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) const;
 	bool OnRightClickList(HWND, int row, int col, POINT const& pt) const;
 	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
+	CString GetDefaultSaveFile() const;
 
 	BEGIN_MSG_MAP(CCalloutsView)
 		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
@@ -64,6 +65,7 @@ private:
 	LRESULT OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnDelete(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;
 

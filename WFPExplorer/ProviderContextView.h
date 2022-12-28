@@ -17,6 +17,7 @@ public:
 	void DoSort(SortInfo const* si);
 	int GetSaveColumnRange(HWND, int&) const;
 	int GetRowImage(HWND, int row, int col) const;
+	CString GetDefaultSaveFile() const;
 
 	BEGIN_MSG_MAP(CProviderContextView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
