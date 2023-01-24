@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 template<typename TItem, typename T = TItem*>
 class WFPObjectVector {
 public:

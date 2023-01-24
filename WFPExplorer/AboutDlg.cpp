@@ -22,3 +22,10 @@ LRESULT CAboutDlg::OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, 
 	EndDialog(wID);
 	return 0;
 }
+
+LRESULT CAboutDlg::OnClickSyslink(int, LPNMHDR hdr, BOOL&) const {
+	if (hdr->idFrom == IDC_LINK) {
+		::ShellExecute(nullptr, L"open", L"https://github.com/zodiacon/wfpexplorer", nullptr, nullptr, SW_SHOWDEFAULT);
+	}
+	return 0;
+}

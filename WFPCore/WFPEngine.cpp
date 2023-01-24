@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "WFPEngine.h"
-#include <unordered_map>
 
 bool WFPEngine::Open(DWORD auth) {
 	if (m_hEngine)

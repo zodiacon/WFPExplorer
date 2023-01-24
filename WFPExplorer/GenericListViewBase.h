@@ -37,37 +37,10 @@ public:
 		auto p = static_cast<T*>(this);
 		auto findDlg = p->Frame()->GetFindDialog();
 		auto searchDown = findDlg->SearchDown();
-		int start = m_List.GetNextItem(-1, LVIS_SELECTED);
-		CString find(findDlg->GetFindString());
-		auto ignoreCase = !findDlg->MatchCase();
-		if (ignoreCase)
-			find.MakeLower();
+		auto index = ListViewHelper::SearchItem(m_List, findDlg->GetFindString(), searchDown, findDlg->MatchCase());
 
-		auto columns = m_List.GetHeader().GetItemCount();
-		auto count = m_List.GetItemCount();
-		int from = searchDown ? start + 1 : start - 1 + count;
-		int to = searchDown ? count + start : start + 1;
-		int step = searchDown ? 1 : -1;
-
-		int findIndex = -1;
-		CString text;
-		for (int i = from; i != to; i += step) {
-			int index = i % count;
-			for (int c = 0; c < columns; c++) {
-				m_List.GetItemText(index, c, text);
-				if (ignoreCase)
-					text.MakeLower();
-				if (text.Find(find) >= 0) {
-					findIndex = index;
-					break;
-				}
-			}
-			if (findIndex >= 0)
-				break;
-		}
-
-		if (findIndex >= 0) {
-			m_List.SelectItem(findIndex);
+		if (index >= 0) {
+			m_List.SelectItem(index);
 			m_List.SetFocus();
 		}
 		else {

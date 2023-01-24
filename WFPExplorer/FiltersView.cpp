@@ -120,12 +120,12 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Filter Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
-	cm->AddColumn(L"Filter Name", 0, 170, ColumnType::Name);
+	cm->AddColumn(L"Name", 0, 300, ColumnType::Name);
 	cm->AddColumn(L"Layer", LVCFMT_LEFT, 200, ColumnType::Layer);
+	cm->AddColumn(L"Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Id", LVCFMT_RIGHT, 100, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 140, ColumnType::Weight, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 140, ColumnType::EffectiveWeight, ColumnFlags::Visible | ColumnFlags::Numeric);
-	cm->AddColumn(L"Filter Id", LVCFMT_RIGHT, 100, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Conditions", LVCFMT_RIGHT, 70, ColumnType::ConditionCount, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Action", LVCFMT_LEFT, 110, ColumnType::Action);
 	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);

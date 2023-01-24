@@ -10,6 +10,8 @@ public:
 
 	BEGIN_MSG_MAP(CAboutDlg)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		NOTIFY_CODE_HANDLER(NM_CLICK, OnClickSyslink)
+		NOTIFY_CODE_HANDLER(NM_RETURN, OnClickSyslink)
 		COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
 		COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
 	END_MSG_MAP()
@@ -21,4 +23,5 @@ public:
 
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnClickSyslink(int, LPNMHDR hdr, BOOL&) const;
 };

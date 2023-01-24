@@ -215,10 +215,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About WFP Explorer"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,69,60,50,14
+    DEFPUSHBUTTON   "OK",IDOK,73,60,43,14
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
-    LTEXT           "Static",IDC_VERSION,56,12,97,8
-    LTEXT           "Static",IDC_COPYRIGHT,56,28,97,8
+    LTEXT           "Static",IDC_VERSION,56,11,97,8
+    LTEXT           "Static",IDC_COPYRIGHT,56,24,97,8
+    CONTROL         "<a>github.com/zodiacon/WFPExplorer</a>",IDC_LINK,
+                    "SysLink",WS_TABSTOP,37,41,123,14
 END
 
 IDD_FILTERINFO DIALOGEX 0, 0, 417, 241
@@ -496,7 +498,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,5,3,0
+ FILEVERSION 0,5,4,0
  PRODUCTVERSION 0,5,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -514,12 +516,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.5.3.0"
+            VALUE "FileVersion", "0.5.4.0"
             VALUE "InternalName", "WFPExplorer"
-            VALUE "LegalCopyright", "©2022 Pavel Yosifovich"
+            VALUE "LegalCopyright", "©2022-2023 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.5.3.0"
+            VALUE "ProductVersion", "0.5.4"
         END
     END
     BLOCK "VarFileInfo"

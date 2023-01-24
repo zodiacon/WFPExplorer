@@ -54,7 +54,6 @@
 #define IDC_PROVIDER                    1004
 #define IDC_SERVICENAME                 1004
 #define IDC_PROVIDER_PROP               1005
-#define IDC_PROVIDERDATA                1027
 #define IDC_LAYER                       1006
 #define IDC_LAYER_PROP                  1007
 #define IDC_ACTIONTYPE                  1008
@@ -81,6 +80,9 @@
 #define IDC_DATASIZE                    1024
 #define IDC_REGISTERED                  1025
 #define IDC_COFI                        1026
+#define IDC_PROVIDERDATA                1027
+#define IDC_SYSLINK1                    1028
+#define IDC_LINK                        1028
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS_ALWAYSONTOP          32775
@@ -111,7 +113,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        247
 #define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

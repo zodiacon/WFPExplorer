@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 template<typename T>
 struct WFPObject {
 	explicit WFPObject(T* p) : Data(p) {}

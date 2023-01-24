@@ -30,9 +30,9 @@ LRESULT CCalloutsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Callout Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
-	cm->AddColumn(L"Callout ID", LVCFMT_RIGHT, 90, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
+	cm->AddColumn(L"ID", LVCFMT_RIGHT, 90, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Provider", 0, 250, ColumnType::Provider);
 	cm->AddColumn(L"Applicable Layer", 0, 250, ColumnType::Layer);

@@ -17,9 +17,9 @@ LRESULT CLayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
-	cm->AddColumn(L"Layer Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
-	cm->AddColumn(L"Layer ID", LVCFMT_RIGHT, 70, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Name", 0, 250, ColumnType::Name);
+	cm->AddColumn(L"Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"ID", LVCFMT_RIGHT, 70, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 250, ColumnType::Flags);
 	cm->AddColumn(L"Fields", LVCFMT_RIGHT, 60, ColumnType::Fields, ColumnFlags::Visible | ColumnFlags::Numeric);
 	//cm->AddColumn(L"Filters", LVCFMT_RIGHT, 60, ColumnType::Filters);
