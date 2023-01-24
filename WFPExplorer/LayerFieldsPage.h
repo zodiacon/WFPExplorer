@@ -36,8 +36,11 @@ private:
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
 private:
+	struct FieldInfo : FWPM_FIELD {
+		int Index;
+	};
 	WFPEngine& m_Engine;
 	FWPM_LAYER* m_Layer;
-	std::vector<FWPM_FIELD> m_Fields;
+	std::vector<FieldInfo> m_Fields;
 	CListViewCtrl m_List;
 };

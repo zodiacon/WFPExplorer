@@ -51,7 +51,8 @@ LRESULT CLayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CLayersView::OnProperties(WORD, WORD, HWND, BOOL&) {
-	auto& layer = m_Layers[m_List.GetSelectedIndex()];
+	ATLASSERT(m_List.GetSelectedCount() == 1);
+	auto& layer = m_Layers[m_List.GetNextItem(-1, LVNI_SELECTED)];
 	WFPHelper::ShowLayerProperties(m_Engine, layer.Data);
 	return 0;
 }
