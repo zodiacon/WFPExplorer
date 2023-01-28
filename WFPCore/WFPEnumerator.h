@@ -6,27 +6,25 @@ template<typename TItem, typename T = TItem*>
 class WFPObjectVector {
 public:
 	WFPObjectVector() = default;
-	WFPObjectVector(std::vector<T>&& v, TItem** items) : m_Vec(std::move(v)), m_pItems(items) {}
-	WFPObjectVector(WFPObjectVector const&) = delete;
-	WFPObjectVector(WFPObjectVector&& other) : m_Vec(std::move(other.m_Vec)), m_pItems(other.m_pItems) {
-		other.m_pItems = nullptr;
+	WFPObjectVector(std::vector<T>&& v, TItem** items) : m_Vec(std::move(v)) {
+		m_pItems.push_back(items);
 	}
-
+	WFPObjectVector(WFPObjectVector const&) = delete;
+	WFPObjectVector(WFPObjectVector&& other) = default;
 	WFPObjectVector& operator=(WFPObjectVector const&) = delete;
 	WFPObjectVector& operator=(WFPObjectVector&& other) {
 		if (this != &other) {
-			if(m_pItems)
-				::FwpmFreeMemory((void**)&m_pItems);
 			m_Vec = std::move(other.m_Vec);
-			m_pItems = other.m_pItems;
-			other.m_pItems = nullptr;
+			for (auto& p : m_pItems)
+				::FwpmFreeMemory((void**)&p);
+			m_pItems = std::move(other.m_pItems);
 		}
 		return *this;
 	}
 
 	~WFPObjectVector() {
-		if (m_pItems)
-			::FwpmFreeMemory((void**)&m_pItems);
+		for (auto& p : m_pItems)
+			::FwpmFreeMemory((void**)&p);
 	}
 
 	auto begin() {
@@ -61,9 +59,22 @@ public:
 		return m_Vec[index];
 	}
 
+	void Append(WFPObjectVector&& v) {
+		if (m_Vec.empty()) {
+			m_Vec = std::move(v.m_Vec);
+			m_pItems = std::move(v.m_pItems);
+		}
+		else {
+			m_Vec.insert(m_Vec.end(), v.m_Vec.begin(), v.m_Vec.end());
+			m_pItems.insert(m_pItems.end(), v.m_pItems.begin(), v.m_pItems.end());
+			v.m_pItems.clear();
+			v.m_Vec.clear();
+		}
+	}
+
 private:
 	std::vector<T> m_Vec;
-	TItem** m_pItems{ nullptr };
+	std::vector<TItem**> m_pItems;
 };
 
 

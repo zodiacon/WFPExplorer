@@ -24,10 +24,16 @@ void CFiltersView::SetLayer(GUID const& layer) {
 void CFiltersView::Refresh() {
 	CWaitCursor wait;
 	WFPFilterEnumerator enumerator(m_Engine.Handle());
-	if (m_Layer == GUID_NULL)
-		m_Filters = enumerator.Next<FilterInfo>(8192);
-	else
-		m_Filters = enumerator.NextFiltered<FilterInfo>([&](auto& filter) { return filter->layerKey == m_Layer; }, 8192);
+	auto maxCount = 4000;
+	DWORD count = 0;
+	do {
+		if (m_Layer == GUID_NULL)
+			m_Filters.Append(enumerator.Next<FilterInfo>(maxCount));
+		else
+			m_Filters.Append(enumerator.NextFiltered<FilterInfo>([&](auto& filter) { return filter->layerKey == m_Layer; }, maxCount));
+		count += maxCount;
+	} while (m_Filters.size() == count);
+
 	Sort(m_List);
 	m_List.SetItemCountEx((int)m_Filters.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(3, std::format(L"{} Filters", m_Filters.size()).c_str());

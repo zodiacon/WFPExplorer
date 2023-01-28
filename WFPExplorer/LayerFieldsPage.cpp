@@ -45,7 +45,7 @@ LRESULT CLayerFieldsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	m_Fields.reserve(count);
 	for (UINT32 i = 0; i < count; i++) {
 		FieldInfo info(m_Layer->field[i]);
-		info.Index = i + 1;
+		info.Index = i;
 		m_Fields.push_back(info);
 	}
 	m_List.SetItemCount(count);

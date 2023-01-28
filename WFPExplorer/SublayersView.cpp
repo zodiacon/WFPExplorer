@@ -14,13 +14,13 @@ LRESULT CSublayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	auto cm = GetColumnManager(m_List);
+	cm->AddColumn(L"Name", 0, 300, ColumnType::Name);
 	cm->AddColumn(L"Layer Key", 0, 300, ColumnType::Key, ColumnFlags::Visible | ColumnFlags::Numeric);
-	cm->AddColumn(L"Name", 0, 180, ColumnType::Name);
 	cm->AddColumn(L"Flags", 0, 120, ColumnType::Flags);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 80, ColumnType::Weight, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Provider", 0, 200, ColumnType::Provider);
 	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 90, ColumnType::ProviderData);
-	cm->AddColumn(L"Provider", 0, 180, ColumnType::Provider);
-	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
+	cm->AddColumn(L"Description", 0, 300, ColumnType::Desc);
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
