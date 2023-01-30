@@ -13,7 +13,7 @@ std::wstring GuidToString(GUID const& guid) {
 	return ::StringFromGUID2(guid, sguid, _countof(sguid)) ? sguid : L"";
 }
 
-void DisplaySessions(WFPEngine& engine) {
+void DisplaySessions(WFPEngine const& engine) {
 	WFPSessionEnumerator enumerator(engine.Handle());
 	auto sessions = enumerator.Next(256);
 	printf("Total sessions: %u\n", (UINT32)sessions.size());
@@ -21,7 +21,7 @@ void DisplaySessions(WFPEngine& engine) {
 		"Key", "PID", "User name", "Flags", "Name", "Description");
 	printf("%s\n", std::string(n, '-').c_str());
 
-	for (auto session : sessions) {
+	for (auto const& session : sessions) {
 		printf("%ws %6u %-28ws %6X %-28ws %ws\n",
 			GuidToString(session->sessionKey).c_str(),
 			session->processId,

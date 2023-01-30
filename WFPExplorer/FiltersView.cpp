@@ -7,7 +7,6 @@
 #include "FilterGeneralPage.h"
 #include "FilterConditionsPage.h"
 #include "WFPHelper.h"
-#include <ResizablePropertySheet.h>
 #include "AppSettings.h"
 #include <WFPEnumerators.h>
 #include <ClipboardHelper.h>
