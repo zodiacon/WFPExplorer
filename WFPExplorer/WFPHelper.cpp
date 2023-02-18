@@ -9,6 +9,7 @@
 #include "LayersView.h"
 #include "ProviderDlg.h"
 #include "CalloutDlg.h"
+#include <SortHelper.h>
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	auto provider = engine.GetProviderByKey(key);
@@ -99,4 +100,30 @@ int WFPHelper::ShowProviderProperties(WFPEngine& engine, FWPM_PROVIDER* provider
 int WFPHelper::ShowCalloutProperties(WFPEngine& engine, FWPM_CALLOUT* callout) {
 	CCalloutDlg dlg(engine, callout);
 	return (int)dlg.DoModal();
+}
+
+bool WFPHelper::Sort(FWP_VALUE const& v1, FWP_VALUE const& v2, bool asc) {
+	if (v1.type != v2.type) {
+		if (v1.type == FWP_EMPTY)
+			return asc;
+		if (v2.type == FWP_EMPTY)
+			return !asc;
+	}
+
+	//
+	// cover some common cases...
+	//
+	switch (v1.type + (v2.type << 8)) {
+		case FWP_UINT8 + (FWP_UINT8 << 8): return SortHelper::Sort(v1.uint8, v2.uint8, asc);
+		case FWP_UINT8 + (FWP_UINT64 << 8) : return SortHelper::Sort<UINT64>(v1.uint8, *v2.uint64, asc);
+		case FWP_UINT64 + (FWP_UINT8 << 8) : return SortHelper::Sort<UINT64>(*v1.uint64, v2.uint8, asc);
+		case FWP_UINT16 + (FWP_UINT16 << 8) : return SortHelper::Sort(v1.uint16, v2.uint16, asc);
+		case FWP_UINT32 + (FWP_UINT32 << 8) : return SortHelper::Sort(v1.uint32, v2.uint32, asc);
+		case FWP_UINT64 + (FWP_UINT64 << 8) : return SortHelper::Sort(*v1.uint64, *v2.uint64, asc);
+		case FWP_INT8 + (FWP_INT64 << 8) : return SortHelper::Sort(v1.int8, *v2.int64, asc);
+		case FWP_INT16 + (FWP_INT16 << 8) : return SortHelper::Sort(v1.int16, v2.int16, asc);
+		case FWP_INT32 + (FWP_INT32 << 8): return SortHelper::Sort(v1.int32, v2.int32, asc);
+		case FWP_INT64 + (FWP_INT64 << 8): return SortHelper::Sort(*v1.int64, *v2.int64, asc);
+	}
+	return false;
 }

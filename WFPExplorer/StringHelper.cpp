@@ -12,9 +12,21 @@ CString StringHelper::ParseMUIString(PCWSTR input) {
 		return L"";
 
 	if (*input && input[0] == L'@') {
-		WCHAR result[256];
+		WCHAR result[512];
 		if (::SHLoadIndirectString(input, result, _countof(result), nullptr) == S_OK)
 			return result;
+
+		std::wstring path(input);
+		auto dot = path.rfind(L".dll");
+		if (dot != std::wstring::npos) {
+			//
+			// try with a MUI file
+			//
+			path.insert(dot + 4, L".mui");
+			path.insert(1, L"%SystemRoot%\\System32\\en-us\\");
+			if (::SHLoadIndirectString(path.c_str(), result, _countof(result), nullptr) == S_OK)
+				return result;
+		}
 	}
 	return input;
 }

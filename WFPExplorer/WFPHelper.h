@@ -13,5 +13,6 @@ struct WFPHelper abstract final {
 	static int ShowSublayerProperties(WFPEngine& engine, FWPM_SUBLAYER* sublayer);
 	static int ShowProviderProperties(WFPEngine& engine, FWPM_PROVIDER* provider);
 	static int ShowCalloutProperties(WFPEngine& engine, FWPM_CALLOUT* callout);
+	static bool Sort(FWP_VALUE const& v1, FWP_VALUE const& v2, bool asc);
 };
 

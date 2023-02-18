@@ -131,13 +131,13 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	cm->AddColumn(L"Id", LVCFMT_RIGHT, 100, ColumnType::Id, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Weight", LVCFMT_RIGHT, 140, ColumnType::Weight, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Effective Weight", LVCFMT_RIGHT, 140, ColumnType::EffectiveWeight, ColumnFlags::Visible | ColumnFlags::Numeric);
+	cm->AddColumn(L"Provider", 0, 240, ColumnType::ProviderName);
 	cm->AddColumn(L"Conditions", LVCFMT_RIGHT, 70, ColumnType::ConditionCount, ColumnFlags::Visible | ColumnFlags::Numeric);
 	cm->AddColumn(L"Action", LVCFMT_LEFT, 110, ColumnType::Action);
 	cm->AddColumn(L"Action Filter/Callout", LVCFMT_LEFT, 120, ColumnType::ActionKey);
 	cm->AddColumn(L"Flags", LVCFMT_LEFT, 150, ColumnType::Flags);
 	cm->AddColumn(L"Provider Data", LVCFMT_RIGHT, 100, ColumnType::ProviderData);
 	cm->AddColumn(L"Description", 0, 180, ColumnType::Desc);
-	cm->AddColumn(L"Provider", 0, 240, ColumnType::ProviderName);
 	cm->AddColumn(L"Sublayer", LVCFMT_LEFT, 250, ColumnType::SubLayer);
 
 	CImageList images;
@@ -213,7 +213,7 @@ void CFiltersView::DoSort(SortInfo const* si) {
 			case ColumnType::ActionKey: return SortHelper::Sort(filter1.FilterAction, filter2.FilterAction, asc);
 			case ColumnType::Flags: return SortHelper::Sort(f1->flags, f2->flags, asc);
 			case ColumnType::ProviderName: return SortHelper::Sort(GetProviderName(filter1), GetProviderName(filter2), asc);
-			case ColumnType::Weight: return SortHelper::Sort(*f1->weight.uint64, *f2->weight.uint64, asc);
+			case ColumnType::Weight: return WFPHelper::Sort(f1->weight, f2->weight, asc);
 			case ColumnType::EffectiveWeight: return SortHelper::Sort(*f1->effectiveWeight.uint64, *f2->effectiveWeight.uint64, asc);
 			case ColumnType::Layer: return SortHelper::Sort(GetLayerName(filter1), GetLayerName(filter2), asc);
 			case ColumnType::SubLayer: return SortHelper::Sort(GetSublayerName(filter1), GetSublayerName(filter2), asc);
