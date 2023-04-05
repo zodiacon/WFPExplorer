@@ -44,7 +44,7 @@ public:
 			m_List.SetFocus();
 		}
 		else {
-			AtlMessageBox(p->m_hWnd, L"Finsihed searching list.", IDS_TITLE, MB_ICONINFORMATION);
+			AtlMessageBox(p->m_hWnd, L"Finished searching list.", IDS_TITLE, MB_ICONINFORMATION);
 		}
 		return 0;
 	}
