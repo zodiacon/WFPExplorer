@@ -23,8 +23,14 @@ public:
 	}
 
 	~WFPObjectVector() {
+		clear();
+	}
+
+	void clear() {
 		for (auto& p : m_pItems)
 			::FwpmFreeMemory((void**)&p);
+		m_Vec.clear();
+		m_pItems.clear();
 	}
 
 	auto begin() {
