@@ -223,7 +223,7 @@
       <DllDataFileName />
     </Midl>
     <PostBuildEvent>
-      <Command>signtool sign /i DigiCert /fd sha256 $(TargetPath)</Command>
+      <Command>signtool sign /i DigiCert /n "Pavel Yosifovich" /fd sha256 $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
