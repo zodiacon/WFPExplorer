@@ -32,6 +32,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 
 BOOL CMainFrame::OnIdle() {
 	UIUpdateToolBar();
+	UIUpdateStatusBar();
 	return FALSE;
 }
 
@@ -41,6 +42,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		return -1;
 	}
 
+	SetCheckIcon(IDI_CHECK, IDI_RADIO);
+	InitDarkTheme();
 	CreateSimpleStatusBar();
 	m_StatusBar.SubclassWindow(m_hWndStatusBar);
 	int parts[] = { 120, 240, 360, 480, 600, 720, 840 };
@@ -71,19 +74,17 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UIAddToolBar(tb);
 
 	//m_view.m_bTabCloseButton = false;
-	m_hWndClient = m_view.Create(m_hWnd, rcDefault, nullptr, 
+	m_hWndClient = m_view.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
-	UINT icons[] = { 
+	UINT icons[] = {
 		IDI_SESSION, IDI_FILTER, IDI_PROVIDER, IDI_LAYERS, IDI_SUBLAYER, IDI_CALLOUT,
 		IDI_CONTEXT, IDI_TREE, IDI_EVENT,
 	};
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
 	m_view.SetImageList(images);
-
-	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
 	pLoop->AddMessageFilter(this);
@@ -100,10 +101,20 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	if (!m_Engine.Open()) {
 		AtlMessageBox(nullptr, L"Failed to open WFP Engine", IDR_MAINFRAME, MB_ICONERROR);
 	}
+
 	InitMenu();
 	UIAddMenu(menuMain);
 	AddMenu(menuMain);
+	UISetCheck(ID_VIEW_STATUS_BAR, 1);
+
 	UpdateUI();
+
+	if (AppSettings::Get().DarkMode()) {
+		ThemeHelper::SetCurrentTheme(s_DarkTheme, m_hWnd);
+		ThemeHelper::UpdateMenuColors(*this, true);
+		UpdateMenu(GetMenu(), true);
+		UISetCheck(ID_OPTIONS_DARKMODE, true);
+	}
 
 	PostMessage(WM_COMMAND, ID_VIEW_HIERARCHY);
 
@@ -342,7 +353,7 @@ LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
 	if (page >= 0) {
 		handled = ::SendMessage(m_view.GetPageHWND(page), WM_ACTIVATE, 1, 0);
 	}
-	if(!handled) {
+	if (!handled) {
 		UpdateUI();
 	}
 	return 0;
@@ -373,10 +384,49 @@ LRESULT CMainFrame::OnFind(UINT msg, WPARAM wp, LPARAM lp, BOOL&) {
 		return 0;
 	}
 	m_pFindDlg->SetFocus();
-	
+
 	if (auto page = m_view.GetActivePage(); page >= 0) {
 		m_SearchText = m_pFindDlg->GetFindString();
 		::SendMessage(m_view.GetPageHWND(page), msg, wp, lp);
 	}
 	return 0;
+}
+
+LRESULT CMainFrame::OnToggleDarkMode(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
+	auto& settings = AppSettings::Get();
+	settings.DarkMode(!settings.DarkMode());
+	UISetCheck(ID_OPTIONS_DARKMODE, settings.DarkMode());
+	
+	if (settings.DarkMode())
+		ThemeHelper::SetCurrentTheme(s_DarkTheme, m_hWnd);
+	else
+		ThemeHelper::SetDefaultTheme(m_hWnd);
+
+	ThemeHelper::UpdateMenuColors(*this, settings.DarkMode());
+	UpdateMenu(GetMenu(), true);
+
+	return 0;
+}
+
+void CMainFrame::InitDarkTheme() const {
+	s_DarkTheme.BackColor = s_DarkTheme.SysColors[COLOR_WINDOW] = RGB(32, 32, 32);
+	s_DarkTheme.TextColor = s_DarkTheme.SysColors[COLOR_WINDOWTEXT] = RGB(248, 248, 248);
+	s_DarkTheme.SysColors[COLOR_HIGHLIGHT] = RGB(10, 10, 160);
+	s_DarkTheme.SysColors[COLOR_HIGHLIGHTTEXT] = RGB(240, 240, 240);
+	s_DarkTheme.SysColors[COLOR_MENUTEXT] = s_DarkTheme.TextColor;
+	s_DarkTheme.SysColors[COLOR_CAPTIONTEXT] = s_DarkTheme.TextColor;
+	s_DarkTheme.SysColors[COLOR_BTNFACE] = s_DarkTheme.BackColor;
+	s_DarkTheme.SysColors[COLOR_BTNTEXT] = s_DarkTheme.TextColor;
+	s_DarkTheme.SysColors[COLOR_3DLIGHT] = RGB(192, 192, 192);
+	s_DarkTheme.SysColors[COLOR_BTNHIGHLIGHT] = RGB(192, 192, 192);
+	s_DarkTheme.SysColors[COLOR_CAPTIONTEXT] = s_DarkTheme.TextColor;
+	s_DarkTheme.SysColors[COLOR_3DSHADOW] = s_DarkTheme.TextColor;
+	s_DarkTheme.SysColors[COLOR_SCROLLBAR] = s_DarkTheme.BackColor;
+	s_DarkTheme.SysColors[COLOR_APPWORKSPACE] = s_DarkTheme.BackColor;
+	s_DarkTheme.StatusBar.BackColor = RGB(16, 0, 16);
+	s_DarkTheme.StatusBar.TextColor = s_DarkTheme.TextColor;
+
+	s_DarkTheme.Name = L"Dark";
+	s_DarkTheme.Menu.BackColor = s_DarkTheme.BackColor;
+	s_DarkTheme.Menu.TextColor = s_DarkTheme.TextColor;
 }

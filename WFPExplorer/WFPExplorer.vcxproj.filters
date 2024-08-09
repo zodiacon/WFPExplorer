@@ -279,5 +279,11 @@
     <Image Include="res\Find-prev.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\check.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\circle.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

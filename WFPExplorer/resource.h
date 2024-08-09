@@ -46,6 +46,9 @@
 #define IDI_FIND_PREV                   242
 #define IDD_PROVIDER                    243
 #define IDD_CALLOUT                     245
+#define IDI_CHECK                       247
+#define IDI_ICON2                       248
+#define IDI_RADIO                       248
 #define IDC_VERSION                     1000
 #define IDC_COPYRIGHT                   1001
 #define IDC_KEY                         1001
@@ -111,7 +114,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        247
+#define _APS_NEXT_RESOURCE_VALUE        249
 #define _APS_NEXT_COMMAND_VALUE         32799
 #define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           101

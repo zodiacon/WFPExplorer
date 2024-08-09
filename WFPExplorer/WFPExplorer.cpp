@@ -33,7 +33,7 @@ int Run(LPTSTR /*lpstrCmdLine*/ = nullptr, int nCmdShow = SW_SHOWDEFAULT) {
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow) {
-	HRESULT hRes = ::CoInitialize(nullptr);
+	HRESULT hRes = ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 	ATLASSERT(SUCCEEDED(hRes));
 
 	AtlInitCommonControls(ICC_BAR_CLASSES);	// add flags to support other controls

@@ -4,6 +4,7 @@
 #include <OwnerDrawnMenu.h>
 #include <CustomTabView.h>
 #include "Interfaces.h"
+#include <Theme.h>
 
 class CMainFrame : 
 	public CFrameWindowImpl<CMainFrame>, 
@@ -39,6 +40,7 @@ public:
 		COMMAND_RANGE_HANDLER(ID_WINDOW_TABFIRST, ID_WINDOW_TABLAST, OnWindowActivate)
 		MESSAGE_HANDLER(WM_WINDOW_MENU_BUILT, OnRebuildWindowMenu)
 		MESSAGE_HANDLER(WM_MENUSELECT, [](auto, auto, auto, auto) { return 0; })
+		COMMAND_ID_HANDLER(ID_OPTIONS_DARKMODE, OnToggleDarkMode)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		MESSAGE_HANDLER(WM_SHOWWINDOW, OnShowWindow)
@@ -61,6 +63,7 @@ private:
 	HFONT GetMonoFont() const override;
 	bool TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWnd = nullptr) override;
 	CFindReplaceDialog* GetFindDialog() const override;
+	void InitDarkTheme() const;
 
 	void InitMenu();
 	void UpdateUI();
@@ -90,6 +93,7 @@ private:
 	LRESULT OnAlwaysOnTop(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnEditFind(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnFind(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnToggleDarkMode(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine m_Engine;
 	CFont m_MonoFont;
@@ -97,4 +101,5 @@ private:
 	CMultiPaneStatusBarCtrl m_StatusBar;
 	CFindReplaceDialog* m_pFindDlg{ nullptr };
 	CString m_SearchText;
+	inline static Theme s_DarkTheme;
 };

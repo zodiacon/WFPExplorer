@@ -204,6 +204,10 @@ IDI_FIND_NEXT           ICON                    "res\\Find-next.ico"
 
 IDI_FIND_PREV           ICON                    "res\\Find-prev.ico"
 
+IDI_CHECK               ICON                    "res\\check.ico"
+
+IDI_RADIO               ICON                    "res\\circle.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -211,7 +215,7 @@ IDI_FIND_PREV           ICON                    "res\\Find-prev.ico"
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 189, 81
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
 CAPTION "About WFP Explorer"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
@@ -259,7 +263,7 @@ BEGIN
 END
 
 IDD_FILTERCONDITIONS DIALOGEX 0, 0, 389, 254
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | WS_CAPTION
 CAPTION "Conditions"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
@@ -294,7 +298,7 @@ BEGIN
 END
 
 IDD_LAYERFIELDS DIALOGEX 0, 0, 389, 254
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN | WS_CAPTION
 CAPTION "Fields"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
@@ -302,7 +306,7 @@ BEGIN
 END
 
 IDD_PROPSHEET DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -331,7 +335,7 @@ BEGIN
 END
 
 IDD_PROVIDER DIALOGEX 0, 0, 389, 184
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
 CAPTION "Provider"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -351,7 +355,7 @@ BEGIN
 END
 
 IDD_CALLOUT DIALOGEX 0, 0, 393, 205
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
 CAPTION "Callout"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -496,8 +500,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,5,5,0
- PRODUCTVERSION 0,5,5,0
+ FILEVERSION 0,5,6,0
+ PRODUCTVERSION 0,5,6,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -514,12 +518,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.5.5.0"
+            VALUE "FileVersion", "0.5.6.0"
             VALUE "InternalName", "WFPExplorer"
-            VALUE "LegalCopyright", "©2022-2023 Pavel Yosifovich"
+            VALUE "LegalCopyright", "©2022-2024 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.5.5.0"
+            VALUE "ProductVersion", "0.5.6.0"
         END
     END
     BLOCK "VarFileInfo"
