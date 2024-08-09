@@ -25,7 +25,8 @@ CString ProcessHelper::GetProcessName(DWORD pid) {
             }
             ::CloseHandle(hSnap);
         }
-        name = processes.at(pid);
+        if (auto it = processes.find(pid); it != processes.end())
+            name = it->second;
     }
     return name;
 }
