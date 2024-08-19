@@ -25,6 +25,7 @@ struct StringHelper abstract final {
 	static CString FormatIpv6Address(BYTE const* address);
 	static PCWSTR IpProtocolToString(UINT8 protocol);
 	static PCWSTR AddressFamilyToString(FWP_AF af);
+	static GUID ExtractGuid(CString const& text);
 
 	template<typename TFlags, typename TValue>
 	static CString FlagsToString(TValue value, TFlags const& data) {

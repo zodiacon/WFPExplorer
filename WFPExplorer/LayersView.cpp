@@ -3,10 +3,8 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "WFPHelper.h"
-#include "LayerGeneralPage.h"
 #include <WFPEnumerators.h>
 #include <ClipboardHelper.h>
-#include <ThemeHelper.h>
 
 CLayersView::CLayersView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }

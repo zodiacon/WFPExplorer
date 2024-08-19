@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "WFPHelper.h"
 #include <WFPEngine.h>
+#include <SortHelper.h>
 #include "StringHelper.h"
 #include "LayerGeneralPage.h"
 #include "LayerFieldsPage.h"
@@ -9,7 +10,7 @@
 #include "LayersView.h"
 #include "ProviderDlg.h"
 #include "CalloutDlg.h"
-#include <SortHelper.h>
+#include "SubLayerDlg.h"
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	auto provider = engine.GetProviderByKey(key);
@@ -89,6 +90,9 @@ int WFPHelper::ShowFilterProperties(WFPEngine& engine, FWPM_FILTER* filter) {
 }
 
 int WFPHelper::ShowSublayerProperties(WFPEngine& engine, FWPM_SUBLAYER* sublayer) {
+	CSubLayerDlg dlg(engine, sublayer);
+	dlg.DoModal();
+
 	return 0;
 }
 

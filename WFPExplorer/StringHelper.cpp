@@ -521,6 +521,20 @@ PCWSTR StringHelper::AddressFamilyToString(FWP_AF af) {
 	return L"(Unknown)";
 }
 
+GUID StringHelper::ExtractGuid(CString const& text) {
+	auto index = text.Find('{');
+	if (index < 0)
+		return GUID_NULL;
+
+	auto index2 = text.Find('}', index + 1);
+	if (index2 < 0)
+		return GUID_NULL;
+
+	GUID guid;
+	::CLSIDFromString(text.Mid(index, index2 - index), &guid);
+	return guid;
+}
+
 PCWSTR StringHelper::WFPFilterActionTypeToString(FWP_ACTION_TYPE type) {
 	switch (type) {
 		case FWP_ACTION_BLOCK:					return L"Block";

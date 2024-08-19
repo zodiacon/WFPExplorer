@@ -4,20 +4,18 @@
 
 class WFPEngine;
 
-class CCalloutDlg :
-	public CDialogImpl<CCalloutDlg>,
-	public CDialogHelper<CCalloutDlg> {
+class CSubLayerDlg :
+	public CDialogImpl<CSubLayerDlg>,
+	public CDialogHelper<CSubLayerDlg> {
 public:
-	enum { IDD = IDD_CALLOUT };
+	enum { IDD = IDD_SUBLAYER };
 
-	CCalloutDlg(WFPEngine& engine, FWPM_CALLOUT* callout);
+	CSubLayerDlg(WFPEngine& engine, FWPM_SUBLAYER* sublayer);
 
-	BEGIN_MSG_MAP(CCalloutDlg)
+	BEGIN_MSG_MAP(CSubLayerDlg)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
 		COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
-		COMMAND_ID_HANDLER(IDC_PROVIDER_PROP, OnShowProvider)
-		COMMAND_ID_HANDLER(IDC_LAYER_PROP, OnShowLayer)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -28,9 +26,7 @@ public:
 private:
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnShowProvider(WORD /*wNotifyCode*/, WORD, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnShowLayer(WORD /*wNotifyCode*/, WORD, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
-	FWPM_CALLOUT* m_Callout;
 	WFPEngine& m_Engine;
+	FWPM_SUBLAYER* m_Sublayer;
 };

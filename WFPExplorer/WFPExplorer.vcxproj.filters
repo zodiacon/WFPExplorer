@@ -99,6 +99,12 @@
     <ClCompile Include="CalloutDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="NewFilterDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="SubLayerDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -174,6 +180,12 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="CalloutDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="NewFilterDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="SubLayerDlg.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,19 +2,24 @@
 
 #include <DialogHelper.h>
 
-class CProviderDlg :
-	public CDialogImpl<CProviderDlg>,
-	public CDialogHelper<CProviderDlg> {
+class CNewFilterDlg :
+	public CDialogImpl<CNewFilterDlg>,
+	public CDialogHelper<CNewFilterDlg> {
 public:
-	enum { IDD = IDD_PROVIDER };
+	enum { IDD = IDD_NEWFILTER };
 
-	explicit CProviderDlg(FWPM_PROVIDER* provider);
+	explicit CNewFilterDlg(FWPM_FILTER* filter);
 
-	BEGIN_MSG_MAP(CProviderDlg)
+	bool IsNewFilter() const;
+
+	BEGIN_MSG_MAP(CNewFilterDlg)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
 		COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
 		COMMAND_ID_HANDLER(IDC_GENERATE, OnGenerateKey)
+		COMMAND_ID_HANDLER(IDC_LAYER_PROP, OnLayerProperties)
+		COMMAND_ID_HANDLER(IDC_SUBLAYER_PROP, OnSublayerProperties)
+		COMMAND_ID_HANDLER(IDC_PROVIDER_PROP, OnProviderProperties)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -26,7 +31,9 @@ private:
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnGenerateKey(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnLayerProperties(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSublayerProperties(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnProviderProperties(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
-	FWPM_PROVIDER* m_Provider;
-	CString m_Name, m_Desc, m_Service;
+	FWPM_FILTER* m_Filter;
 };

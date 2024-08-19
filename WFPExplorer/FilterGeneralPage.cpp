@@ -67,7 +67,11 @@ LRESULT CFilterGeneralPage::OnShowProvider(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CFilterGeneralPage::OnShowSublayer(WORD, WORD, HWND, BOOL&) {
-    return LRESULT();
+    auto sl = m_Engine.GetSublayerByKey(m_Filter->subLayerKey);
+    ATLASSERT(sl);
+    WFPHelper::ShowSublayerProperties(m_Engine, *sl);
+
+    return 0;
 }
 
 LRESULT CFilterGeneralPage::OnShowCallout(WORD, WORD, HWND, BOOL&) {

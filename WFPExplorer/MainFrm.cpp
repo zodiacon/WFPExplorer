@@ -17,6 +17,8 @@
 #include "AppSettings.h"
 #include "HierarchyView.h"
 #include "NetEventsView.h"
+#include "ProviderDlg.h"
+#include "NewFilterDlg.h"
 
 const int WINDOW_MENU_POSITION = 4;
 
@@ -396,7 +398,7 @@ LRESULT CMainFrame::OnToggleDarkMode(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 	auto& settings = AppSettings::Get();
 	settings.DarkMode(!settings.DarkMode());
 	UISetCheck(ID_OPTIONS_DARKMODE, settings.DarkMode());
-	
+
 	if (settings.DarkMode())
 		ThemeHelper::SetCurrentTheme(s_DarkTheme, m_hWnd);
 	else
@@ -405,6 +407,33 @@ LRESULT CMainFrame::OnToggleDarkMode(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 	ThemeHelper::UpdateMenuColors(*this, settings.DarkMode());
 	UpdateMenu(GetMenu(), true);
 
+	return 0;
+}
+
+LRESULT CMainFrame::OnNewProvider(WORD, WORD, HWND, BOOL&) {
+	FWPM_PROVIDER provider{};
+	CProviderDlg dlg(&provider);
+	if (dlg.DoModal() == IDOK) {
+		//
+		// attempt to add a new provider
+		//
+		WFPEngine engine;
+		bool ok = false;
+		if (engine.Open()) {
+			ok = engine.AddProvider(&provider);
+		}
+		AtlMessageBox(m_hWnd, ok ? L"Provider added successfully." : L"Failed to add provider.",
+			IDS_TITLE, ok ? MB_ICONINFORMATION : MB_ICONERROR);
+	}
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnNewFilter(WORD, WORD, HWND, BOOL&) {
+	FWPM_FILTER filter{};
+	CNewFilterDlg dlg(&filter);
+	if (dlg.DoModal() == IDOK) {
+	}
 	return 0;
 }
 

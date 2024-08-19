@@ -180,7 +180,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
@@ -215,7 +215,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
@@ -254,7 +254,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
@@ -292,7 +292,7 @@
       <PreprocessorDefinitions>_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
@@ -330,7 +330,7 @@
       <PreprocessorDefinitions>_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
@@ -371,6 +371,7 @@
     <ClCompile Include="LayersView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="NetEventsView.cpp" />
+    <ClCompile Include="NewFilterDlg.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -385,6 +386,7 @@
     <ClCompile Include="ProvidersView.cpp" />
     <ClCompile Include="SessionsView.cpp" />
     <ClCompile Include="StringHelper.cpp" />
+    <ClCompile Include="SubLayerDlg.cpp" />
     <ClCompile Include="SublayersView.cpp" />
     <ClCompile Include="WFPExplorer.cpp" />
     <ClCompile Include="WFPHelper.cpp" />
@@ -405,6 +407,7 @@
     <ClInclude Include="LayersView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="NetEventsView.h" />
+    <ClInclude Include="NewFilterDlg.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ProviderContextView.h" />
     <ClInclude Include="ProviderDlg.h" />
@@ -413,6 +416,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="SessionsView.h" />
     <ClInclude Include="StringHelper.h" />
+    <ClInclude Include="SubLayerDlg.h" />
     <ClInclude Include="SublayersView.h" />
     <ClInclude Include="WFPHelper.h" />
   </ItemGroup>
