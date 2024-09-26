@@ -297,5 +297,8 @@
     <Image Include="res\circle.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\Info.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

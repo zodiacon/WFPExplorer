@@ -433,6 +433,15 @@ LRESULT CMainFrame::OnNewFilter(WORD, WORD, HWND, BOOL&) {
 	FWPM_FILTER filter{};
 	CNewFilterDlg dlg(&filter);
 	if (dlg.DoModal() == IDOK) {
+		WFPEngine engine;
+		auto ok = engine.Open();
+		UINT64 id = 0;
+		if (ok) {
+			id = engine.AddFilter(&filter);
+		}
+		AtlMessageBox(m_hWnd, ok && id ? std::format(L"Filter with ID {} added successfully.", id).c_str() : L"Failed to add filter.",
+			IDS_TITLE, ok ? MB_ICONINFORMATION : MB_ICONERROR);
+
 	}
 	return 0;
 }

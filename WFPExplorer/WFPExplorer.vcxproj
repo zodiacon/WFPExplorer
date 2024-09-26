@@ -354,7 +354,7 @@
       </DllDataFileName>
     </Midl>
     <PostBuildEvent>
-      <Command>signtool sign /i DigiCert /fd sha256 /t http://time.digicert.com $(TargetPath)</Command>
+      <Command>signtool sign /a /n Scorpio /t http://timestamp.digicert.com /fd sha256 $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -443,6 +443,7 @@
     <Image Include="res\Find-next.ico" />
     <Image Include="res\Find-prev.ico" />
     <Image Include="res\Find.ico" />
+    <Image Include="res\Info.ico" />
     <Image Include="res\layers.ico" />
     <Image Include="res\Object.ico" />
     <Image Include="res\Open.ico" />

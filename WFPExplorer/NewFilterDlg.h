@@ -28,6 +28,8 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
+	LRESULT ReportOpenEngineFailure(PCWSTR errorText = nullptr) const;
+
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnGenerateKey(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -36,4 +38,7 @@ private:
 	LRESULT OnProviderProperties(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	FWPM_FILTER* m_Filter;
+	CString m_Name, m_Desc;
+	GUID m_ProviderKey;
+	UINT64 m_Weight;
 };

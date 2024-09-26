@@ -18,8 +18,18 @@ bool CNewFilterDlg::IsNewFilter() const {
 	return m_Filter->filterKey == GUID_NULL;
 }
 
+LRESULT CNewFilterDlg::ReportOpenEngineFailure(PCWSTR errorText) const {
+	AtlMessageBox(m_hWnd, errorText ? errorText : L"Failed to open WFP engine.", L"New Filter", MB_ICONERROR);
+	return 0;
+}
+
 LRESULT CNewFilterDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	SetDialogIcon(IDI_FILTER);
+	UINT ids[] = { IDC_PROVIDER_PROP, IDC_LAYER_PROP, IDC_SUBLAYER_PROP };
+	for (auto id : ids) {
+		CButton button(GetDlgItem(id));
+		button.SetIcon(AtlLoadIconImage(IDI_INFO, 0, 16, 16));
+	}
 
 	struct {
 		PCWSTR text;
@@ -120,8 +130,10 @@ LRESULT CNewFilterDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 		}
 
 		auto cb = (CComboBox)GetDlgItem(IDC_WEIGHTRANGE);
-		for(int i = 0; i < 16; i++)
-			cb.AddString(std::format(L"0x{:X}", i).c_str());
+		for (int i = 0; i < 16; i++) {
+			int n = cb.AddString(std::format(L"0x{:X}", i).c_str());
+			cb.SetItemData(n, i);
+		}
 		cb.SetCurSel(0);
 
 		if (IsNewFilter()) {
@@ -148,6 +160,78 @@ LRESULT CNewFilterDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 }
 
 LRESULT CNewFilterDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&) {
+	if (wID == IDOK) {
+		GetDlgItemText(IDC_NAME, m_Name);
+		if (m_Name.IsEmpty()) {
+			AtlMessageBox(m_hWnd, L"Filter name cannot be empty.", L"New Filter", MB_ICONWARNING);
+			return 0;
+		}
+
+		CString key;
+		GetDlgItemText(IDC_KEY, key);
+		if (key.IsEmpty()) {
+			AtlMessageBox(m_hWnd, L"Filter key cannot be empty.", L"New Filter", MB_ICONWARNING);
+			return 0;
+		}
+		WFPEngine engine;
+		if (!engine.Open())
+			return ReportOpenEngineFailure();
+
+		GetDlgItemText(IDC_DESC, m_Desc);
+		m_Filter->displayData.name = m_Name.GetBuffer();
+		m_Filter->displayData.description = m_Desc.GetBuffer();
+		::CLSIDFromString(key, &m_Filter->filterKey);
+		CComboBox cb(GetDlgItem(IDC_ACTION));
+		m_Filter->action.type = (FWP_ACTION_TYPE)cb.GetItemData(cb.GetCurSel());
+		if (m_Filter->action.type & FWP_ACTION_FLAG_CALLOUT) {
+			CComboBox cb(GetDlgItem(IDC_CALLOUT));
+			auto calloutId = (UINT)cb.GetItemData(cb.GetCurSel());
+
+			auto callout = engine.GetCalloutById(calloutId);
+			m_Filter->action.calloutKey = callout->calloutKey;
+		}
+		//
+		// filter weight
+		//
+		if (IsDlgButtonChecked(IDC_AUTOMATIC) == BST_CHECKED) {
+			m_Filter->weight.type = FWP_EMPTY;
+		}
+		else if (IsDlgButtonChecked(IDC_SPECIFIC) == BST_CHECKED) {
+			CString text;
+			GetDlgItemText(IDC_WEIGHT, text);
+			m_Filter->weight.type = FWP_UINT64;
+			m_Weight = wcstoull(text, nullptr, 0);
+			m_Filter->weight.uint64 = &m_Weight;
+		}
+		else {
+			ATLASSERT(IsDlgButtonChecked(IDC_RANGE) == BST_CHECKED);
+			auto cb = (CComboBox)GetDlgItem(IDC_WEIGHTRANGE);
+			int range = (int)cb.GetItemData(cb.GetCurSel());
+			m_Filter->weight.type = FWP_UINT8;
+			m_Filter->weight.int32 = range;
+		}
+
+		//
+		// get provider
+		//
+		cb = (CComboBox)GetDlgItem(IDC_PROVIDER);
+		if (cb.GetCurSel()) {
+			CString text;
+			cb.GetLBText(cb.GetCurSel(), text);
+			m_ProviderKey = StringHelper::ExtractGuid(text);
+			ATLASSERT(m_ProviderKey != GUID_NULL);
+			m_Filter->providerKey = &m_ProviderKey;
+		}
+		//
+		// get layer and sublayer
+		//
+		cb = (CComboBox)GetDlgItem(IDC_LAYER);
+		m_Filter->layerKey = engine.GetLayerById((UINT16)cb.GetItemData(cb.GetCurSel()))->layerKey;
+		cb = (CComboBox)GetDlgItem(IDC_SUBLAYER);
+		CString text;
+		cb.GetLBText(cb.GetCurSel(), text);
+		m_Filter->subLayerKey = StringHelper::ExtractGuid(text);
+	}
 	EndDialog(wID);
 
 	return 0;

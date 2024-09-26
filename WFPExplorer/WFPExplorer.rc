@@ -208,6 +208,8 @@ IDI_CHECK               ICON                    "res\\check.ico"
 
 IDI_RADIO               ICON                    "res\\circle.ico"
 
+IDI_INFO                ICON                    "res\\Info.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -336,7 +338,7 @@ BEGIN
     COMBOBOX        IDC_SUBLAYER,48,121,332,75,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Weight:",IDC_STATIC,7,145,26,8
     CONTROL         "Automatic",IDC_AUTOMATIC,"Button",BS_AUTORADIOBUTTON | WS_GROUP,53,145,48,10
-    CONTROL         "Specific:",IDC_SPECIFIC,"Button",BS_AUTORADIOBUTTON,111,146,43,10
+    CONTROL         "Explicit:",IDC_SPECIFIC,"Button",BS_AUTORADIOBUTTON,111,146,41,10
     EDITTEXT        IDC_WEIGHT,156,145,154,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_STATICEDGE
     CONTROL         "Range:",IDC_RANGE,"Button",BS_AUTORADIOBUTTON,331,146,39,10
     COMBOBOX        IDC_WEIGHTRANGE,373,144,37,75,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
@@ -347,9 +349,9 @@ BEGIN
     PUSHBUTTON      "Conditions...",IDC_CONDITIONS,343,165,71,14
     DEFPUSHBUTTON   "OK",IDOK,152,227,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,218,227,50,14
-    PUSHBUTTON      "...",IDC_SUBLAYER_PROP,384,121,30,14
-    PUSHBUTTON      "...",IDC_LAYER_PROP,384,97,30,14
-    PUSHBUTTON      "...",IDC_PROVIDER_PROP,384,72,30,14
+    PUSHBUTTON      "...",IDC_SUBLAYER_PROP,384,121,30,14,BS_ICON
+    PUSHBUTTON      "...",IDC_LAYER_PROP,384,97,30,14,BS_ICON
+    PUSHBUTTON      "...",IDC_PROVIDER_PROP,384,72,30,14,BS_ICON
     PUSHBUTTON      "...",IDC_CALLOUT_PROP,384,187,30,14
 END
 
@@ -551,8 +553,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,5,6,0
- PRODUCTVERSION 0,5,6,0
+ FILEVERSION 0,5,7,0
+ PRODUCTVERSION 0,5,7,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -569,12 +571,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.5.6.0"
+            VALUE "FileVersion", "0.5.7.0"
             VALUE "InternalName", "WFPExplorer"
             VALUE "LegalCopyright", "©2022-2024 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.5.6.0"
+            VALUE "ProductVersion", "0.5.7.0"
         END
     END
     BLOCK "VarFileInfo"
