@@ -19,6 +19,7 @@
 #include "NetEventsView.h"
 #include "ProviderDlg.h"
 #include "NewFilterDlg.h"
+#include "NewSubLayerDlg.h"
 
 const int WINDOW_MENU_POSITION = 4;
 
@@ -442,6 +443,21 @@ LRESULT CMainFrame::OnNewFilter(WORD, WORD, HWND, BOOL&) {
 		AtlMessageBox(m_hWnd, ok && id ? std::format(L"Filter with ID {} added successfully.", id).c_str() : L"Failed to add filter.",
 			IDS_TITLE, ok ? MB_ICONINFORMATION : MB_ICONERROR);
 
+	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnNewSubLayer(WORD, WORD, HWND, BOOL&) {
+	FWPM_SUBLAYER sl{};
+	CNewSubLayerDlg dlg(&sl);
+	if (IDOK == dlg.DoModal()) {
+		WFPEngine engine;
+		auto ok = engine.Open();
+		if (ok) {
+			ok = engine.AddSubLayer(&sl);
+		}
+		AtlMessageBox(m_hWnd, ok ? L"Sublayer added successfully." : L"Failed to add sublayer.",
+			IDS_TITLE, ok ? MB_ICONINFORMATION : MB_ICONERROR);
 	}
 	return 0;
 }

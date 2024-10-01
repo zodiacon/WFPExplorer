@@ -69,6 +69,8 @@ public:
 	WFPObject<FWPM_SUBLAYER> GetSublayerByKey(GUID const& key) const;
 	WFPObject<FWPM_CALLOUT> GetCalloutByKey(GUID const& key) const;
 	WFPObject<FWPM_CALLOUT> GetCalloutById(UINT32 id) const;
+	bool AddSubLayer(FWPM_SUBLAYER const* sl, PSECURITY_DESCRIPTOR sd = nullptr);
+	bool DeleteSubLayer(GUID const& key);
 
 private:
 	HANDLE m_hEngine{ nullptr };

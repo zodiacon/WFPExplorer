@@ -105,6 +105,9 @@
     <ClCompile Include="SubLayerDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="NewSubLayerDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -186,6 +189,9 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="SubLayerDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="NewSubLayerDlg.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>

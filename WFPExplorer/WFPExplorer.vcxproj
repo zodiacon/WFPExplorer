@@ -372,6 +372,7 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="NetEventsView.cpp" />
     <ClCompile Include="NewFilterDlg.cpp" />
+    <ClCompile Include="NewSubLayerDlg.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -408,6 +409,7 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="NetEventsView.h" />
     <ClInclude Include="NewFilterDlg.h" />
+    <ClInclude Include="NewSubLayerDlg.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ProviderContextView.h" />
     <ClInclude Include="ProviderDlg.h" />

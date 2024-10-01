@@ -187,7 +187,7 @@ LRESULT CFiltersView::OnDeleteFilter(WORD, WORD, HWND, BOOL&) {
 		Refresh();
 	}
 	if (deleted < selected)
-		AtlMessageBox(m_hWnd, std::format(L"Deleted {}/{} filters", deleted, selected).c_str(), IDS_TITLE, MB_ICONINFORMATION);
+		AtlMessageBox(m_hWnd, std::format(L"Deleted {}/{} filters.", deleted, selected).c_str(), IDS_TITLE, MB_ICONWARNING);
 
 	return 0;
 }

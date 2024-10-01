@@ -9,6 +9,8 @@ CSubLayerDlg::CSubLayerDlg(WFPEngine& engine, FWPM_SUBLAYER* sublayer) : m_Engin
 }
 
 LRESULT CSubLayerDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
+	SetDialogIcon(IDI_SUBLAYER);
+	SetWindowText(std::format(L"Sublayer ({})", m_Sublayer->displayData.name).c_str());
 	SetDlgItemText(IDC_KEY, StringHelper::GuidToString(m_Sublayer->subLayerKey));
 	SetDlgItemText(IDC_NAME, StringHelper::ParseMUIString(m_Sublayer->displayData.name));
 	SetDlgItemText(IDC_DESC, m_Sublayer->displayData.description);
@@ -28,5 +30,12 @@ LRESULT CSubLayerDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 
 LRESULT CSubLayerDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&) {
 	EndDialog(wID);
+	return 0;
+}
+
+LRESULT CSubLayerDlg::OnProviderProperties(WORD, WORD wID, HWND, BOOL&) {
+	ATLASSERT(m_Sublayer->providerKey);
+	WFPHelper::ShowProviderProperties(m_Engine, *m_Engine.GetProviderByKey(*m_Sublayer->providerKey));
+
 	return 0;
 }

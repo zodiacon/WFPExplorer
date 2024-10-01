@@ -4,6 +4,7 @@
 #include <SortHelper.h>
 #include "resource.h"
 #include <WFPEnumerators.h>
+#include "WFPHelper.h"
 
 CSublayersView::CSublayersView(IMainFrame* frame, WFPEngine& engine) : CGenericListViewBase(frame), m_Engine(engine) {
 }
@@ -37,10 +38,50 @@ LRESULT CSublayersView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CSublayersView::OnDeleteSubLayer(WORD, WORD, HWND, BOOL&) {
+	int selected = m_List.GetSelectedCount();
+	ATLASSERT(selected > 0);
+	if (AtlMessageBox(m_hWnd, L"Delete selected sublayer(s)?", IDS_TITLE, MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2) == IDNO)
+		return 0;
+
+	int deleted = 0;
+	for (auto index : SelectedItemsView(m_List)) {
+		auto const& sl = m_Layers[index];
+		if (m_Engine.DeleteSubLayer(sl.Data->subLayerKey))
+			deleted++;
+	}
+	if (deleted > 0) {
+		m_List.SelectAllItems(false);
+		Refresh();
+	}
+	if (deleted < selected)
+		AtlMessageBox(m_hWnd, std::format(L"Deleted {}/{} sublayers.", deleted, selected).c_str(), IDS_TITLE, MB_ICONWARNING);
+
+	return 0;
+}
+
+LRESULT CSublayersView::OnProperties(WORD, WORD, HWND, BOOL&) {
+	auto row = m_List.GetNextItem(-1, LVNI_SELECTED);
+	if (row >= 0) {
+		auto& sl = m_Layers[row];
+		WFPHelper::ShowSublayerProperties(m_Engine, sl.Data);
+	}
+	return 0;
+}
+
 void CSublayersView::Refresh() {
 	m_Layers = WFPSubLayerEnumerator(m_Engine.Handle()).Next<SubLayerInfo>(512);
 	m_List.SetItemCountEx((int)m_Layers.size(), LVSICF_NOSCROLL);
 	Frame()->SetStatusText(6, std::format(L"{} Sublayers", m_Layers.size()).c_str());
+}
+
+void CSublayersView::UpdateUI() const {
+	auto& ui = Frame()->UI();
+	auto selected = m_List.GetSelectedCount();
+	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
+	ui.UIEnable(ID_EDIT_DELETE, selected > 0);
+	ui.UIEnable(ID_EDIT_COPY, selected > 0);
+	ui.UIEnable(ID_EDIT_FINDNEXT, Frame()->GetFindDialog() != nullptr);
 }
 
 CString CSublayersView::GetColumnText(HWND, int row, int col) {
@@ -106,6 +147,31 @@ CString CSublayersView::GetDefaultSaveFile() const {
 	return L"sublayers.csv";
 }
 
+bool CSublayersView::OnDoubleClickList(HWND, int row, int col, POINT const& pt) {
+	if (row >= 0) {
+		auto& sl = m_Layers[row];
+		WFPHelper::ShowSublayerProperties(m_Engine, sl.Data);
+		return true;
+	}
+	return false;
+}
+
+bool CSublayersView::OnRightClickList(HWND, int row, int col, POINT const& pt) const {
+	if (row < 0)
+		return false;
+
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT);
+
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(2), 0, pt.x, pt.y);
+}
+
+LRESULT CSublayersView::OnActivate(UINT, WPARAM activate, LPARAM, BOOL&) {
+	if (activate)
+		UpdateUI();
+	return 0;
+}
+
 CString const& CSublayersView::SubLayerInfo::Name() const {
 	if (m_Name.IsEmpty())
 		m_Name = StringHelper::ParseMUIString(Data->displayData.name);
@@ -116,4 +182,9 @@ CString const& CSublayersView::SubLayerInfo::Desc() const {
 	if (m_Desc.IsEmpty())
 		m_Desc = StringHelper::ParseMUIString(Data->displayData.description);
 	return m_Desc;
+}
+
+void CSublayersView::OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState) {
+	if ((newState & LVIS_SELECTED) || (oldState & LVIS_SELECTED))
+		UpdateUI();
 }

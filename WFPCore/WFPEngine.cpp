@@ -111,6 +111,16 @@ WFPObject<FWPM_CALLOUT> WFPEngine::GetCalloutById(UINT32 id) const {
 	return WFPObject(co);
 }
 
+bool WFPEngine::AddSubLayer(FWPM_SUBLAYER const* sl, PSECURITY_DESCRIPTOR sd) {
+	m_LastError = FwpmSubLayerAdd(m_hEngine, sl, sd);
+	return m_LastError == ERROR_SUCCESS;
+}
+
+bool WFPEngine::DeleteSubLayer(GUID const& key) {
+	m_LastError = FwpmSubLayerDeleteByKey(m_hEngine, &key);
+	return m_LastError == ERROR_SUCCESS;
+}
+
 uint32_t WFPEngine::GetFilterCount(GUID const& layer) const {
 	HANDLE hEnum;
 	m_LastError = FwpmFilterCreateEnumHandle(m_hEngine, nullptr, &hEnum);
