@@ -364,6 +364,7 @@
     <ClCompile Include="CalloutsView.cpp" />
     <ClCompile Include="FilterConditionsPage.cpp" />
     <ClCompile Include="FilterGeneralPage.cpp" />
+    <ClCompile Include="FiltersListPage.cpp" />
     <ClCompile Include="FiltersView.cpp" />
     <ClCompile Include="HierarchyView.cpp" />
     <ClCompile Include="LayerFieldsPage.cpp" />
@@ -399,6 +400,7 @@
     <ClInclude Include="CalloutsView.h" />
     <ClInclude Include="FilterConditionsPage.h" />
     <ClInclude Include="FilterGeneralPage.h" />
+    <ClInclude Include="FiltersListPage.h" />
     <ClInclude Include="FiltersView.h" />
     <ClInclude Include="GenericListViewBase.h" />
     <ClInclude Include="HierarchyView.h" />

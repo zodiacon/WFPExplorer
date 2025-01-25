@@ -11,6 +11,8 @@
 #include "ProviderDlg.h"
 #include "CalloutDlg.h"
 #include "SubLayerDlg.h"
+#include "WFPEnumerators.h"
+#include "FiltersListPage.h"
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	auto provider = engine.GetProviderByKey(key);
@@ -55,18 +57,25 @@ CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
 	auto name = L"Layer Properties (" + GetLayerName(engine, layer->layerKey) + L")";
 	CPropertySheet sheet((PCWSTR)name);
-	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
+	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_LAYERS);
 	CLayerGeneralPage general(engine, layer);
-	general.m_psp.dwFlags |= PSP_USEICONID;
-	general.m_psp.pszIcon = MAKEINTRESOURCE(IDI_CUBE);
+	general.m_psp.dwFlags |= PSP_USEHICON;
+	general.m_psp.hIcon = AtlLoadIconImage(IDI_CUBE, LR_LOADTRANSPARENT | LR_CREATEDIBSECTION, 16, 16);
 	sheet.AddPage(general);
-
+	
 	CLayerFieldsPage fields(engine, layer);
 	if (layer->numFields > 0) {
 		fields.m_psp.dwFlags |= PSP_USEICONID;
 		fields.m_psp.pszIcon = MAKEINTRESOURCE(IDI_FIELD);
 		sheet.AddPage(fields);
+	}
+	CFiltersListPage filterPage(engine, layer);
+	if (filterPage.GetFilterCount()) {
+		filterPage.SetTitle(L"Filters");
+		filterPage.m_psp.dwFlags |= PSP_USEICONID;
+		filterPage.m_psp.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
+		sheet.AddPage(filterPage);
 	}
 	return (int)sheet.DoModal();
 }

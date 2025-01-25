@@ -20,7 +20,7 @@ public:
 	virtual BOOL OnIdle();
 
 	BEGIN_MSG_MAP(CMainFrame)
-		COMMAND_TABVIEW_HANDLER(m_view, 1)
+		COMMAND_TABVIEW_HANDLER(m_Tabs, 1)
 		COMMAND_ID_HANDLER(ID_VIEW_FILTERS, OnViewFilters)
 		COMMAND_ID_HANDLER(ID_VIEW_SESSIONS, OnViewSessions)
 		COMMAND_ID_HANDLER(ID_VIEW_PROVIDERS, OnViewProviders)
@@ -103,7 +103,7 @@ private:
 
 	WFPEngine m_Engine;
 	CFont m_MonoFont;
-	CCustomTabView m_view;
+	CCustomTabView m_Tabs;
 	CMultiPaneStatusBarCtrl m_StatusBar;
 	CFindReplaceDialog* m_pFindDlg{ nullptr };
 	CString m_SearchText;

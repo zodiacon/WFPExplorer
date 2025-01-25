@@ -30,7 +30,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg))
 		return TRUE;
 
-	return m_view.PreTranslateMessage(pMsg);
+	return m_Tabs.PreTranslateMessage(pMsg);
 }
 
 BOOL CMainFrame::OnIdle() {
@@ -77,7 +77,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UIAddToolBar(tb);
 
 	//m_view.m_bTabCloseButton = false;
-	m_hWndClient = m_view.Create(m_hWnd, rcDefault, nullptr,
+	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
@@ -87,17 +87,17 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	};
 	for (auto icon : icons)
 		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
-	m_view.SetImageList(images);
+	m_Tabs.SetImageList(images);
 
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
 	pLoop->AddMessageFilter(this);
 	pLoop->AddIdleHandler(this);
 
 	CMenuHandle menuMain = GetMenu();
-	m_view.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
 
 	LOGFONT lf;
-	((CFontHandle)m_view.GetFont()).GetLogFont(lf);
+	((CFontHandle)m_Tabs.GetFont()).GetLogFont(lf);
 	wcscpy_s(lf.lfFaceName, L"Consolas");
 	m_MonoFont.CreateFontIndirect(&lf);
 
@@ -169,6 +169,9 @@ void CMainFrame::InitMenu() {
 		{ ID_FILE_SAVE, IDI_SAVE },
 		{ ID_EDIT_FIND, IDI_FIND },
 		{ ID_EDIT_FINDNEXT, IDI_FIND_NEXT },
+		{ ID_NEW_FILTER, IDI_FILTER },
+		{ ID_NEW_PROVIDER, IDI_PROVIDER },
+		{ ID_NEW_SUBLAYER, IDI_SUBLAYER },
 	};
 	for (auto& cmd : cmds) {
 		if (cmd.icon)
@@ -179,7 +182,7 @@ void CMainFrame::InitMenu() {
 }
 
 void CMainFrame::UpdateUI() {
-	bool anyPage = m_view.GetPageCount() > 0;
+	bool anyPage = m_Tabs.GetPageCount() > 0;
 	UIEnable(ID_FILE_SAVE, anyPage);
 	UIEnable(ID_EDIT_COPY, false);
 	UIEnable(ID_EDIT_CUT, false);
@@ -224,9 +227,9 @@ LRESULT CMainFrame::OnShowWindow(UINT, WPARAM, LPARAM, BOOL&) {
 }
 
 LRESULT CMainFrame::OnRebuildWindowMenu(UINT, WPARAM, LPARAM, BOOL& bHandled) {
-	auto il = CImageList(m_view.GetImageList());
-	for (int i = 0; i < m_view.GetPageCount(); i++) {
-		auto image = m_view.GetPageImage(i);
+	auto il = CImageList(m_Tabs.GetImageList());
+	for (int i = 0; i < m_Tabs.GetPageCount(); i++) {
+		auto image = m_Tabs.GetPageImage(i);
 		AddCommand(ID_WINDOW_TABFIRST + i, il.GetIcon(image));
 	}
 	AddSubMenu(GetSubMenu(GetMenu(), WINDOW_MENU_POSITION));
@@ -241,16 +244,16 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 LRESULT CMainFrame::OnViewSessions(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	auto view = new CSessionsView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Sessions", 0, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Sessions", 0, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	auto view = new CFiltersView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Filters", 1, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Filters", 1, view);
 	view->Refresh();
 
 	return 0;
@@ -258,56 +261,56 @@ LRESULT CMainFrame::OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 
 LRESULT CMainFrame::OnViewProviders(WORD, WORD, HWND, BOOL&) {
 	auto view = new CProvidersView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Providers", 2, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Providers", 2, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewProviderContexts(WORD, WORD, HWND, BOOL&) {
 	auto view = new CProviderContextView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Provider Contexts", 6, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Provider Contexts", 6, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewLayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CLayersView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Layers", 3, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Layers", 3, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewNetEvents(WORD, WORD, HWND, BOOL&) {
 	auto view = new CNetEventsView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Net Events", 8, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Net Events", 8, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewHierarchy(WORD, WORD, HWND, BOOL&) {
 	auto view = new CHierarchyView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Hierarchy", 7, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Hierarchy", 7, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewSublayers(WORD, WORD, HWND, BOOL&) {
 	auto view = new CSublayersView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Sublayers", 4, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Sublayers", 4, view);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnViewCallouts(WORD, WORD, HWND, BOOL&) {
 	auto view = new CCalloutsView(this, m_Engine);
-	view->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(view->m_hWnd, L"Callouts", 5, view);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(view->m_hWnd, L"Callouts", 5, view);
 	view->Refresh();
 
 	return 0;
@@ -328,9 +331,9 @@ LRESULT CMainFrame::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 }
 
 LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	int nActivePage = m_view.GetActivePage();
+	int nActivePage = m_Tabs.GetActivePage();
 	if (nActivePage != -1)
-		m_view.RemovePage(nActivePage);
+		m_Tabs.RemovePage(nActivePage);
 	else
 		::MessageBeep((UINT)-1);
 
@@ -338,23 +341,23 @@ LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 }
 
 LRESULT CMainFrame::OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	m_view.RemoveAllPages();
+	m_Tabs.RemoveAllPages();
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nPage = wID - ID_WINDOW_TABFIRST;
-	m_view.SetActivePage(nPage);
+	m_Tabs.SetActivePage(nPage);
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
-	int page = m_view.GetActivePage();
+	int page = m_Tabs.GetActivePage();
 	bool handled = false;
 	if (page >= 0) {
-		handled = ::SendMessage(m_view.GetPageHWND(page), WM_ACTIVATE, 1, 0);
+		handled = ::SendMessage(m_Tabs.GetPageHWND(page), WM_ACTIVATE, 1, 0);
 	}
 	if (!handled) {
 		UpdateUI();
@@ -370,7 +373,7 @@ LRESULT CMainFrame::OnAlwaysOnTop(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CMainFrame::OnEditFind(WORD, WORD, HWND, BOOL&) {
-	ATLASSERT(m_view.GetPageCount() > 0);
+	ATLASSERT(m_Tabs.GetPageCount() > 0);
 
 	if (m_pFindDlg == nullptr) {
 		m_pFindDlg = new CFindReplaceDialog;
@@ -388,9 +391,9 @@ LRESULT CMainFrame::OnFind(UINT msg, WPARAM wp, LPARAM lp, BOOL&) {
 	}
 	m_pFindDlg->SetFocus();
 
-	if (auto page = m_view.GetActivePage(); page >= 0) {
+	if (auto page = m_Tabs.GetActivePage(); page >= 0) {
 		m_SearchText = m_pFindDlg->GetFindString();
-		::SendMessage(m_view.GetPageHWND(page), msg, wp, lp);
+		::SendMessage(m_Tabs.GetPageHWND(page), msg, wp, lp);
 	}
 	return 0;
 }

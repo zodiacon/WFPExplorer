@@ -611,7 +611,7 @@ BEGIN
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
             VALUE "FileVersion", "0.5.7.0"
             VALUE "InternalName", "WFPExplorer"
-            VALUE "LegalCopyright", "©2022-2024 Pavel Yosifovich"
+            VALUE "LegalCopyright", "©2022-2025 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
             VALUE "ProductVersion", "0.5.7.0"

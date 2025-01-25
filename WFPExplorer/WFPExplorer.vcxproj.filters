@@ -108,6 +108,9 @@
     <ClCompile Include="NewSubLayerDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="FiltersListPage.cpp">
+      <Filter>PropertyPages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -193,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="NewSubLayerDlg.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FiltersListPage.h">
+      <Filter>PropertyPages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
