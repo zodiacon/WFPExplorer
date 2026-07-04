@@ -17,7 +17,6 @@ public:
 
 	CFiltersListPage(WFPEngine& engine, FWPM_LAYER* layer);
 
-	size_t GetFilterCount() const;
 	CString GetColumnText(HWND, int row, int col) const;
 	void DoSort(SortInfo const* si);
 	int GetRowImage(HWND, int row, int) const;
@@ -29,6 +28,8 @@ public:
 	END_MSG_MAP()
 
 private:
+	void CreateFilterList();
+
 	struct FilterInfo {
 		FWPM_FILTER* Data;
 		int Index;
@@ -46,4 +47,5 @@ private:
 	FWPM_LAYER* m_Layer;
 	WFPObjectVector<FWPM_FILTER, FilterInfo> m_Filters;
 	CListViewCtrl m_List;
+	bool m_FilterListCreated{ false };
 };

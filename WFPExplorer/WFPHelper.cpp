@@ -60,10 +60,10 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_LAYERS);
 	CLayerGeneralPage general(engine, layer);
-	general.m_psp.dwFlags |= PSP_USEHICON;
-	general.m_psp.hIcon = AtlLoadIconImage(IDI_CUBE, LR_LOADTRANSPARENT | LR_CREATEDIBSECTION, 16, 16);
+	general.m_psp.dwFlags |= PSP_USEICONID;
+	general.m_psp.pszIcon = MAKEINTRESOURCE(IDI_CUBE);
 	sheet.AddPage(general);
-	
+
 	CLayerFieldsPage fields(engine, layer);
 	if (layer->numFields > 0) {
 		fields.m_psp.dwFlags |= PSP_USEICONID;
@@ -71,19 +71,17 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
 		sheet.AddPage(fields);
 	}
 	CFiltersListPage filterPage(engine, layer);
-	if (filterPage.GetFilterCount()) {
-		filterPage.SetTitle(L"Filters");
-		filterPage.m_psp.dwFlags |= PSP_USEICONID;
-		filterPage.m_psp.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
-		sheet.AddPage(filterPage);
-	}
+	filterPage.SetTitle(L"Filters");
+	filterPage.m_psp.dwFlags |= PSP_USEICONID;
+	filterPage.m_psp.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
+	sheet.AddPage(filterPage);
 	return (int)sheet.DoModal();
 }
 
 int WFPHelper::ShowFilterProperties(WFPEngine& engine, FWPM_FILTER* filter) {
 	auto name = L"Filter: " + GetFilterName(engine, filter->filterKey);
 	CPropertySheet sheet((PCWSTR)name);
-	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP | PSH_RESIZABLE;
+	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
 	CFilterGeneralPage general(engine, filter);
 	general.m_psp.dwFlags |= PSP_USEICONID;
@@ -127,16 +125,16 @@ bool WFPHelper::Sort(FWP_VALUE const& v1, FWP_VALUE const& v2, bool asc) {
 	// cover some common cases...
 	//
 	switch (v1.type + (v2.type << 8)) {
-		case FWP_UINT8 + (FWP_UINT8 << 8): return SortHelper::Sort(v1.uint8, v2.uint8, asc);
-		case FWP_UINT8 + (FWP_UINT64 << 8) : return SortHelper::Sort<UINT64>(v1.uint8, *v2.uint64, asc);
-		case FWP_UINT64 + (FWP_UINT8 << 8) : return SortHelper::Sort<UINT64>(*v1.uint64, v2.uint8, asc);
-		case FWP_UINT16 + (FWP_UINT16 << 8) : return SortHelper::Sort(v1.uint16, v2.uint16, asc);
-		case FWP_UINT32 + (FWP_UINT32 << 8) : return SortHelper::Sort(v1.uint32, v2.uint32, asc);
-		case FWP_UINT64 + (FWP_UINT64 << 8) : return SortHelper::Sort(*v1.uint64, *v2.uint64, asc);
-		case FWP_INT8 + (FWP_INT64 << 8) : return SortHelper::Sort(v1.int8, *v2.int64, asc);
-		case FWP_INT16 + (FWP_INT16 << 8) : return SortHelper::Sort(v1.int16, v2.int16, asc);
-		case FWP_INT32 + (FWP_INT32 << 8): return SortHelper::Sort(v1.int32, v2.int32, asc);
-		case FWP_INT64 + (FWP_INT64 << 8): return SortHelper::Sort(*v1.int64, *v2.int64, asc);
+		case FWP_UINT8 + (FWP_UINT8 << 8) : return SortHelper::Sort(v1.uint8, v2.uint8, asc);
+			case FWP_UINT8 + (FWP_UINT64 << 8) : return SortHelper::Sort<UINT64>(v1.uint8, *v2.uint64, asc);
+				case FWP_UINT64 + (FWP_UINT8 << 8) : return SortHelper::Sort<UINT64>(*v1.uint64, v2.uint8, asc);
+					case FWP_UINT16 + (FWP_UINT16 << 8) : return SortHelper::Sort(v1.uint16, v2.uint16, asc);
+						case FWP_UINT32 + (FWP_UINT32 << 8) : return SortHelper::Sort(v1.uint32, v2.uint32, asc);
+							case FWP_UINT64 + (FWP_UINT64 << 8) : return SortHelper::Sort(*v1.uint64, *v2.uint64, asc);
+								case FWP_INT8 + (FWP_INT64 << 8) : return SortHelper::Sort(v1.int8, *v2.int64, asc);
+									case FWP_INT16 + (FWP_INT16 << 8) : return SortHelper::Sort(v1.int16, v2.int16, asc);
+										case FWP_INT32 + (FWP_INT32 << 8) : return SortHelper::Sort(v1.int32, v2.int32, asc);
+											case FWP_INT64 + (FWP_INT64 << 8) : return SortHelper::Sort(*v1.int64, *v2.int64, asc);
 	}
 	return false;
 }

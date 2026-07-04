@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "MainFrm.h"
-#include <ThemeHelper.h>
+#include <WTLHelper.h>
 #include "AppSettings.h"
 
 #pragma comment(lib, "Fwpuclnt.lib")
@@ -37,15 +37,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lps
 	ATLASSERT(SUCCEEDED(hRes));
 
 	AtlInitCommonControls(ICC_BAR_CLASSES);	// add flags to support other controls
-	AppSettings::Get().LoadFromKey(L"SOFTWARE\\ScorpioSoftware\\WFPExplorer");
+	auto& settings = AppSettings::Get();
+	settings.LoadFromKey(L"SOFTWARE\\ScorpioSoftware\\WFPExplorer");
 
 	hRes = _Module.Init(nullptr, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));
 
-	ThemeHelper::Init();
+	WTLHelper::InitDarkMode(settings.DarkMode() ? DarkModeKind::Dark : DarkModeKind::Light);
 
 	int nRet = Run(lpstrCmdLine, nCmdShow);
-	AppSettings::Get().Save();
+	settings.Save();
 
 	_Module.Term();
 	::CoUninitialize();

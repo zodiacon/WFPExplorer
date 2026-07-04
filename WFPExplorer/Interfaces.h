@@ -1,5 +1,7 @@
 #pragma once
 
+static const UINT WM_UPDATE_DARKMODE = WM_APP + 56;
+
 struct IMainFrame abstract {
 	virtual void SetStatusText(int index, PCWSTR text) = 0;
 	virtual CUpdateUIBase& UI() = 0;

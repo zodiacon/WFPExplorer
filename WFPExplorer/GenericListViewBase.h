@@ -4,7 +4,7 @@
 #include <VirtualListView.h>
 #include "Interfaces.h"
 #include "resource.h"
-#include <ThemeHelper.h>
+#include <WTLHelper.h>
 
 template<typename T>
 class CGenericListViewBase abstract :
@@ -53,10 +53,10 @@ public:
 		auto p = static_cast<T*>(this);
 		CSimpleFileDialog dlg(FALSE, L"csv", p->GetDefaultSaveFile(), OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
 			L"CSV Files (*.csv)\0*.csv\0Text Files (*.txt)\0*.txt\0All Files\0*.*\0", p->m_hWnd);
-		ThemeHelper::Suspend();
+		WTLHelper::SuspendHook();
 
 		auto ok = IDOK == dlg.DoModal();
-		ThemeHelper::Resume();
+		WTLHelper::ResumeHook();
 		if (ok && !ListViewHelper::SaveAll(dlg.m_szFileName, m_List, L",")) {
 			AtlMessageBox(p->m_hWnd, L"Error in opening file", IDS_TITLE, MB_ICONERROR);
 		}

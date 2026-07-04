@@ -45,8 +45,6 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		return -1;
 	}
 
-	SetCheckIcon(IDI_CHECK, IDI_RADIO);
-	InitDarkTheme();
 	CreateSimpleStatusBar();
 	m_StatusBar.SubclassWindow(m_hWndStatusBar);
 	int parts[] = { 120, 240, 360, 480, 600, 720, 840 };
@@ -70,6 +68,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		{ 0 },
 		{ ID_EDIT_FIND, IDI_FIND },
 		{ ID_EDIT_FINDNEXT, IDI_FIND_NEXT },
+		{ 0},
+		{ ID_OPTIONS_ALWAYSONTOP, IDI_PIN },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
 	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
@@ -105,17 +105,13 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		AtlMessageBox(nullptr, L"Failed to open WFP Engine", IDR_MAINFRAME, MB_ICONERROR);
 	}
 
-	InitMenu();
+	InitMenu(menuMain);
 	UIAddMenu(menuMain);
-	AddMenu(menuMain);
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
 	UpdateUI();
 
 	if (AppSettings::Get().DarkMode()) {
-		ThemeHelper::SetCurrentTheme(s_DarkTheme, m_hWnd);
-		ThemeHelper::UpdateMenuColors(*this, true);
-		UpdateMenu(GetMenu(), true);
 		UISetCheck(ID_OPTIONS_DARKMODE, true);
 	}
 
@@ -137,18 +133,16 @@ HFONT CMainFrame::GetMonoFont() const {
 }
 
 bool CMainFrame::TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWnd) {
-	return ShowContextMenu(hMenu, flags, x, y, hWnd);
+	InitMenu(hMenu);
+	return ::TrackPopupMenu(hMenu, flags, x, y, 0, hWnd ? hWnd : m_hWnd, nullptr);
 }
 
 CFindReplaceDialog* CMainFrame::GetFindDialog() const {
 	return m_pFindDlg;
 }
 
-void CMainFrame::InitMenu() {
-	struct {
-		UINT id, icon;
-		HICON hIcon = nullptr;
-	} cmds[] = {
+void CMainFrame::InitMenu(HMENU hMenu) {
+	MenuItemData commands[] {
 		{ ID_EDIT_COPY, IDI_COPY },
 		{ ID_EDIT_CUT, IDI_CUT },
 		{ ID_EDIT_PASTE, IDI_PASTE },
@@ -159,7 +153,6 @@ void CMainFrame::InitMenu() {
 		{ ID_VIEW_PROVIDERS, IDI_PROVIDER },
 		{ ID_VIEW_LAYERS, IDI_LAYERS },
 		{ ID_VIEW_SUBLAYERS, IDI_SUBLAYER },
-		{ ID_OPTIONS_ALWAYSONTOP, IDI_PIN },
 		{ ID_EDIT_DELETE, IDI_DELETE },
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
 		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
@@ -173,12 +166,7 @@ void CMainFrame::InitMenu() {
 		{ ID_NEW_PROVIDER, IDI_PROVIDER },
 		{ ID_NEW_SUBLAYER, IDI_SUBLAYER },
 	};
-	for (auto& cmd : cmds) {
-		if (cmd.icon)
-			AddCommand(cmd.id, cmd.icon);
-		else
-			AddCommand(cmd.id, cmd.hIcon);
-	}
+	WTLHelper::InitMenu(hMenu, commands, _countof(commands));
 }
 
 void CMainFrame::UpdateUI() {
@@ -223,17 +211,6 @@ LRESULT CMainFrame::OnShowWindow(UINT, WPARAM, LPARAM, BOOL&) {
 			SetWindowPlacement(&wp);
 		SetAlwaysOnTop(AppSettings::Get().AlwaysOnTop());
 	}
-	return 0;
-}
-
-LRESULT CMainFrame::OnRebuildWindowMenu(UINT, WPARAM, LPARAM, BOOL& bHandled) {
-	auto il = CImageList(m_Tabs.GetImageList());
-	for (int i = 0; i < m_Tabs.GetPageCount(); i++) {
-		auto image = m_Tabs.GetPageImage(i);
-		AddCommand(ID_WINDOW_TABFIRST + i, il.GetIcon(image));
-	}
-	AddSubMenu(GetSubMenu(GetMenu(), WINDOW_MENU_POSITION));
-
 	return 0;
 }
 
@@ -401,15 +378,22 @@ LRESULT CMainFrame::OnFind(UINT msg, WPARAM wp, LPARAM lp, BOOL&) {
 LRESULT CMainFrame::OnToggleDarkMode(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	auto& settings = AppSettings::Get();
 	settings.DarkMode(!settings.DarkMode());
+
+	::EnumThreadWindows(::GetCurrentThreadId(), [](auto hWnd, auto) {
+		::PostMessage(hWnd, WM_UPDATE_DARKMODE, 0, 0);
+		return TRUE;
+		}, 0);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnUpdateDarkMode(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
+	auto& settings = AppSettings::Get();
+
+	WTLHelper::SwitchToMode(settings.DarkMode() ? DarkModeKind::Dark : DarkModeKind::Light, m_hWnd);
 	UISetCheck(ID_OPTIONS_DARKMODE, settings.DarkMode());
-
-	if (settings.DarkMode())
-		ThemeHelper::SetCurrentTheme(s_DarkTheme, m_hWnd);
-	else
-		ThemeHelper::SetDefaultTheme(m_hWnd);
-
-	ThemeHelper::UpdateMenuColors(*this, settings.DarkMode());
-	UpdateMenu(GetMenu(), true);
+	InitMenu(GetMenu());
+	DrawMenuBar();
 
 	return 0;
 }
@@ -463,27 +447,4 @@ LRESULT CMainFrame::OnNewSubLayer(WORD, WORD, HWND, BOOL&) {
 			IDS_TITLE, ok ? MB_ICONINFORMATION : MB_ICONERROR);
 	}
 	return 0;
-}
-
-void CMainFrame::InitDarkTheme() const {
-	s_DarkTheme.BackColor = s_DarkTheme.SysColors[COLOR_WINDOW] = RGB(32, 32, 32);
-	s_DarkTheme.TextColor = s_DarkTheme.SysColors[COLOR_WINDOWTEXT] = RGB(248, 248, 248);
-	s_DarkTheme.SysColors[COLOR_HIGHLIGHT] = RGB(10, 10, 160);
-	s_DarkTheme.SysColors[COLOR_HIGHLIGHTTEXT] = RGB(240, 240, 240);
-	s_DarkTheme.SysColors[COLOR_MENUTEXT] = s_DarkTheme.TextColor;
-	s_DarkTheme.SysColors[COLOR_CAPTIONTEXT] = s_DarkTheme.TextColor;
-	s_DarkTheme.SysColors[COLOR_BTNFACE] = s_DarkTheme.BackColor;
-	s_DarkTheme.SysColors[COLOR_BTNTEXT] = s_DarkTheme.TextColor;
-	s_DarkTheme.SysColors[COLOR_3DLIGHT] = RGB(192, 192, 192);
-	s_DarkTheme.SysColors[COLOR_BTNHIGHLIGHT] = RGB(192, 192, 192);
-	s_DarkTheme.SysColors[COLOR_CAPTIONTEXT] = s_DarkTheme.TextColor;
-	s_DarkTheme.SysColors[COLOR_3DSHADOW] = s_DarkTheme.TextColor;
-	s_DarkTheme.SysColors[COLOR_SCROLLBAR] = s_DarkTheme.BackColor;
-	s_DarkTheme.SysColors[COLOR_APPWORKSPACE] = s_DarkTheme.BackColor;
-	s_DarkTheme.StatusBar.BackColor = RGB(16, 0, 16);
-	s_DarkTheme.StatusBar.TextColor = s_DarkTheme.TextColor;
-
-	s_DarkTheme.Name = L"Dark";
-	s_DarkTheme.Menu.BackColor = s_DarkTheme.BackColor;
-	s_DarkTheme.Menu.TextColor = s_DarkTheme.TextColor;
 }

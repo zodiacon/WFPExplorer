@@ -5,18 +5,6 @@
 #include <SortHelper.h>
 
 CFiltersListPage::CFiltersListPage(WFPEngine& engine, FWPM_LAYER* layer) : m_Engine(engine), m_Layer(layer) {
-	WFPFilterEnumerator enumerator(engine.Handle());
-	DWORD count = 0;
-	DWORD maxCount = 8000;
-	do {
-		m_Filters.Append(enumerator.NextFiltered<FilterInfo>([&](auto& filter) { return filter->layerKey == layer->layerKey; }, maxCount));
-		count += maxCount;
-	} while (m_Filters.size() == count);
-
-}
-
-size_t CFiltersListPage::GetFilterCount() const {
-	return m_Filters.size();
 }
 
 CString CFiltersListPage::GetColumnText(HWND, int row, int col) const {
@@ -55,10 +43,25 @@ int CFiltersListPage::GetRowImage(HWND, int row, int) const {
 	return 4;
 }
 
+void CFiltersListPage::CreateFilterList() {
+	if (!m_FilterListCreated) {
+		m_FilterListCreated = true;
+		WFPFilterEnumerator enumerator(m_Engine.Handle());
+		DWORD count = 0;
+		DWORD maxCount = 8000;
+		do {
+			m_Filters.Append(enumerator.NextFiltered<FilterInfo>([&](auto& filter) { return filter->layerKey == m_Layer->layerKey; }, maxCount));
+			count += maxCount;
+		} while (m_Filters.size() == count);
+	}
+}
+
 LRESULT CFiltersListPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	InitDynamicLayout(false);
 	m_List.Attach(GetDlgItem(IDC_LIST));
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
+
+	CreateFilterList();
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 6, 4);
