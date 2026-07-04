@@ -103,6 +103,7 @@ BEGIN
         MENUITEM "&Always On Top",              ID_OPTIONS_ALWAYSONTOP
         MENUITEM "&Dark Mode",                  ID_OPTIONS_DARKMODE
         MENUITEM "&Font...",                    ID_OPTIONS_FONT
+        MENUITEM "&Reset Font",                 ID_OPTIONS_RESETFONT
     END
     POPUP "&Window"
     BEGIN

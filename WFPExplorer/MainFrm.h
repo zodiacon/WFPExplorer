@@ -41,6 +41,8 @@ public:
 		MESSAGE_HANDLER(WM_MENUSELECT, [](auto, auto, auto, auto) { return 0; })
 		COMMAND_ID_HANDLER(ID_OPTIONS_DARKMODE, OnToggleDarkMode)
 		MESSAGE_HANDLER(WM_UPDATE_DARKMODE, OnUpdateDarkMode)
+		COMMAND_ID_HANDLER(ID_OPTIONS_FONT, OnOptionsFont)
+		COMMAND_ID_HANDLER(ID_OPTIONS_RESETFONT, OnResetFont)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		MESSAGE_HANDLER(WM_SHOWWINDOW, OnShowWindow)
@@ -69,6 +71,7 @@ private:
 	void InitMenu(HMENU hMenu);
 	void UpdateUI();
 	void SetAlwaysOnTop(bool ontop);
+	void ApplyFont();
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
@@ -95,12 +98,16 @@ private:
 	LRESULT OnFind(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnToggleDarkMode(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnUpdateDarkMode(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnOptionsFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnResetFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnNewProvider(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnNewFilter(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnNewSubLayer(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine m_Engine;
 	CFont m_MonoFont;
+	CFont m_Font;
+	CFont m_DefaultFont;
 	CNativeCustomTabView m_Tabs;
 	CMultiPaneStatusBarCtrl m_StatusBar;
 	CFindReplaceDialog* m_pFindDlg{ nullptr };

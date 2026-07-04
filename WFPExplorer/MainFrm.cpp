@@ -115,6 +115,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		UISetCheck(ID_OPTIONS_DARKMODE, true);
 	}
 
+	m_DefaultFont.Attach(AtlCreateControlFont());
+	ApplyFont();
+
 	PostMessage(WM_COMMAND, ID_VIEW_HIERARCHY);
 
 	return 0;
@@ -339,6 +342,7 @@ LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
 	if (!handled) {
 		UpdateUI();
 	}
+	ApplyFont();
 	return 0;
 }
 
@@ -395,6 +399,57 @@ LRESULT CMainFrame::OnUpdateDarkMode(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*
 	InitMenu(GetMenu());
 	DrawMenuBar();
 
+	return 0;
+}
+
+LRESULT CMainFrame::OnOptionsFont(WORD, WORD, HWND, BOOL&) {
+	auto& settings = AppSettings::Get();
+	auto lf = settings.Font();
+	if (lf.lfFaceName[0] == 0)
+		((CFontHandle)(HFONT)m_DefaultFont).GetLogFont(lf);
+
+	CFontDialog dlg(&lf, CF_EFFECTS | CF_SCREENFONTS, nullptr, m_hWnd);
+	auto ok = WTLHelper::InvokeFontDialog(dlg);
+	if (ok) {
+		settings.Font(dlg.m_lf);
+		ApplyFont();
+	}
+
+	return 0;
+}
+
+void CMainFrame::ApplyFont() {
+	auto lf = AppSettings::Get().Font();
+	HFONT hFont;
+	if (lf.lfFaceName[0] == 0) {
+		// no custom font chosen (or explicitly reset): fall back to the natural
+		// default control font
+		hFont = m_DefaultFont;
+	}
+	else {
+		if (m_Font.m_hFont)
+			m_Font.DeleteObject();
+		m_Font.CreateFontIndirect(&lf);
+		hFont = m_Font;
+	}
+
+	// Apply to each open tab's content only, never to m_Tabs itself: the tab
+	// control manages its own strip font internally (CNativeCustomTabView owns
+	// and later deletes it), so feeding it a foreign HFONT via WM_SETFONT would
+	// leave it holding a handle it doesn't own and later tries to delete.
+	for (int i = 0; i < m_Tabs.GetPageCount(); i++) {
+		auto hWndPage = m_Tabs.GetPageHWND(i);
+		::SendMessage(hWndPage, WM_SETFONT, (WPARAM)hFont, TRUE);
+		::EnumChildWindows(hWndPage, [](HWND hWnd, LPARAM font) -> BOOL {
+			::SendMessage(hWnd, WM_SETFONT, (WPARAM)font, TRUE);
+			return TRUE;
+			}, (LPARAM)hFont);
+	}
+}
+
+LRESULT CMainFrame::OnResetFont(WORD, WORD, HWND, BOOL&) {
+	AppSettings::Get().Font(LOGFONT{});
+	ApplyFont();
 	return 0;
 }
 
