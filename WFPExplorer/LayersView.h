@@ -31,6 +31,7 @@ public:
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
+		COMMAND_ID_HANDLER(ID_LAYER_SHOWMAP, OnShowMap)
 		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CLayersView>, 1)
 	END_MSG_MAP()
 
@@ -65,6 +66,7 @@ private:
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCopy(WORD, WORD, HWND, BOOL&);
+	LRESULT OnShowMap(WORD, WORD, HWND, BOOL&);
 
 	WFPEngine& m_Engine;
 

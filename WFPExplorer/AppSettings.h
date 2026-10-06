@@ -15,6 +15,8 @@ public:
 		SETTING(HideEmptyLayers, 1, SettingType::Bool);
 		SETTING(AppendNetworkEvents, 0, SettingType::Bool);
 		SETTING(ResolveNetworkAddresses, 0, SettingType::Bool);
+		SETTING(MapHideFirewall, 0, SettingType::Bool);
+		SETTING(MapColorByProvider, 0, SettingType::Bool);
 	END_SETTINGS
 
 	DEF_SETTING(DarkMode, bool)
@@ -27,5 +29,7 @@ public:
 	DEF_SETTING(HideEmptyLayers, bool)
 	DEF_SETTING(AppendNetworkEvents, bool)
 	DEF_SETTING(ResolveNetworkAddresses, bool)
+	DEF_SETTING(MapHideFirewall, bool)
+	DEF_SETTING(MapColorByProvider, bool)
 };
 

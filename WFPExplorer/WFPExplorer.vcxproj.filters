@@ -90,6 +90,9 @@
     <ClCompile Include="HierarchyView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="LayerMapView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
     <ClCompile Include="NetEventsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -174,6 +177,9 @@
       <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="HierarchyView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerMapView.h">
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="NetEventsView.h">

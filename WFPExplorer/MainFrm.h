@@ -30,6 +30,8 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_PROVIDERCONTEXTS, OnViewProviderContexts)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_VIEW_HIERARCHY, OnViewHierarchy)
+		COMMAND_ID_HANDLER(ID_VIEW_LAYERMAP, OnViewLayerMap)
+		COMMAND_ID_HANDLER(ID_VIEW_CALLOUTMAP, OnViewCalloutMap)
 		COMMAND_ID_HANDLER(ID_VIEW_NETWORKEVENTS, OnViewNetEvents)
 		MESSAGE_HANDLER(CFindReplaceDialog::GetFindReplaceMsg(), OnFind)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
@@ -67,6 +69,9 @@ private:
 	HFONT GetMonoFont() const override;
 	bool TrackPopupMenu(HMENU hMenu, DWORD flags, int x, int y, HWND hWnd = nullptr) override;
 	CFindReplaceDialog* GetFindDialog() const override;
+	void ShowLayerMap(GUID const& layer, GUID const& callout = GUID_NULL) override;
+	void ShowCalloutMap(GUID const& callout) override;
+	void SetViewTitle(HWND hView, PCWSTR title) override;
 
 	void InitMenu(HMENU hMenu);
 	void UpdateUI();
@@ -85,6 +90,8 @@ private:
 	LRESULT OnViewLayers(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewNetEvents(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewHierarchy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnViewLayerMap(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnViewCalloutMap(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewSublayers(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewCallouts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);

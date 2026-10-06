@@ -120,13 +120,21 @@
 #define ID_VIEW_STATISTICS              32798
 #define ID_NEW_SUBLAYER                 32799
 #define ID_OPTIONS_RESETFONT            32800
+#define ID_VIEW_LAYERMAP                32801
+#define ID_LAYER_SHOWMAP                32802
+#define ID_CALLOUT_SHOWMAP              32803
+#define ID_CALLOUT_SHOWLAYERMAP         32804
+#define ID_MAP_HIDEFIREWALL             32805
+#define ID_MAP_COLORBYPROVIDER          32806
+#define ID_MAP_FIT                      32807
+#define ID_VIEW_CALLOUTMAP              32808
 
 // Next default values for new objects
 //
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        252
-#define _APS_NEXT_COMMAND_VALUE         32801
+#define _APS_NEXT_COMMAND_VALUE         32809
 #define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

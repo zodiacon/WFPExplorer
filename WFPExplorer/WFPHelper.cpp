@@ -24,7 +24,7 @@ public:
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	auto provider = engine.GetProviderByKey(key);
-	if (auto name = StringHelper::ParseMUIString(provider->displayData.name); !name.IsEmpty())
+	if (auto name = provider ? StringHelper::ParseMUIString(provider->displayData.name) : CString(); !name.IsEmpty())
 		return name;
 	return StringHelper::GuidToString(key);
 }
@@ -47,7 +47,7 @@ CString WFPHelper::GetLayerName(WFPEngine const& engine, GUID const& key) {
 
 CString WFPHelper::GetCalloutName(WFPEngine const& engine, GUID const& key) {
 	auto callout = engine.GetCalloutByKey(key);
-	if (auto name = StringHelper::ParseMUIString(callout->displayData.name); !name.IsEmpty())
+	if (auto name = callout ? StringHelper::ParseMUIString(callout->displayData.name) : CString(); !name.IsEmpty())
 		return name;
 	return StringHelper::GuidToString(key);
 }
@@ -60,6 +60,13 @@ CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 		return StringHelper::GuidToString(key);
 	}
 	return L"";
+}
+
+UINT WFPHelper::TrackMapMenu(HWND hWnd, POINT const& pt, bool callout) {
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT);
+	// the "layer map" and "callout map" popups of IDR_CONTEXT
+	return (UINT)::TrackPopupMenu(menu.GetSubMenu(callout ? 5 : 3), TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, hWnd, nullptr);
 }
 
 int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {

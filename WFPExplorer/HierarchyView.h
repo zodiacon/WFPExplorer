@@ -22,6 +22,7 @@ public:
 	void Refresh();
 	void OnTreeSelChanged(HWND tree, HTREEITEM hOld, HTREEITEM hNew);
 	bool OnTreeDoubleClick(HWND tree, HTREEITEM hItem);
+	bool OnTreeRightClick(HWND tree, HTREEITEM hItem, POINT const& pt);
 
 	BEGIN_MSG_MAP(CHierarchyView)
 		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)

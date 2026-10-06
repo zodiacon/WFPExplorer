@@ -16,6 +16,7 @@
 #include <ToolbarHelper.h>
 #include "AppSettings.h"
 #include "HierarchyView.h"
+#include "LayerMapView.h"
 #include "NetEventsView.h"
 #include "ProviderDlg.h"
 #include "NewFilterDlg.h"
@@ -160,6 +161,8 @@ void CMainFrame::InitMenu(HMENU hMenu) {
 		{ ID_VIEW_PROVIDERCONTEXTS, IDI_CONTEXT },
 		{ ID_EDIT_PROPERTIES, IDI_PROPERTIES },
 		{ ID_VIEW_HIERARCHY, IDI_TREE },
+		{ ID_VIEW_LAYERMAP, IDI_LAYERS },
+		{ ID_VIEW_CALLOUTMAP, IDI_CALLOUT },
 		{ ID_VIEW_NETWORKEVENTS, IDI_EVENT },
 		{ ID_FILE_OPEN, IDI_OPEN },
 		{ ID_FILE_SAVE, IDI_SAVE },
@@ -269,6 +272,41 @@ LRESULT CMainFrame::OnViewNetEvents(WORD, WORD, HWND, BOOL&) {
 	m_Tabs.AddPage(view->m_hWnd, L"Net Events", 8, view);
 
 	return 0;
+}
+
+LRESULT CMainFrame::OnViewLayerMap(WORD, WORD, HWND, BOOL&) {
+	ShowLayerMap(GUID_NULL);
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewCalloutMap(WORD, WORD, HWND, BOOL&) {
+	ShowCalloutMap(GUID_NULL);
+	return 0;
+}
+
+void CMainFrame::ShowLayerMap(GUID const& layer, GUID const& callout) {
+	auto view = new CLayerMapView(this, m_Engine, CLayerMapView::MapKind::Layer);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	if (layer != GUID_NULL)
+		view->Select(layer);
+	// the view picks its layer while it's created, before it has a tab to name
+	m_Tabs.AddPage(view->m_hWnd, view->GetTitle(), 3, view);
+	// once the tab shows the view at its size
+	if (callout != GUID_NULL)
+		view->FocusCallout(callout);
+}
+
+void CMainFrame::ShowCalloutMap(GUID const& callout) {
+	auto view = new CLayerMapView(this, m_Engine, CLayerMapView::MapKind::Callout);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	if (callout != GUID_NULL)
+		view->Select(callout);
+	m_Tabs.AddPage(view->m_hWnd, view->GetTitle(), 5, view);
+}
+
+void CMainFrame::SetViewTitle(HWND hView, PCWSTR title) {
+	if (int page = m_Tabs.PageIndexFromHwnd(hView); page >= 0)
+		m_Tabs.SetPageTitle(page, title);
 }
 
 LRESULT CMainFrame::OnViewHierarchy(WORD, WORD, HWND, BOOL&) {

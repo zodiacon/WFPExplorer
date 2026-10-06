@@ -80,6 +80,8 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "&Hierarchy",                  ID_VIEW_HIERARCHY
+        MENUITEM "Layer &Map",                  ID_VIEW_LAYERMAP
+        MENUITEM "Callout M&ap",                ID_VIEW_CALLOUTMAP
         MENUITEM SEPARATOR
         MENUITEM "&Sessions",                   ID_VIEW_SESSIONS
         MENUITEM "&Providers",                  ID_VIEW_PROVIDERS
@@ -127,6 +129,8 @@ BEGIN
     END
     POPUP "layer"
     BEGIN
+        MENUITEM "Show Layer &Map",             ID_LAYER_SHOWMAP
+        MENUITEM SEPARATOR
         MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
         MENUITEM SEPARATOR
         MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
@@ -136,6 +140,37 @@ BEGIN
         MENUITEM "&Delete\tDel",                ID_EDIT_DELETE
         MENUITEM SEPARATOR
         MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
+    END
+    POPUP "layer map"
+    BEGIN
+        MENUITEM "Open Layer Map in New &Tab",  ID_LAYER_SHOWMAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties...",              ID_EDIT_PROPERTIES
+    END
+    POPUP "callout"
+    BEGIN
+        MENUITEM "Show in &Layer Map",          ID_CALLOUT_SHOWLAYERMAP
+        MENUITEM "Show Callout &Map",           ID_CALLOUT_SHOWMAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Delete\tDel",                ID_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Properties...\tAlt+Enter",    ID_EDIT_PROPERTIES
+    END
+    POPUP "callout map"
+    BEGIN
+        MENUITEM "Show in &Layer Map",          ID_CALLOUT_SHOWLAYERMAP
+        MENUITEM "Open Callout Map in New &Tab", ID_CALLOUT_SHOWMAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties...",              ID_EDIT_PROPERTIES
+    END
+    POPUP "map options"
+    BEGIN
+        MENUITEM "Hide &Windows Firewall Filters", ID_MAP_HIDEFIREWALL
+        MENUITEM "Color by &Provider",          ID_MAP_COLORBYPROVIDER
+        MENUITEM SEPARATOR
+        MENUITEM "&Fit to Window",              ID_MAP_FIT
+        MENUITEM "&Save...",                    ID_FILE_SAVE
     END
 END
 
@@ -592,8 +627,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,6,0,0
- PRODUCTVERSION 0,6,0,0
+ FILEVERSION 0,7,0,0
+ PRODUCTVERSION 0,7,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -610,12 +645,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.6.0.0"
+            VALUE "FileVersion", "0.7.0.0"
             VALUE "InternalName", "WFPExplorer"
-            VALUE "LegalCopyright", "©2022-2026 Pavel Yosifovich"
+            VALUE "LegalCopyright", "ï¿½2022-2026 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.6.0.0"
+            VALUE "ProductVersion", "0.7.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -849,6 +884,13 @@ BEGIN
     ID_VIEW_NETWORKEVENTS   "\nNetwork Events"
     ID_NEW_FILTER           "\nNew Filter"
     ID_EDIT_FINDNEXT        "\nFind Next"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_LAYERMAP        "Show a layer's sublayers, filters and callouts as a graph\nLayer Map"
+    ID_LAYER_SHOWMAP        "Show the layer's sublayers, filters and callouts as a graph\nShow Layer Map"
+    ID_VIEW_CALLOUTMAP      "Show a callout with its provider, layer and the filters that use it as a graph\nCallout Map"
 END
 
 #endif    // English (United States) resources

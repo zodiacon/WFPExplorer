@@ -177,6 +177,12 @@ LRESULT CLayersView::OnCopy(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CLayersView::OnShowMap(WORD, WORD, HWND, BOOL&) {
+	if (int selected = m_List.GetNextItem(-1, LVNI_SELECTED); selected >= 0)
+		Frame()->ShowLayerMap(m_Layers[selected].Data->layerKey);
+	return 0;
+}
+
 bool CLayersView::OnRightClickList(HWND, int row, int col, POINT const& pt) {
 	if (row < 0)
 		return false;

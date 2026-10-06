@@ -205,6 +205,18 @@ bool CCalloutsView::OnRightClickList(HWND, int row, int col, POINT const& pt) co
 	CMenu menu;
 	menu.LoadMenu(IDR_CONTEXT);
 
-	return Frame()->TrackPopupMenu(menu.GetSubMenu(0), 0, pt.x, pt.y);
+	return Frame()->TrackPopupMenu(menu.GetSubMenu(4), 0, pt.x, pt.y);	// "callout"
+}
+
+LRESULT CCalloutsView::OnShowMap(WORD, WORD id, HWND, BOOL&) {
+	int selected = m_List.GetNextItem(-1, LVNI_SELECTED);
+	if (selected < 0)
+		return 0;
+	auto callout = m_Callouts[selected].Data;
+	if (id == ID_CALLOUT_SHOWLAYERMAP)
+		Frame()->ShowLayerMap(callout->applicableLayer, callout->calloutKey);
+	else
+		Frame()->ShowCalloutMap(callout->calloutKey);
+	return 0;
 }
 

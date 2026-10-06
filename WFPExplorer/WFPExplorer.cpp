@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "MainFrm.h"
 #include <WTLHelper.h>
+#include <NodeGraphControl.h>
 #include "AppSettings.h"
 
 #pragma comment(lib, "Fwpuclnt.lib")
@@ -42,6 +43,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lps
 
 	hRes = _Module.Init(nullptr, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));
+	NodeGraphCtrl::Register(hInstance);
 
 	WTLHelper::InitDarkMode(settings.DarkMode() ? DarkModeKind::Dark : DarkModeKind::Light);
 

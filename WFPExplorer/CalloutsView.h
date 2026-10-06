@@ -32,6 +32,8 @@ public:
 		COMMAND_ID_HANDLER(ID_EDIT_DELETE, OnDelete)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
+		COMMAND_ID_HANDLER(ID_CALLOUT_SHOWLAYERMAP, OnShowMap)
+		COMMAND_ID_HANDLER(ID_CALLOUT_SHOWMAP, OnShowMap)
 		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CCalloutsView>, 1)
 	END_MSG_MAP()
 
@@ -65,6 +67,7 @@ private:
 	LRESULT OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnDelete(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnShowMap(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;

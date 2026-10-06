@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33020.496
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wfpc", "wfpc\wfpc.vcxproj", "{838BF7A3-0019-47F4-9DA8-2DC1194BF8CB}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WFPCore", "WFPCore\WFPCore.vcxproj", "{1EC9C4CA-34FD-4BE0-9662-9D92C53B9A90}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WTLHelper", "WTLHelper\WTLHelper\WTLHelper.vcxproj", "{AE53419F-A769-4548-8E15-E311904DF7DF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NodeGraphControl", "WTLHelper\NodeGraphControl\NodeGraphControl.vcxproj", "{768E9381-B6E3-4D46-8257-64E5BD8409B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +98,24 @@ Global
 		{AE53419F-A769-4548-8E15-E311904DF7DF}.ReleaseSigned|x64.Build.0 = ReleaseSigned|x64
 		{AE53419F-A769-4548-8E15-E311904DF7DF}.ReleaseSigned|x86.ActiveCfg = ReleaseSigned|Win32
 		{AE53419F-A769-4548-8E15-E311904DF7DF}.ReleaseSigned|x86.Build.0 = ReleaseSigned|Win32
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Debug|ARM64.ActiveCfg = Debug|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Debug|ARM64.Build.0 = Debug|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Debug|x64.ActiveCfg = Debug|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Debug|x64.Build.0 = Debug|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Debug|x86.ActiveCfg = Debug|Win32
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Debug|x86.Build.0 = Debug|Win32
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Release|ARM64.ActiveCfg = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Release|ARM64.Build.0 = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Release|x64.ActiveCfg = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Release|x64.Build.0 = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Release|x86.ActiveCfg = Release|Win32
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.Release|x86.Build.0 = Release|Win32
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.ReleaseSigned|ARM64.ActiveCfg = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.ReleaseSigned|ARM64.Build.0 = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.ReleaseSigned|x64.ActiveCfg = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.ReleaseSigned|x64.Build.0 = Release|x64
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.ReleaseSigned|x86.ActiveCfg = Release|Win32
+		{768E9381-B6E3-4D46-8257-64E5BD8409B2}.ReleaseSigned|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

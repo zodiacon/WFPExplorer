@@ -58,6 +58,22 @@ bool CHierarchyView::OnTreeDoubleClick(HWND tree, HTREEITEM hItem) {
 	return ShowProperties(hItem);
 }
 
+bool CHierarchyView::OnTreeRightClick(HWND, HTREEITEM hItem, POINT const& pt) {
+	if (GetItemData<TreeItemType>(m_Tree, hItem) != TreeItemType::Layer)
+		return false;
+
+	auto key = m_LayersMap[hItem];
+	switch (WFPHelper::TrackMapMenu(m_hWnd, pt)) {
+		case ID_LAYER_SHOWMAP:
+			Frame()->ShowLayerMap(key);
+			break;
+		case ID_EDIT_PROPERTIES:
+			ShowProperties(hItem);
+			break;
+	}
+	return true;
+}
+
 void CHierarchyView::BuildTree() {
 	CWaitCursor wait;
 	m_Tree.SetRedraw(FALSE);

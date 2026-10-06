@@ -144,7 +144,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WTLHelper\NodeGraphControl\include;..\WFPCore</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
@@ -179,7 +179,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WTLHelper\NodeGraphControl\include;..\WFPCore</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
@@ -214,7 +214,7 @@
       <DebugInformationFormat />
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WTLHelper\NodeGraphControl\include;..\WFPCore</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
@@ -253,7 +253,7 @@
       </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WTLHelper\NodeGraphControl\include;..\WFPCore</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
@@ -291,7 +291,7 @@
       <DebugInformationFormat />
       <PreprocessorDefinitions>_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WTLHelper\NodeGraphControl\include;..\WFPCore</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
@@ -329,7 +329,7 @@
       </DebugInformationFormat>
       <PreprocessorDefinitions>_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WFPCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\WTLHelper\WTLHelper;..\WTLHelper\NodeGraphControl\include;..\WFPCore</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>false</EnableModules>
     </ClCompile>
@@ -367,6 +367,7 @@
     <ClCompile Include="FiltersListPage.cpp" />
     <ClCompile Include="FiltersView.cpp" />
     <ClCompile Include="HierarchyView.cpp" />
+    <ClCompile Include="LayerMapView.cpp" />
     <ClCompile Include="LayerFieldsPage.cpp" />
     <ClCompile Include="LayerGeneralPage.cpp" />
     <ClCompile Include="LayersView.cpp" />
@@ -404,6 +405,7 @@
     <ClInclude Include="FiltersView.h" />
     <ClInclude Include="GenericListViewBase.h" />
     <ClInclude Include="HierarchyView.h" />
+    <ClInclude Include="LayerMapView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="LayerFieldsPage.h" />
     <ClInclude Include="LayerGeneralPage.h" />
@@ -467,6 +469,9 @@
   <ItemGroup>
     <ProjectReference Include="..\WTLHelper\WTLHelper\WTLHelper.vcxproj">
       <Project>{ae53419f-a769-4548-8e15-e311904df7df}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\WTLHelper\NodeGraphControl\NodeGraphControl.vcxproj">
+      <Project>{768e9381-b6e3-4d46-8257-64e5bd8409b2}</Project>
     </ProjectReference>
     <ProjectReference Include="..\WFPCore\WFPCore.vcxproj">
       <Project>{1ec9c4ca-34fd-4be0-9662-9d92c53b9a90}</Project>
