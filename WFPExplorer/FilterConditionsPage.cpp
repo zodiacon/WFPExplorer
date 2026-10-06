@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "FilterConditionsPage.h"
 #include "StringHelper.h"
 #include <WFPEngine.h>
@@ -44,7 +45,7 @@ LRESULT CFilterConditionsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 
     CImageList images;
     images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
-    images.AddIcon(AtlLoadIconImage(IDI_FIELD, 0, 16, 16));
+    images.AddIcon(IconHelper::LoadCached(IDI_FIELD, 16));
     m_List.SetImageList(images, LVSIL_SMALL);
 
     CWindow edit(GetDlgItem(IDC_VALUE));

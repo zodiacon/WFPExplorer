@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "ProvidersView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
@@ -32,8 +33,8 @@ LRESULT CProvidersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
-	images.AddIcon(AtlLoadIconImage(IDI_PROVIDER, 0, 16, 16));
-	images.AddIcon(AtlLoadIconImage(IDI_PROVIDER_PERSISTENT, 0, 16, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_PROVIDER, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_PROVIDER_PERSISTENT, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();

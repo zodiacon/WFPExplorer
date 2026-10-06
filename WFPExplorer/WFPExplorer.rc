@@ -106,6 +106,9 @@ BEGIN
         MENUITEM "&Dark Mode",                  ID_OPTIONS_DARKMODE
         MENUITEM "&Font...",                    ID_OPTIONS_FONT
         MENUITEM "&Reset Font",                 ID_OPTIONS_RESETFONT
+        MENUITEM SEPARATOR
+        MENUITEM "Map: Hide &Windows Firewall Filters", ID_MAP_HIDEFIREWALL
+        MENUITEM "Map: Color by &Provider",     ID_MAP_COLORBYPROVIDER
     END
     POPUP "&Window"
     BEGIN
@@ -891,6 +894,8 @@ BEGIN
     ID_VIEW_LAYERMAP        "Show a layer's sublayers, filters and callouts as a graph\nLayer Map"
     ID_LAYER_SHOWMAP        "Show the layer's sublayers, filters and callouts as a graph\nShow Layer Map"
     ID_VIEW_CALLOUTMAP      "Show a callout with its provider, layer and the filters that use it as a graph\nCallout Map"
+    ID_MAP_HIDEFIREWALL     "Hide the filters of Windows Firewall in the map (and in new maps)\nHide Windows Firewall Filters"
+    ID_MAP_COLORBYPROVIDER  "Color the nodes of the map (and of new maps) by their provider\nColor by Provider"
 END
 
 #endif    // English (United States) resources

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "SublayersView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
@@ -25,7 +26,7 @@ LRESULT CSublayersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
-	images.AddIcon(AtlLoadIconImage(IDI_SUBLAYER, 0, 16, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_SUBLAYER, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();

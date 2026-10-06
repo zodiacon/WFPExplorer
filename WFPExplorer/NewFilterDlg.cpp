@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "resource.h"
 #include "NewFilterDlg.h"
 #include <WFPEngine.h>
@@ -28,7 +29,7 @@ LRESULT CNewFilterDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	UINT ids[] = { IDC_PROVIDER_PROP, IDC_LAYER_PROP, IDC_SUBLAYER_PROP };
 	for (auto id : ids) {
 		CButton button(GetDlgItem(id));
-		button.SetIcon(AtlLoadIconImage(IDI_INFO, 0, 16, 16));
+		button.SetIcon(IconHelper::LoadCached(IDI_INFO, 16));
 	}
 
 	struct {

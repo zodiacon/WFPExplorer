@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "LayerFieldsPage.h"
 #include <WFPEngine.h>
 #include "StringHelper.h"
@@ -58,7 +59,7 @@ LRESULT CLayerFieldsPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
-	images.AddIcon(AtlLoadIconImage(IDI_FIELD, 0, 16, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_FIELD, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	return 0;

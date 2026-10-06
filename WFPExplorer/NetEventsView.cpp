@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "NetEventsView.h"
 #include <WFPEnumerators.h>
 #include <atltime.h>
@@ -154,7 +155,7 @@ LRESULT CNetEventsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
-	images.AddIcon(AtlLoadIconImage(IDI_EVENT, 0, 16, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_EVENT, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	auto cm = GetColumnManager(m_List);

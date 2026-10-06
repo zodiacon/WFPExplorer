@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "FiltersListPage.h"
 #include <WFPEngine.h>
 #include "StringHelper.h"
@@ -67,7 +68,7 @@ LRESULT CFiltersListPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 6, 4);
 	UINT icons[] = { IDI_FILTER, IDI_FILTER_PERMIT, IDI_FILTER_BLOCK, IDI_FILTER_REFRESH, IDI_CALLOUT };
 	for (auto icon : icons)
-		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
+		images.AddIcon(IconHelper::LoadCached(icon, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	auto cm = GetColumnManager(m_List);

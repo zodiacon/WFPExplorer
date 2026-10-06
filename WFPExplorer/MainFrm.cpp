@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
+#include <IconHelper.h>
 #include "resource.h"
 #include "AboutDlg.h"
 #include "SessionsView.h"
@@ -87,7 +88,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		IDI_CONTEXT, IDI_TREE, IDI_EVENT,
 	};
 	for (auto icon : icons)
-		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
+		images.AddIcon(IconHelper::LoadCached(icon, 16));
 	m_Tabs.SetImageList(images);
 
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -367,6 +368,9 @@ LRESULT CMainFrame::OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nPage = wID - ID_WINDOW_TABFIRST;
 	m_Tabs.SetActivePage(nPage);
+	// unlike a click on a tab, SetActivePage doesn't notify; the new view must still update the commands
+	BOOL handled;
+	OnPageActivated(0, nullptr, handled);
 
 	return 0;
 }
@@ -374,6 +378,11 @@ LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
 	int page = m_Tabs.GetActivePage();
 	bool handled = false;
+	// only a map view enables these (on its activation below); other views don't know about them
+	UIEnable(ID_MAP_HIDEFIREWALL, false);
+	UIEnable(ID_MAP_COLORBYPROVIDER, false);
+	UISetCheck(ID_MAP_HIDEFIREWALL, false);
+	UISetCheck(ID_MAP_COLORBYPROVIDER, false);
 	if (page >= 0) {
 		handled = ::SendMessage(m_Tabs.GetPageHWND(page), WM_ACTIVATE, 1, 0);
 	}

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "FiltersView.h"
 #include <WFPEngine.h>
 #include "StringHelper.h"
@@ -145,7 +146,7 @@ LRESULT CFiltersView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 6, 4);
 	UINT icons[] = { IDI_FILTER, IDI_FILTER_PERMIT, IDI_FILTER_BLOCK, IDI_FILTER_REFRESH, IDI_CALLOUT };
 	for (auto icon : icons)
-		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
+		images.AddIcon(IconHelper::LoadCached(icon, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	return 0;

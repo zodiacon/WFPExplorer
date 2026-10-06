@@ -655,18 +655,10 @@ void CLayerMapView::ShowOptionsMenu(POINT const& pt) {
 	popup.CheckMenuItem(ID_MAP_HIDEFIREWALL, MF_BYCOMMAND | (m_HideFirewall ? MF_CHECKED : MF_UNCHECKED));
 	popup.CheckMenuItem(ID_MAP_COLORBYPROVIDER, MF_BYCOMMAND | (m_ColorByProvider ? MF_CHECKED : MF_UNCHECKED));
 	BOOL handled;
-	// an option also becomes the default of new maps
-	switch (popup.TrackPopupMenu(TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, m_hWnd)) {
+	switch (auto id = popup.TrackPopupMenu(TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, m_hWnd)) {
 		case ID_MAP_HIDEFIREWALL:
-			m_HideFirewall = !m_HideFirewall;
-			AppSettings::Get().MapHideFirewall(m_HideFirewall);
-			FillList();		// the filter counts change, and layers may come and go
-			break;
-
 		case ID_MAP_COLORBYPROVIDER:
-			m_ColorByProvider = !m_ColorByProvider;
-			AppSettings::Get().MapColorByProvider(m_ColorByProvider);
-			BuildGraph(false);
+			ToggleOption(id);
 			break;
 
 		case ID_MAP_FIT:
@@ -678,6 +670,43 @@ void CLayerMapView::ShowOptionsMenu(POINT const& pt) {
 			OnSave(0, ID_FILE_SAVE, nullptr, handled);
 			break;
 	}
+}
+
+//
+// from the graph's menu or the main menu; an option also becomes the default of new maps
+//
+void CLayerMapView::ToggleOption(UINT id) {
+	if (id == ID_MAP_HIDEFIREWALL) {
+		m_HideFirewall = !m_HideFirewall;
+		AppSettings::Get().MapHideFirewall(m_HideFirewall);
+		FillList();		// the filter counts change, and layers may come and go
+	}
+	else {
+		m_ColorByProvider = !m_ColorByProvider;
+		AppSettings::Get().MapColorByProvider(m_ColorByProvider);
+		BuildGraph(false);
+	}
+	UpdateUI();
+}
+
+void CLayerMapView::UpdateUI() {
+	auto& ui = Frame()->UI();
+	ui.UIEnable(ID_MAP_HIDEFIREWALL, true);
+	ui.UIEnable(ID_MAP_COLORBYPROVIDER, true);
+	ui.UISetCheck(ID_MAP_HIDEFIREWALL, m_HideFirewall);
+	ui.UISetCheck(ID_MAP_COLORBYPROVIDER, m_ColorByProvider);
+}
+
+LRESULT CLayerMapView::OnActivate(UINT, WPARAM active, LPARAM, BOOL&) {
+	if (active)
+		UpdateUI();
+	// 0: the frame still updates the commands every view shares
+	return 0;
+}
+
+LRESULT CLayerMapView::OnToggleOption(WORD, WORD id, HWND, BOOL&) {
+	ToggleOption(id);
+	return 0;
 }
 
 LRESULT CLayerMapView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {

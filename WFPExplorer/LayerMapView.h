@@ -31,6 +31,7 @@ public:
 	BEGIN_MSG_MAP(CLayerMapView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
 		MESSAGE_HANDLER(WM_REBUILD_GRAPH, OnRebuildGraph)
 		MESSAGE_HANDLER(WM_CONTEXTMENU, OnContextMenu)
 		MESSAGE_HANDLER(WTLHelper::ThemeChangedMessage, OnThemeChanged)
@@ -40,6 +41,8 @@ public:
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnSave)
+		COMMAND_ID_HANDLER(ID_MAP_HIDEFIREWALL, OnToggleOption)
+		COMMAND_ID_HANDLER(ID_MAP_COLORBYPROVIDER, OnToggleOption)
 	END_MSG_MAP()
 
 private:
@@ -99,10 +102,14 @@ private:
 	FWPM_CALLOUT* FindCallout(GUID const& key) const;
 	FWPM_PROVIDER* FindProvider(GUID const& key) const;
 	void ShowOptionsMenu(POINT const& pt);
+	void ToggleOption(UINT id);		// ID_MAP_HIDEFIREWALL or ID_MAP_COLORBYPROVIDER
+	void UpdateUI();
 	void UpdateBackground();
 
 	LRESULT OnCreate(UINT, WPARAM, LPARAM, BOOL&);
 	LRESULT OnSize(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnActivate(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnToggleOption(WORD, WORD, HWND, BOOL&);
 	LRESULT OnRebuildGraph(UINT, WPARAM, LPARAM, BOOL&);
 	LRESULT OnContextMenu(UINT, WPARAM, LPARAM, BOOL&);
 	LRESULT OnThemeChanged(UINT, WPARAM, LPARAM, BOOL&);

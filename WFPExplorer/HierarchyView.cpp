@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <IconHelper.h>
 #include "HierarchyView.h"
 #include "WFPHelper.h"
 #include "StringHelper.h"
@@ -144,7 +145,7 @@ void CHierarchyView::UpdateUI() {
 	auto& ui = Frame()->UI();
 	auto hItem = m_Tree.GetSelectedItem();
 	auto type = hItem ? GetItemData<TreeItemType>(m_Tree, hItem) : TreeItemType::None;
-	ui.UIEnable(ID_EDIT_PROPERTIES, type == TreeItemType::Filter || type == TreeItemType::Layer);
+	ui.UIEnable(ID_EDIT_PROPERTIES, type == TreeItemType::Filter || type == TreeItemType::Layer || type == TreeItemType::Callout);
 	ui.UIEnable(ID_EDIT_COPY, type != TreeItemType::None);
 }
 
@@ -160,7 +161,8 @@ bool CHierarchyView::ShowProperties(HTREEITEM hItem) {
 			return true;
 
 		case TreeItemType::Callout:
-			//WFPHelper::ShowCalloutProperties(m_Engine, *m_Engine.GetCalloutByKey(m_CalloutsMap[hItem], false));
+			if (auto callout = m_Engine.GetCalloutByKey(m_CalloutsMap[hItem]); callout)
+				WFPHelper::ShowCalloutProperties(m_Engine, *callout);
 			return true;
 	}
 	return false;
@@ -185,7 +187,7 @@ LRESULT CHierarchyView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 		IDI_FILTER, IDI_LAYERS, IDI_CALLOUT,
 	};
 	for (auto icon : icons)
-		images.AddIcon(AtlLoadIconImage(icon, 0, 16, 16));
+		images.AddIcon(IconHelper::LoadCached(icon, 16));
 	m_Tree.SetImageList(images);
 
 	m_Splitter.SetSplitterPane(0, m_Tree);

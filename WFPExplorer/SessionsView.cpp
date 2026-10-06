@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
+#include <IconHelper.h>
 #include "resource.h"
 #include "SessionsView.h"
 #include <WFPEngine.h>
@@ -95,8 +96,8 @@ LRESULT CSessionsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
-	images.AddIcon(AtlLoadIconImage(IDI_SESSION, 0, 16, 16));
-	images.AddIcon(AtlLoadIconImage(IDI_SESSION_DYNAMIC, 0, 16, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_SESSION, 16));
+	images.AddIcon(IconHelper::LoadCached(IDI_SESSION_DYNAMIC, 16));
 	m_List.SetImageList(images, LVSIL_SMALL);
 
 	Refresh();
