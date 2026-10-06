@@ -8,6 +8,7 @@ struct WFPFilterInfo;
 
 class CFilterGeneralPage :
 	public CPropertyPageImpl<CFilterGeneralPage>,
+	public CDynamicDialogLayout<CFilterGeneralPage>,
 	public CDialogHelper<CFilterGeneralPage> {
 public:
 	enum { IDD = IDD_FILTERINFO };
@@ -20,6 +21,7 @@ public:
 		COMMAND_ID_HANDLER(IDC_CALLOUT_PROP, OnShowCallout)
 		COMMAND_ID_HANDLER(IDC_SUBLAYER_PROP, OnShowSublayer)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		CHAIN_MSG_MAP(CDynamicDialogLayout<CFilterGeneralPage>)
 	END_MSG_MAP()
 
 private:

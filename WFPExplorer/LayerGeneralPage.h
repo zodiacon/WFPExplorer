@@ -8,6 +8,7 @@ struct WFPLayerInfo;
 
 class CLayerGeneralPage :
 	public CPropertyPageImpl<CLayerGeneralPage>,
+	public CDynamicDialogLayout<CLayerGeneralPage>,
 	public CDialogHelper<CLayerGeneralPage> {
 public:
 	enum { IDD = IDD_LAYERINFO };
@@ -16,6 +17,7 @@ public:
 
 	BEGIN_MSG_MAP(CLayerGeneralPage)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		CHAIN_MSG_MAP(CDynamicDialogLayout<CLayerGeneralPage>)
 	END_MSG_MAP()
 
 private:

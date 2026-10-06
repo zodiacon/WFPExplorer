@@ -8,6 +8,7 @@ CFilterGeneralPage::CFilterGeneralPage(WFPEngine& engine, FWPM_FILTER* filter) :
 }
 
 LRESULT CFilterGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
+    InitDynamicLayout(false);
     SetDlgItemText(IDC_KEY, StringHelper::GuidToString(m_Filter->filterKey));
     SetDlgItemText(IDC_ID, std::to_wstring(m_Filter->filterId).c_str());
     SetDlgItemText(IDC_PROVIDER, m_Filter->providerKey ? WFPHelper::GetProviderName(m_Engine, *m_Filter->providerKey) : CString(L""));

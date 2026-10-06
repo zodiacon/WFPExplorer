@@ -8,6 +8,7 @@ CLayerGeneralPage::CLayerGeneralPage(WFPEngine& engine, FWPM_LAYER* layer) : m_E
 }
 
 LRESULT CLayerGeneralPage::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
+	InitDynamicLayout(false);
 	SetDlgItemText(IDC_NAME, StringHelper::ParseMUIString(m_Layer->displayData.name));
 	SetDlgItemText(IDC_DESC, StringHelper::ParseMUIString(m_Layer->displayData.description));
 	SetDlgItemText(IDC_KEY, StringHelper::GuidToString(m_Layer->layerKey));
