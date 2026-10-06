@@ -18,7 +18,7 @@ msbuild WFPExplorer\WFPExplorer.vcxproj /p:Configuration=Release /p:Platform=x64
 The configurations are Debug, Release and ReleaseSigned. x64 is the main platform; ARM64 solution platforms map to the x64 project configurations.
 
 Dependencies:
-- **WTLHelper** is a separate repo (github.com/zodiacon/WTLHelper). The solution and `WFPExplorer.vcxproj` refer to it at `..\WTLHelper\WTLHelper` (a **sibling** of this repo, e.g. `C:\Dev\WTLHelper`). They do not use the in-repo `WTLHelper` git submodule, so the sibling clone has to exist.
+- **WTLHelper** (github.com/zodiacon/WTLHelper) is the git submodule at `WTLHelper\`. Run `git submodule update --init` after cloning. The solution and `WFPExplorer.vcxproj` build `WTLHelper\WTLHelper\WTLHelper.vcxproj`. Changes to WTLHelper are committed inside the submodule, and then the submodule pointer is committed in this repo.
 - WTL headers and other third-party packages come from vcpkg's classic MSBuild integration (`VcpkgUseStatic=true`). There is no manifest file.
 - The app links `Fwpuclnt.lib`. Its manifest requires administrator rights, so running it or debugging it from VS needs an elevated session.
 

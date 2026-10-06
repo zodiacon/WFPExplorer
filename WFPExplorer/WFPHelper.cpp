@@ -14,33 +14,12 @@
 #include "WFPEnumerators.h"
 #include "FiltersListPage.h"
 
-//
-// the property sheet's built-in tab image list is low color depth,
-// so replace it with a 32-bit one once the sheet is initialized
-//
-class CIconPropertySheet : public CPropertySheetImpl<CIconPropertySheet> {
+#include <IconPropertySheet.h>
+#include <ResizablePropertySheet.h>
+
+class CPropertiesSheet : public CIconPropertySheetImpl<CPropertiesSheet, CResizablePropertySheetImpl<CPropertiesSheet>> {
 public:
-	using CPropertySheetImpl::CPropertySheetImpl;
-
-	BOOL AddPage(LPCPROPSHEETPAGE page) {
-		m_Icons.push_back((page->dwFlags & PSP_USEICONID) ? page->pszIcon : nullptr);
-		return CPropertySheetImpl::AddPage(page);
-	}
-
-	void OnSheetInitialized() {
-		CTabCtrl tabs(GetTabControl());
-		m_Images.Create(16, 16, ILC_COLOR32 | ILC_MASK, (int)m_Icons.size(), 0);
-		for (int i = 0; i < (int)m_Icons.size(); i++) {
-			TCITEM item{ TCIF_IMAGE };
-			item.iImage = m_Icons[i] ? m_Images.AddIcon(AtlLoadIconImage(m_Icons[i], 0, 16, 16)) : -1;
-			tabs.SetItem(i, &item);
-		}
-		tabs.SetImageList(m_Images);
-	}
-
-private:
-	std::vector<PCWSTR> m_Icons;
-	CImageListManaged m_Images;
+	using CIconPropertySheetImpl::CIconPropertySheetImpl;
 };
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
@@ -85,7 +64,7 @@ CString WFPHelper::GetSublayerName(WFPEngine const& engine, GUID const& key) {
 
 int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
 	auto name = L"Layer Properties (" + GetLayerName(engine, layer->layerKey) + L")";
-	CIconPropertySheet sheet((PCWSTR)name);
+	CPropertiesSheet sheet((PCWSTR)name);
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_LAYERS);
 	CLayerGeneralPage general(engine, layer);
@@ -109,7 +88,7 @@ int WFPHelper::ShowLayerProperties(WFPEngine& engine, FWPM_LAYER* layer) {
 
 int WFPHelper::ShowFilterProperties(WFPEngine& engine, FWPM_FILTER* filter) {
 	auto name = L"Filter: " + GetFilterName(engine, filter->filterKey);
-	CIconPropertySheet sheet((PCWSTR)name);
+	CPropertiesSheet sheet((PCWSTR)name);
 	sheet.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_USEICONID | PSH_NOCONTEXTHELP;
 	sheet.m_psh.pszIcon = MAKEINTRESOURCE(IDI_FILTER);
 	CFilterGeneralPage general(engine, filter);
