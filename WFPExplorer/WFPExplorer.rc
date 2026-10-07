@@ -630,8 +630,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,7,0,0
- PRODUCTVERSION 0,7,0,0
+ FILEVERSION 0,8,0,0
+ PRODUCTVERSION 0,8,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -648,12 +648,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "Windows Filtering Platform Explorer"
-            VALUE "FileVersion", "0.7.0.0"
+            VALUE "FileVersion", "0.8.0.0"
             VALUE "InternalName", "WFPExplorer"
-            VALUE "LegalCopyright", "ï¿½2022-2026 Pavel Yosifovich"
+            VALUE "LegalCopyright", "©2022-2026 Pavel Yosifovich"
             VALUE "OriginalFilename", "WFPExplorer.exe"
             VALUE "ProductName", "WFP Explorer"
-            VALUE "ProductVersion", "0.7.0.0"
+            VALUE "ProductVersion", "0.8.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -893,9 +893,9 @@ STRINGTABLE
 BEGIN
     ID_VIEW_LAYERMAP        "Show a layer's sublayers, filters and callouts as a graph\nLayer Map"
     ID_LAYER_SHOWMAP        "Show the layer's sublayers, filters and callouts as a graph\nShow Layer Map"
-    ID_VIEW_CALLOUTMAP      "Show a callout with its provider, layer and the filters that use it as a graph\nCallout Map"
     ID_MAP_HIDEFIREWALL     "Hide the filters of Windows Firewall in the active map and in new maps\nHide Windows Firewall Filters"
     ID_MAP_COLORBYPROVIDER  "Color the nodes of the active map and of new maps by their provider\nColor by Provider"
+    ID_VIEW_CALLOUTMAP      "Show a callout with its provider, layer and the filters that use it as a graph\nCallout Map"
 END
 
 #endif    // English (United States) resources

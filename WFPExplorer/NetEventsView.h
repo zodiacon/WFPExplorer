@@ -38,10 +38,21 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 private:
+	// the properties of the event's type (empty when the type doesn't have them)
+	struct EventDetails {
+		bool HasFilter{ false }, HasLayer{ false }, HasClassify{ false };
+		UINT64 FilterId{ 0 };
+		UINT16 LayerId{ 0 };
+		UINT32 ReauthReason{ 0 }, OriginalProfile{ 0 }, CurrentProfile{ 0 };
+		bool Loopback{ false };
+		CString Direction, Error, Capability, Spi, LocalMac, RemoteMac;
+	};
+
 	struct NetEventInfo {
 		FWPM_NET_EVENT* Data;
 		CString LocalAddress, RemoteAddress;
 		CString AppId, UserId, PackageId;
+		EventDetails Details;
 	};
 
 	void UpdateUI() const;
@@ -52,13 +63,18 @@ private:
 	CString const& GetAppId(NetEventInfo& info);
 	CString const& GetUserId(NetEventInfo& info);
 	CString const& GetPackageId(NetEventInfo& info);
+	CString const& GetFilterName(UINT64 id);
+	CString const& GetLayerName(UINT16 id);
+	static EventDetails GetDetails(FWPM_NET_EVENT const* e);
 
 	enum class ColumnType {
 		Time, Type, LocalPort, RemotePort, LocalAddress, RemoteAddress, Flags, EnterpriseId,
 		IPVersion, Protocol, ScopeId, AppId, UserId, PackageId, PolicyFlags, EffectiveName,
-		AddressFamily
-		
+		AddressFamily, FilterId, Filter, Layer, Direction, Loopback, ReauthReason, OriginalProfile, CurrentProfile,
+		Error, Capability, Spi, LocalMac, RemoteMac,
 	};
+
+	CString GetText(NetEventInfo& info, ColumnType column);
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -68,4 +84,7 @@ private:
 	WFPEngine& m_Engine;
 
 	WFPObjectVector<FWPM_NET_EVENT, NetEventInfo> m_Events;
+	// events share a few filters and layers
+	std::unordered_map<UINT64, CString> m_FilterNames;
+	std::unordered_map<UINT16, CString> m_LayerNames;
 };
