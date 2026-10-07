@@ -18,6 +18,7 @@
 #include "AppSettings.h"
 #include "HierarchyView.h"
 #include "LayerMapView.h"
+#include "MapFileView.h"
 #include "NetEventsView.h"
 #include "ProviderDlg.h"
 #include "NewFilterDlg.h"
@@ -81,6 +82,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	//m_view.m_bTabCloseButton = false;
 	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	// room for the titles of the map tabs ("Map: <layer>", "Callout: <callout>")
+	m_Tabs.SetMaxTabTextLength(60);
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 8, 4);
 	UINT icons[] = {
@@ -280,6 +283,29 @@ LRESULT CMainFrame::OnViewLayerMap(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+//
+// a map saved by a map view (File > Save, as a WFP Map), in a tab of its own
+//
+LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(TRUE, L"wfpmap", nullptr, OFN_EXPLORER | OFN_ENABLESIZING | OFN_FILEMUSTEXIST,
+		L"WFP Map (*.wfpmap)\0*.wfpmap\0All Files\0*.*\0", m_hWnd);
+	WTLHelper::SuspendHook();
+	auto ok = IDOK == dlg.DoModal();
+	WTLHelper::ResumeHook();
+	if (!ok)
+		return 0;
+
+	auto view = new CMapFileView(this);
+	view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	if (!view->Load(dlg.m_szFileName)) {
+		view->DestroyWindow();		// the view deletes itself
+		AtlMessageBox(m_hWnd, L"The file isn't a map saved by WFP Explorer, or it can't be read.", IDR_MAINFRAME, MB_ICONERROR);
+		return 0;
+	}
+	m_Tabs.AddPage(view->m_hWnd, view->GetTitle(), 3, view);
+	return 0;
+}
+
 LRESULT CMainFrame::OnViewCalloutMap(WORD, WORD, HWND, BOOL&) {
 	ShowCalloutMap(GUID_NULL);
 	return 0;
@@ -368,9 +394,6 @@ LRESULT CMainFrame::OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nPage = wID - ID_WINDOW_TABFIRST;
 	m_Tabs.SetActivePage(nPage);
-	// unlike a click on a tab, SetActivePage doesn't notify; the new view must still update the commands
-	BOOL handled;
-	OnPageActivated(0, nullptr, handled);
 
 	return 0;
 }
@@ -378,11 +401,8 @@ LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
 	int page = m_Tabs.GetActivePage();
 	bool handled = false;
-	// only a map view enables these (on its activation below); other views don't know about them
-	UIEnable(ID_MAP_HIDEFIREWALL, false);
-	UIEnable(ID_MAP_COLORBYPROVIDER, false);
-	UISetCheck(ID_MAP_HIDEFIREWALL, false);
-	UISetCheck(ID_MAP_COLORBYPROVIDER, false);
+	// the map options show (and change) the defaults of new maps; a map view shows its own on its activation below
+	UpdateMapOptions();
 	if (page >= 0) {
 		handled = ::SendMessage(m_Tabs.GetPageHWND(page), WM_ACTIVATE, 1, 0);
 	}
@@ -390,6 +410,27 @@ LRESULT CMainFrame::OnPageActivated(int, LPNMHDR, BOOL&) {
 		UpdateUI();
 	}
 	ApplyFont();
+	return 0;
+}
+
+void CMainFrame::UpdateMapOptions() {
+	auto& settings = AppSettings::Get();
+	UIEnable(ID_MAP_HIDEFIREWALL, true);
+	UIEnable(ID_MAP_COLORBYPROVIDER, true);
+	UISetCheck(ID_MAP_HIDEFIREWALL, settings.MapHideFirewall());
+	UISetCheck(ID_MAP_COLORBYPROVIDER, settings.MapColorByProvider());
+}
+
+//
+// an active map handles these itself (the command goes to the active tab first); otherwise they change the defaults of new maps
+//
+LRESULT CMainFrame::OnMapOption(WORD, WORD id, HWND, BOOL&) {
+	auto& settings = AppSettings::Get();
+	if (id == ID_MAP_HIDEFIREWALL)
+		settings.MapHideFirewall(!settings.MapHideFirewall());
+	else
+		settings.MapColorByProvider(!settings.MapColorByProvider());
+	UpdateMapOptions();
 	return 0;
 }
 

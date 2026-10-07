@@ -17,6 +17,8 @@ public:
 		SETTING(ResolveNetworkAddresses, 0, SettingType::Bool);
 		SETTING(MapHideFirewall, 0, SettingType::Bool);
 		SETTING(MapColorByProvider, 0, SettingType::Bool);
+		SETTING(LayerPropertiesSize, SIZE{}, SettingType::Binary);
+		SETTING(FilterPropertiesSize, SIZE{}, SettingType::Binary);
 	END_SETTINGS
 
 	DEF_SETTING(DarkMode, bool)
@@ -31,5 +33,7 @@ public:
 	DEF_SETTING(ResolveNetworkAddresses, bool)
 	DEF_SETTING(MapHideFirewall, bool)
 	DEF_SETTING(MapColorByProvider, bool)
+	DEF_SETTING(LayerPropertiesSize, SIZE)
+	DEF_SETTING(FilterPropertiesSize, SIZE)
 };
 

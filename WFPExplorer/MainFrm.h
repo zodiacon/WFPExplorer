@@ -32,6 +32,8 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_HIERARCHY, OnViewHierarchy)
 		COMMAND_ID_HANDLER(ID_VIEW_LAYERMAP, OnViewLayerMap)
 		COMMAND_ID_HANDLER(ID_VIEW_CALLOUTMAP, OnViewCalloutMap)
+		COMMAND_ID_HANDLER(ID_MAP_HIDEFIREWALL, OnMapOption)
+		COMMAND_ID_HANDLER(ID_MAP_COLORBYPROVIDER, OnMapOption)
 		COMMAND_ID_HANDLER(ID_VIEW_NETWORKEVENTS, OnViewNetEvents)
 		MESSAGE_HANDLER(CFindReplaceDialog::GetFindReplaceMsg(), OnFind)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
@@ -51,6 +53,7 @@ public:
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
 		COMMAND_ID_HANDLER(ID_EDIT_FIND, OnEditFind)
 		COMMAND_ID_HANDLER(ID_APP_EXIT, OnFileExit)
+		COMMAND_ID_HANDLER(ID_FILE_OPEN, OnFileOpen)
 		COMMAND_ID_HANDLER(ID_NEW_FILTER, OnNewFilter)
 		COMMAND_ID_HANDLER(ID_NEW_PROVIDER, OnNewProvider)
 		COMMAND_ID_HANDLER(ID_NEW_SUBLAYER, OnNewSubLayer)
@@ -75,6 +78,7 @@ private:
 
 	void InitMenu(HMENU hMenu);
 	void UpdateUI();
+	void UpdateMapOptions();
 	void SetAlwaysOnTop(bool ontop);
 	void ApplyFont();
 
@@ -83,6 +87,7 @@ private:
 	LRESULT OnEraseBkgnd(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 	LRESULT OnShowWindow(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnFileOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewSessions(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewFilters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewProviders(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -92,6 +97,7 @@ private:
 	LRESULT OnViewHierarchy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewLayerMap(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewCalloutMap(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnMapOption(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewSublayers(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewCallouts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);

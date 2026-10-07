@@ -6,11 +6,16 @@
 #include <ranges>
 #include "AppSettings.h"
 #include <WFPEnumerators.h>
+#include <atlfile.h>
+#include <functional>
 
 CHierarchyView::CHierarchyView(IMainFrame* frame, WFPEngine& engine) : CFrameView(frame), m_Engine(engine) {
 }
 
 void CHierarchyView::Refresh() {
+	// the map keeps its own snapshot of the engine's objects
+	if (m_LayerMapView)
+		m_LayerMapView->Refresh();
 	BuildTree();
 }
 
@@ -31,6 +36,16 @@ void CHierarchyView::OnTreeSelChanged(HWND tree, HTREEITEM /* hOld */, HTREEITEM
 			m_FiltersView->Refresh();
 			break;
 		}
+
+		case TreeItemType::Layer:
+			// the layer's map, without the map's own list of layers: the tree picks the layer
+			if (!m_LayerMapView) {
+				m_LayerMapView = new CLayerMapView(Frame(), m_Engine, CLayerMapView::MapKind::Layer, false);
+				m_LayerMapView->Create(m_Splitter, rcDefault, nullptr, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+			}
+			m_LayerMapView->Select(m_LayersMap[hNew]);
+			hNewView = m_LayerMapView->m_hWnd;
+			break;
 
 		case TreeItemType::Callouts:
 		{
@@ -196,6 +211,47 @@ LRESULT CHierarchyView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	Refresh();
 
 	return 0;
+}
+
+//
+// the tree, when it has the focus or nothing is shown next to it; otherwise what's shown next to it saves itself
+//
+LRESULT CHierarchyView::OnSave(WORD, WORD, HWND, BOOL& handled) {
+	if (::GetFocus() != m_Tree && m_Splitter.GetSinglePaneMode() != SPLIT_PANE_LEFT) {
+		handled = FALSE;
+		return 0;
+	}
+	CSimpleFileDialog dlg(FALSE, L"txt", L"hierarchy", OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
+		L"Text Files (*.txt)\0*.txt\0All Files\0*.*\0", m_hWnd);
+	WTLHelper::SuspendHook();
+	auto ok = IDOK == dlg.DoModal();
+	WTLHelper::ResumeHook();
+	if (ok && !SaveTree(dlg.m_szFileName))
+		AtlMessageBox(m_hWnd, L"Failed to save the hierarchy", IDS_TITLE, MB_ICONERROR);
+	return 0;
+}
+
+//
+// every item (collapsed ones too), a tab deeper for each level, in UTF-8
+//
+bool CHierarchyView::SaveTree(PCWSTR path) const {
+	std::wstring text;
+	std::function<void(HTREEITEM, int)> add = [&](HTREEITEM hItem, int level) {
+		for (; hItem; hItem = m_Tree.GetNextSiblingItem(hItem)) {
+			CString name;
+			m_Tree.GetItemText(hItem, name);
+			text += std::wstring(level, L'\t') + (PCWSTR)name + L"\r\n";
+			add(m_Tree.GetChildItem(hItem), level + 1);
+		}
+	};
+	add(m_Tree.GetRootItem(), 0);
+
+	CAtlFile file;
+	if (FAILED(file.Create(path, GENERIC_WRITE, 0, CREATE_ALWAYS)))
+		return false;
+	CW2A utf8(text.c_str(), CP_UTF8);
+	const BYTE bom[] = { 0xEF, 0xBB, 0xBF };
+	return SUCCEEDED(file.Write(bom, sizeof(bom))) && SUCCEEDED(file.Write((PCSTR)utf8, (DWORD)strlen(utf8)));
 }
 
 LRESULT CHierarchyView::OnRefresh(WORD, WORD, HWND, BOOL&) {

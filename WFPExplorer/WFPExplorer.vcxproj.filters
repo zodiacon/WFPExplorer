@@ -93,6 +93,9 @@
     <ClCompile Include="LayerMapView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="MapFileView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
     <ClCompile Include="NetEventsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -180,6 +183,9 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="LayerMapView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MapFileView.h">
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="NetEventsView.h">

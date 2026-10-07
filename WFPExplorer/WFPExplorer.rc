@@ -788,9 +788,9 @@ END
 STRINGTABLE
 BEGIN
     ID_FILE_NEW             "Create a new document\nNew"
-    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_OPEN            "Open a map saved as a WFP Map file\nOpen"
     ID_FILE_CLOSE           "Close the active document\nClose"
-    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE            "Save the active view: a list as CSV, a tree as text, a map as an image or a WFP Map file\nSave"
     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
     ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
     ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
@@ -894,8 +894,8 @@ BEGIN
     ID_VIEW_LAYERMAP        "Show a layer's sublayers, filters and callouts as a graph\nLayer Map"
     ID_LAYER_SHOWMAP        "Show the layer's sublayers, filters and callouts as a graph\nShow Layer Map"
     ID_VIEW_CALLOUTMAP      "Show a callout with its provider, layer and the filters that use it as a graph\nCallout Map"
-    ID_MAP_HIDEFIREWALL     "Hide the filters of Windows Firewall in the map (and in new maps)\nHide Windows Firewall Filters"
-    ID_MAP_COLORBYPROVIDER  "Color the nodes of the map (and of new maps) by their provider\nColor by Provider"
+    ID_MAP_HIDEFIREWALL     "Hide the filters of Windows Firewall in the active map and in new maps\nHide Windows Firewall Filters"
+    ID_MAP_COLORBYPROVIDER  "Color the nodes of the active map and of new maps by their provider\nColor by Provider"
 END
 
 #endif    // English (United States) resources

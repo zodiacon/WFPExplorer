@@ -368,6 +368,7 @@
     <ClCompile Include="FiltersView.cpp" />
     <ClCompile Include="HierarchyView.cpp" />
     <ClCompile Include="LayerMapView.cpp" />
+    <ClCompile Include="MapFileView.cpp" />
     <ClCompile Include="LayerFieldsPage.cpp" />
     <ClCompile Include="LayerGeneralPage.cpp" />
     <ClCompile Include="LayersView.cpp" />
@@ -406,6 +407,7 @@
     <ClInclude Include="GenericListViewBase.h" />
     <ClInclude Include="HierarchyView.h" />
     <ClInclude Include="LayerMapView.h" />
+    <ClInclude Include="MapFileView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="LayerFieldsPage.h" />
     <ClInclude Include="LayerGeneralPage.h" />

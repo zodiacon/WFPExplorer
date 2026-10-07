@@ -117,7 +117,8 @@ namespace {
 	}
 }
 
-CLayerMapView::CLayerMapView(IMainFrame* frame, WFPEngine& engine, MapKind kind) : CFrameView(frame), m_Engine(engine), m_Kind(kind) {
+CLayerMapView::CLayerMapView(IMainFrame* frame, WFPEngine& engine, MapKind kind, bool showList) :
+	CFrameView(frame), m_Engine(engine), m_Kind(kind), m_ShowList(showList) {
 	auto& settings = AppSettings::Get();
 	m_HideFirewall = settings.MapHideFirewall();
 	m_ColorByProvider = settings.MapColorByProvider();
@@ -170,9 +171,15 @@ GUID CLayerMapView::ItemKey(int index) const {
 void CLayerMapView::Select(GUID const& key) {
 	for (int i = 0; i < m_List.GetItemCount(); i++) {
 		if (ItemKey(i) == key) {
-			m_List.SelectItem(i);
+			m_List.SelectItem(i);	// the selection change builds the graph
 			return;
 		}
+	}
+	// not in the list (e.g. a layer whose filters are all hidden): shown anyway
+	if (key != m_Key) {
+		m_Key = key;
+		m_Expanded.clear();
+		BuildGraph(true);
 	}
 }
 
@@ -614,22 +621,7 @@ void CLayerMapView::ApplyView() {
 
 	if (m_NeedFit) {
 		m_NeedFit = false;
-		m_Graph.FitInView();
-		if (m_Graph.GetZoom() > 1.0f) {
-			// a small graph isn't blown up: the content stays in the middle, at its own size
-			float minX = FLT_MAX, minY = FLT_MAX, maxX = -FLT_MAX, maxY = -FLT_MAX;
-			for (auto& n : m_Graph.GetModel()->Nodes()) {
-				minX = (std::min)(minX, n.X - n.Width / 2); maxX = (std::max)(maxX, n.X + n.Width / 2);
-				minY = (std::min)(minY, n.Y - n.Height / 2); maxY = (std::max)(maxY, n.Y + n.Height / 2);
-			}
-			if (minX <= maxX)
-				m_Graph.CenterOn((minX + maxX) / 2, (minY + maxY) / 2, 1.0f);
-		}
-		else if (m_Graph.GetZoom() < 0.7f) {
-			// too much to fit: show the top-left part (the first rows and columns) at a readable size
-			const float zoom = 0.9f;
-			m_Graph.CenterOn(-NodeWidth / 2 - 20 + rc.Width() / zoom / 2, -NodeHeight / 2 - 20 + rc.Height() / zoom / 2, zoom);
-		}
+		WFPHelper::FitGraph(m_Graph);
 	}
 	if (m_FocusCallout != GUID_NULL) {
 		for (auto& [id, info] : m_NodeInfo) {
@@ -726,6 +718,8 @@ LRESULT CLayerMapView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 
 	m_Splitter.SetSplitterPanes(m_List, m_Graph);
 	m_Splitter.SetSplitterPosPct(22);
+	if (!m_ShowList)
+		m_Splitter.SetSinglePaneMode(SPLIT_PANE_RIGHT);
 
 	Refresh();
 	return 0;
@@ -903,26 +897,10 @@ LRESULT CLayerMapView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CLayerMapView::OnSave(WORD, WORD, HWND, BOOL&) {
-	auto index = m_List.GetSelectedIndex();
-	CString name;
-	if (index >= 0)
-		m_List.GetItemText(index, 0, name);
-	name.Replace(L' ', L'_');
-	// the dialog gives the file the extension of the chosen type
-	CSimpleFileDialog dlg(FALSE, L"png", name, OFN_EXPLORER | OFN_ENABLESIZING | OFN_OVERWRITEPROMPT,
-		L"PNG Image (*.png)\0*.png\0SVG Image (*.svg)\0*.svg\0JPEG Image (*.jpg)\0*.jpg;*.jpeg\0BMP Image (*.bmp)\0*.bmp\0", m_hWnd);
-	WTLHelper::SuspendHook();
-	auto ok = IDOK == dlg.DoModal();
-	WTLHelper::ResumeHook();
-	if (!ok)
-		return 0;
-
-	CWaitCursor wait;
-	auto path = dlg.m_szFileName;
-	// an image is drawn at 1.5 pixels per graph unit so that the text is easy to read (a very large graph gets less)
-	ok = ::_wcsicmp(::PathFindExtension(path), L".svg") == 0 ? m_Graph.GetModel()->SaveSvg(path, m_Graph.GetBackgroundColor())
-		: m_Graph.SaveImage(path, 1.5f);
-	if (!ok)
-		AtlMessageBox(m_hWnd, L"Failed to save the map", IDS_TITLE, MB_ICONERROR);
+	// named after the layer or callout (the title without "Map: " or "Callout: ")
+	auto name = GetTitle();
+	if (int colon = name.Find(L": "); colon >= 0)
+		name = name.Mid(colon + 2);
+	WFPHelper::SaveMap(m_hWnd, m_Graph, name);
 	return 0;
 }

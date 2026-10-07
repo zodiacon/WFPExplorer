@@ -10,6 +10,7 @@
 #include "FiltersView.h"
 #include "LayersView.h"
 #include "CalloutsView.h"
+#include "LayerMapView.h"
 
 class WFPEngine;
 
@@ -32,6 +33,7 @@ public:
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnSave)
 		if (uMsg == WM_COMMAND) {
 			if (m_Splitter.GetSplitterPane(1) == m_FiltersView->m_hWnd)
 				return m_FiltersView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
@@ -39,6 +41,8 @@ public:
 				return m_CalloutsView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
 			if (m_Splitter.GetSplitterPane(1) == m_LayersView->m_hWnd)
 				return m_LayersView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
+			if (m_LayerMapView && m_Splitter.GetSplitterPane(1) == m_LayerMapView->m_hWnd)
+				return m_LayerMapView->ProcessWindowMessage(m_hWnd, uMsg, wParam, lParam, lResult, 1);
 		}
 			
 	END_MSG_MAP()
@@ -61,6 +65,8 @@ private:
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	bool SaveTree(PCWSTR path) const;
 
 	WFPEngine& m_Engine;
 
@@ -69,6 +75,7 @@ private:
 	CLayersView* m_LayersView;
 	CFiltersView* m_FiltersView;
 	CCalloutsView* m_CalloutsView;
+	CLayerMapView* m_LayerMapView{ nullptr };	// created the first time a layer is selected
 	std::unordered_map<HTREEITEM, GUID> m_LayersMap;
 	std::unordered_map<HTREEITEM, GUID> m_FiltersMap;
 	std::unordered_map<HTREEITEM, GUID> m_CalloutsMap;

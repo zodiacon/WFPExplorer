@@ -21,7 +21,8 @@ class CLayerMapView : public CFrameView<CLayerMapView, IMainFrame> {
 public:
 	enum class MapKind { Layer, Callout };
 
-	CLayerMapView(IMainFrame* frame, WFPEngine& engine, MapKind kind);
+	// showList: false for a map inside another view that picks the layer or callout itself (only the graph shows)
+	CLayerMapView(IMainFrame* frame, WFPEngine& engine, MapKind kind, bool showList = true);
 
 	void Refresh();
 	void Select(GUID const& key);			// the layer or the callout to show
@@ -120,6 +121,7 @@ private:
 
 	WFPEngine& m_Engine;
 	MapKind m_Kind;
+	bool m_ShowList;
 	CCustomSplitterWindow m_Splitter;
 	CListViewCtrl m_List;
 	NodeGraphCtrl::CNodeGraphControl m_Graph;
