@@ -27,7 +27,7 @@ public:
 
 CString WFPHelper::GetProviderName(WFPEngine const& engine, GUID const& key) {
 	auto provider = engine.GetProviderByKey(key);
-	if (auto name = provider ? StringHelper::ParseMUIString(provider->displayData.name) : CString(); !name.IsEmpty())
+	if (auto name = provider ? StringHelper::DisplayName(provider->displayData) : CString(); !name.IsEmpty())
 		return name;
 	return StringHelper::GuidToString(key);
 }

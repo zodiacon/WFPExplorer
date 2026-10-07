@@ -128,14 +128,16 @@
 #define ID_MAP_COLORBYPROVIDER          32806
 #define ID_MAP_FIT                      32807
 #define ID_VIEW_CALLOUTMAP              32808
+#define IDD_PROPERTIESLIST              252
+#define IDC_COPY                        1038
 
 // Next default values for new objects
 //
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        252
+#define _APS_NEXT_RESOURCE_VALUE        253
 #define _APS_NEXT_COMMAND_VALUE         32809
-#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_CONTROL_VALUE         1039
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

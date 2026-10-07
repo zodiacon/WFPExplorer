@@ -3,6 +3,9 @@
 struct StringHelper abstract final {
 	static CString GuidToString(GUID const& guid);
 	static CString ParseMUIString(PCWSTR input);
+	// an object's name; a name that refers to a string resource that doesn't exist (e.g. "@bfe.dll,-1217",
+	// the name of the MPSSVC App Isolation provider) is replaced by the object's description
+	static CString DisplayName(FWPM_DISPLAY_DATA0 const& data);
 	static CString WFPValueToString(FWP_VALUE const& value, bool hex = false, bool full = false);
 	static CString WFPConditionValueToString(FWP_CONDITION_VALUE const& value, bool hex = false, bool full = false);
 	static CString WFPFilterFlagsToString(UINT32 flags);

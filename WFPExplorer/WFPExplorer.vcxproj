@@ -386,6 +386,7 @@
     </ClCompile>
     <ClCompile Include="ProcessHelper.cpp" />
     <ClCompile Include="ProviderContextView.cpp" />
+    <ClCompile Include="PropertiesListDlg.cpp" />
     <ClCompile Include="ProviderDlg.cpp" />
     <ClCompile Include="ProvidersView.cpp" />
     <ClCompile Include="SessionsView.cpp" />
@@ -418,6 +419,7 @@
     <ClInclude Include="NewSubLayerDlg.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ProviderContextView.h" />
+    <ClInclude Include="PropertiesListDlg.h" />
     <ClInclude Include="ProviderDlg.h" />
     <ClInclude Include="ProvidersView.h" />
     <ClInclude Include="resource.h" />

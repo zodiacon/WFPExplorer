@@ -5,6 +5,8 @@
 #include <atltime.h>
 #include "StringHelper.h"
 #include <SortHelper.h>
+#include <ClipboardHelper.h>
+#include "PropertiesListDlg.h"
 
 namespace {
 	// a Win32 error (or NTSTATUS) code and its message
@@ -80,6 +82,46 @@ namespace {
 		CString text;
 		text.Format(L"0x%llX", value);
 		return text;
+	}
+
+	// the name of an enum value, from the names of the values 0, 1, 2...; the number for another value
+	template<typename E>
+	CString EnumName(E value, std::initializer_list<PCWSTR> names) {
+		auto index = (size_t)value;
+		if (index < names.size())
+			return names.begin()[index];
+		return std::to_wstring(index).c_str();
+	}
+
+	CString Number(UINT64 value) {
+		return std::to_wstring(value).c_str();
+	}
+
+	// a certificate hash; empty if there's none
+	CString Hash(UINT8 const (&hash)[20]) {
+		if (std::ranges::all_of(hash, [](auto b) { return b == 0; }))
+			return L"";
+		CString text;
+		for (auto b : hash)
+			text.AppendFormat(L"%02X", b);
+		return text;
+	}
+
+	CString FailurePoint(IPSEC_FAILURE_POINT point) {
+		return EnumName(point, { L"None", L"Local", L"Peer" });
+	}
+
+	CString KeyModule(IKEEXT_KEY_MODULE_TYPE type) {
+		return EnumName(type, { L"IKE", L"AuthIP", L"IKEv2" });
+	}
+
+	CString SaRole(IKEEXT_SA_ROLE role) {
+		return EnumName(role, { L"Initiator", L"Responder" });
+	}
+
+	CString AuthMethod(IKEEXT_AUTHENTICATION_METHOD_TYPE method) {
+		return EnumName(method, { L"Preshared Key", L"Certificate", L"Kerberos", L"Anonymous", L"SSL", L"NTLM v2", L"IPv6 CGA",
+			L"Certificate (ECDSA P-256)", L"Certificate (ECDSA P-384)", L"SSL (ECDSA P-256)", L"SSL (ECDSA P-384)", L"EAP", L"Reserved" });
 	}
 
 	// a blob that holds a UTF-16 string (the app ID is a path, the effective name a name)
@@ -326,7 +368,7 @@ void CNetEventsView::UpdateUI() const {
 	auto& ui = Frame()->UI();
 	auto selected = m_List.GetSelectedCount();
 	ui.UIEnable(ID_EDIT_COPY, selected > 0);
-	ui.UIEnable(ID_EDIT_DELETE, selected > 0);
+	// network events can't be deleted (the engine keeps them for a while, and there's no API to delete one)
 	ui.UIEnable(ID_EDIT_PROPERTIES, selected == 1);
 }
 
@@ -426,6 +468,156 @@ LRESULT CNetEventsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 
 	Refresh();
 
+	return 0;
+}
+
+CPropertiesListDlg::Properties CNetEventsView::GetProperties(NetEventInfo& info) {
+	CPropertiesListDlg::Properties props;
+	auto add = [&](PCWSTR name, CString const& value) {
+		if (!value.IsEmpty())
+			props.push_back({ name, value });
+	};
+
+	// what the columns show, in their order
+	auto cm = GetColumnManager(m_List);
+	for (int i = 0; i < cm->GetCount(); i++) {
+		auto& column = cm->GetColumn(i);
+		if (auto text = GetText(info, (ColumnType)column.Tag); !text.IsEmpty())
+			props.push_back({ column.Name, text });
+	}
+
+	//
+	// and what they don't
+	//
+	auto e = info.Data;
+	auto& header = e->header;
+	if (header.flags & FWPM_NET_EVENT_FLAG_IP_VERSION_SET)
+		add(L"IP Version", header.ipVersion == FWP_IP_VERSION_V4 ? L"IPv4" : header.ipVersion == FWP_IP_VERSION_V6 ? L"IPv6" : L"");
+	static const std::pair<UINT32, PCWSTR> flagNames[] = {
+		{ FWPM_NET_EVENT_FLAG_IP_PROTOCOL_SET, L"IP Protocol" },
+		{ FWPM_NET_EVENT_FLAG_LOCAL_ADDR_SET, L"Local Address" },
+		{ FWPM_NET_EVENT_FLAG_REMOTE_ADDR_SET, L"Remote Address" },
+		{ FWPM_NET_EVENT_FLAG_LOCAL_PORT_SET, L"Local Port" },
+		{ FWPM_NET_EVENT_FLAG_REMOTE_PORT_SET, L"Remote Port" },
+		{ FWPM_NET_EVENT_FLAG_APP_ID_SET, L"App ID" },
+		{ FWPM_NET_EVENT_FLAG_USER_ID_SET, L"User ID" },
+		{ FWPM_NET_EVENT_FLAG_SCOPE_ID_SET, L"Scope ID" },
+		{ FWPM_NET_EVENT_FLAG_IP_VERSION_SET, L"IP Version" },
+		{ FWPM_NET_EVENT_FLAG_REAUTH_REASON_SET, L"Reauth Reason" },
+		{ FWPM_NET_EVENT_FLAG_PACKAGE_ID_SET, L"Package ID" },
+		{ FWPM_NET_EVENT_FLAG_ENTERPRISE_ID_SET, L"Enterprise ID" },
+		{ FWPM_NET_EVENT_FLAG_POLICY_FLAGS_SET, L"Policy Flags" },
+		{ FWPM_NET_EVENT_FLAG_EFFECTIVE_NAME_SET, L"Effective Name" },
+	};
+	CString flags;
+	for (auto& [flag, name] : flagNames) {
+		if (header.flags & flag) {
+			if (!flags.IsEmpty())
+				flags += L", ";
+			flags += name;
+		}
+	}
+	add(L"Fields Set", flags);
+
+	auto principals = [&](PCWSTR local, PCWSTR remote) {
+		add(L"Local Principal", local);
+		add(L"Remote Principal", remote);
+	};
+	auto vswitch = [&](auto c) {
+		if (auto id = BlobString(c->vSwitchId); !id.IsEmpty()) {
+			add(L"vSwitch ID", id);
+			add(L"vSwitch Source Port", Number(c->vSwitchSourcePort));
+			add(L"vSwitch Destination Port", Number(c->vSwitchDestinationPort));
+		}
+	};
+
+	switch (e->type) {
+		case FWPM_NET_EVENT_TYPE_CLASSIFY_DROP:
+			if (e->classifyDrop)
+				vswitch(e->classifyDrop);
+			break;
+
+		case FWPM_NET_EVENT_TYPE_CLASSIFY_DROP_MAC:
+			if (auto m = e->classifyDropMac) {
+				add(L"Media Type", Number(m->mediaType));
+				add(L"Interface Type", Number(m->ifType));
+				add(L"Ether Type", Hex(m->etherType));
+				add(L"VLAN Tag", Number(m->vlanTag));
+				add(L"NDIS Port", Number(m->ndisPortNumber));
+				add(L"Interface LUID", Hex(m->ifLuid));
+				vswitch(m);
+			}
+			break;
+
+		case FWPM_NET_EVENT_TYPE_IPSEC_DOSP_DROP:
+			if (auto d = e->idpDrop) {
+				bool v4 = d->ipVersion == FWP_IP_VERSION_V4;
+				add(L"Public Host", v4 ? StringHelper::FormatIpv4Address(d->publicHostV4Addr) : StringHelper::FormatIpv6Address(d->publicHostV6Addr));
+				add(L"Internal Host", v4 ? StringHelper::FormatIpv4Address(d->internalHostV4Addr) : StringHelper::FormatIpv6Address(d->internalHostV6Addr));
+			}
+			break;
+
+		case FWPM_NET_EVENT_TYPE_IKEEXT_MM_FAILURE:
+			if (auto f = e->ikeMmFailure) {
+				add(L"Failure Point", FailurePoint(f->failurePoint));
+				add(L"Keying Module", KeyModule(f->keyingModuleType));
+				add(L"Main Mode State", EnumName(f->mmState, { L"None", L"SA Sent", L"SSPI Sent", L"Final", L"Final Sent", L"Complete" }));
+				add(L"Role", SaRole(f->saRole));
+				add(L"Authentication", AuthMethod(f->mmAuthMethod));
+				add(L"Main Mode ID", Number(f->mmId));
+				principals(f->localPrincipalNameForAuth, f->remotePrincipalNameForAuth);
+				add(L"Certificate Hash", Hash(f->endCertHash));
+				if (f->providerContextKey)
+					add(L"Provider Context", StringHelper::GuidToString(*f->providerContextKey));
+			}
+			break;
+
+		case FWPM_NET_EVENT_TYPE_IKEEXT_QM_FAILURE:
+			if (auto f = e->ikeQmFailure) {
+				add(L"Failure Point", FailurePoint(f->failurePoint));
+				add(L"Keying Module", KeyModule(f->keyingModuleType));
+				add(L"Quick Mode State", EnumName(f->qmState, { L"None", L"Initial", L"Final", L"Complete" }));
+				add(L"Role", SaRole(f->saRole));
+				add(L"Main Mode SA LUID", Hex(f->mmSaLuid));
+				add(L"Main Mode Provider Context", StringHelper::GuidToString(f->mmProviderContextKey));
+			}
+			break;
+
+		case FWPM_NET_EVENT_TYPE_IKEEXT_EM_FAILURE:
+			if (auto f = e->ikeEmFailure) {
+				add(L"Failure Point", FailurePoint(f->failurePoint));
+				add(L"Extended Mode State", EnumName(f->emState, { L"None", L"Sent Attributes", L"SSPI Sent", L"Auth Complete", L"Final", L"Complete" }));
+				add(L"Role", SaRole(f->saRole));
+				add(L"Authentication", AuthMethod(f->emAuthMethod));
+				add(L"Main Mode ID", Number(f->mmId));
+				principals(f->localPrincipalNameForAuth, f->remotePrincipalNameForAuth);
+				add(L"Certificate Hash", Hash(f->endCertHash));
+			}
+			break;
+	}
+	return props;
+}
+
+bool CNetEventsView::OnDoubleClickList(HWND, int row, int, POINT const&) {
+	if (row < 0)
+		return false;
+	BOOL handled;
+	OnProperties(0, ID_EDIT_PROPERTIES, nullptr, handled);
+	return true;
+}
+
+LRESULT CNetEventsView::OnProperties(WORD, WORD, HWND, BOOL&) {
+	int selected = m_List.GetNextItem(-1, LVNI_SELECTED);
+	if (selected < 0)
+		return 0;
+	auto& info = m_Events[selected];
+	CPropertiesListDlg dlg(StringHelper::NetEventTypeToString(info.Data->type) + CString(L" Event"), IDI_EVENT, GetProperties(info));
+	dlg.DoModal(m_hWnd);
+	return 0;
+}
+
+LRESULT CNetEventsView::OnCopy(WORD, WORD, HWND, BOOL&) {
+	ClipboardHelper::CopyText(m_hWnd, ListViewHelper::GetSelectedRowsAsString(m_List, L","));
 	return 0;
 }
 

@@ -7,6 +7,16 @@
 #pragma comment(lib, "ntdll")
 #pragma comment(lib, "ws2_32")
 
+CString StringHelper::DisplayName(FWPM_DISPLAY_DATA0 const& data) {
+	auto name = ParseMUIString(data.name);
+	if (!name.IsEmpty() && name[0] == L'@') {
+		// the reference couldn't be resolved
+		if (auto desc = ParseMUIString(data.description); !desc.IsEmpty() && desc[0] != L'@')
+			return desc;
+	}
+	return name;
+}
+
 CString StringHelper::ParseMUIString(PCWSTR input) {
 	if (input == nullptr)
 		return L"";

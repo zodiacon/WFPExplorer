@@ -130,7 +130,7 @@ int CProvidersView::GetRowImage(HWND, int row, int col) const {
 
 CString const& CProvidersView::ProviderInfo::Name() const {
 	if (m_Name.IsEmpty())
-		m_Name = StringHelper::ParseMUIString(Data->displayData.name);
+		m_Name = StringHelper::DisplayName(Data->displayData);
 	return m_Name;
 }
 

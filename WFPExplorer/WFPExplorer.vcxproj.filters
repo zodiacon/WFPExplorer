@@ -99,6 +99,9 @@
     <ClCompile Include="NetEventsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="PropertiesListDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
     <ClCompile Include="ProviderDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="NetEventsView.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesListDlg.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ProviderDlg.h">
       <Filter>Dialogs</Filter>

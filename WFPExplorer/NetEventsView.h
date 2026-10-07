@@ -4,6 +4,7 @@
 #include <WFPEngine.h>
 #include "resource.h"
 #include <WFPEnumerator.h>
+#include "PropertiesListDlg.h"
 
 class WFPEngine;
 
@@ -19,7 +20,7 @@ public:
 	//int GetSaveColumnRange(HWND, int&) const;
 	int GetRowImage(HWND, int row, int col) const;
 	void OnStateChanged(HWND, int from, int to, UINT oldState, UINT newState);
-	//bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
+	bool OnDoubleClickList(HWND, int row, int col, POINT const& pt);
 	CString GetDefaultSaveFile() const;
 
 	BEGIN_MSG_MAP(CNetEventsView)
@@ -27,7 +28,8 @@ public:
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CGenericListViewBase<CNetEventsView>)
 	ALT_MSG_MAP(1)
-		//COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
+		COMMAND_ID_HANDLER(ID_EDIT_PROPERTIES, OnProperties)
+		COMMAND_ID_HANDLER(ID_EDIT_COPY, OnCopy)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		CHAIN_MSG_MAP_ALT(CGenericListViewBase<CNetEventsView>, 1)
 	END_MSG_MAP()
@@ -75,10 +77,13 @@ private:
 	};
 
 	CString GetText(NetEventInfo& info, ColumnType column);
+	// the columns' values and what the columns don't show, for the properties dialog
+	std::vector<std::pair<CString, CString>> GetProperties(NetEventInfo& info);
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnProperties(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnActivate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
 	WFPEngine& m_Engine;

@@ -136,8 +136,10 @@ void CLayerMapView::Refresh() {
 	// a provider keeps its color in every graph: the colors go by the providers' names
 	m_ProviderNames.clear();
 	m_ProviderColors.clear();
-	for (auto p : m_Providers)
-		m_ProviderNames[p->providerKey] = NameOrKey(p->displayData.name, p->providerKey);
+	for (auto p : m_Providers) {
+		auto name = StringHelper::DisplayName(p->displayData);
+		m_ProviderNames[p->providerKey] = name.IsEmpty() ? StringHelper::GuidToString(p->providerKey) : name;
+	}
 	std::vector<FWPM_PROVIDER*> providers(m_Providers.begin(), m_Providers.end());
 	std::ranges::sort(providers, [&](auto a, auto b) { return m_ProviderNames[a->providerKey].CompareNoCase(m_ProviderNames[b->providerKey]) < 0; });
 	for (int i = 0; i < (int)providers.size(); i++)
