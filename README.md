@@ -1,6 +1,6 @@
 # WFP Explorer
 
-GUI tool to view Windows Filtering Platform objects (WIP).
+GUI tool to view Windows Filtering Platform objects.
 
 ![](https://github.com/zodiacon/WFPExplorer/blob/master/wfpexp1.png)
 
